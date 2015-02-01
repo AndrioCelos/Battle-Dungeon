@@ -1,3 +1,2 @@
 The zapped folder is used when bot owners use the !zap command.  It will remove the character from play and move them into this zapped folder.
-
 Files in this folder are safe to delete. 

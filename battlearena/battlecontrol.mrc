@@ -116,6 +116,10 @@ on 50:TEXT:!new bat*:*:{
   if (%battleis = on) { $display.system.message($readini(translation.dat, errors, BattleAlreadyStarted), private) | halt }
   /.timerBattleStart off | $startnormal($3, $4) 
 }
+on 3:TEXT:!start bat*:#:{
+  if (%battleis = on) { $display.system.message($readini(translation.dat, errors, BattleAlreadyStarted), private) | halt }
+  /.timerBattleStart off | startnormal 
+}
 on 50:TEXT:!end bat*:*:{ $endbattle($3) } 
 on 50:TEXT:!endbat*:*:{  $endbattle($2) } 
 
@@ -220,6 +224,7 @@ alias clear_battle {
 
   ; Clear battle variables
   $clear_variables
+  unset %fled
 
   ; Remove the battle text files
   .remove $txtfile(battle.txt) | .remove $txtfile(battle2.txt) | .remove MonsterTable.file
@@ -307,7 +312,7 @@ alias startnormal {
   unset %previous.battle.type
 
   if ($1 = ai) {
-    var %time.to.enter 30
+    var %time.to.enter $calc($readini(system.dat, system, TimeToEnter) * 2)
     $display.system.message($readini(translation.dat, battle, BattleOpenAIBet), global)
     $ai.battle.generate($2)
   }
@@ -475,15 +480,64 @@ alias flee {
   if ($is_charmed($1) = true) { $set_chr_name($1) | $display.system.message($readini(translation.dat, status, CurrentlyCharmed), private) | halt }
   if ($is_confused($1) = true) { $set_chr_name($1) | $display.system.message($readini(translation.dat, status, CurrentlyConfused), private) | halt }
 
-  writeini $char($1) battle status runaway
-  $set_chr_name($1) | $display.system.message($readini(translation.dat, battle, FleeBattle), battle)
+  ;MOD: Better fleeing mechanics
+  var %successChance = 0, %failureChance = 0
 
-  var %number.of.flees $readini($char($1), stuff, TimesFled)
-  if (%number.of.flees = $null) { var %number.of.flees 0 }
-  inc %number.of.items.sold 1
-  writeini $char($1) stuff TimesFled %number.of.flees
+  var %lines = $lines($txtfile(battle.txt)), %i = 1
+  while (%i <= %lines) { 
+    var %influence = 2
+    set %who.battle $read($txtfile(battle.txt), %i)
+    inc %i
 
-  $achievement_check($1, ScardyCat)
+    if ($readini($char(%who.battle), info, AIType) == defender) continue
+
+    if ($readini($char(%who.battle), status, Staggered) == yes) dec %influence
+    if ($readini($char(%who.battle), status, Blind) == yes) dec %influence
+    if ($readini($char(%who.battle), status, Bored) == yes) dec %influence
+    if ($readini($char(%who.battle), status, Drunk) == yes) dec %influence
+    if ($readini($char(%who.battle), status, Intimidate) == yes) dec %influence
+    if ($readini($char(%who.battle), status, Slow) == yes) dec %influence
+
+    if ($readini($char(%who.battle), status, Petrified) == yes) continue
+    if ($readini($char(%who.battle), status, Cocoon) == yes) continue
+    if ($readini($char(%who.battle), status, Paralysis) == yes) continue
+    if ($readini($char(%who.battle), status, Sleep) == yes) continue
+    if ($readini($char(%who.battle), status, Stun) == yes) continue
+    if ($readini($char(%who.battle), status, Stop) == yes) continue
+
+    if (%influence <= 0) continue
+
+    if ($readini($char(%who.battle), info, flag) == monster) inc %failureChance %influence
+    else inc %successChance %influence
+  }
+
+  var %success = $false
+  if (%successChance > 0) {
+    if (%failureChance <= 0) %success = $true
+    else {
+      var %range = $calc(%successChance + %failureChance)
+      if ($rand(1, %range) <= %successChance) %success = $true
+    }
+  }
+  else {
+    $set_chr_name($1) | $display.system.message($readini(translation.dat, battle, CannotFleeBattle), battle)
+    halt    
+  }
+
+  if (%success) {
+    writeini $char($1) battle status runaway
+    $set_chr_name($1) | $display.system.message($readini(translation.dat, battle, FleeBattle), battle)
+
+    var %number.of.flees $readini($char($1), stuff, TimesFled)
+    if (%number.of.flees = $null) { var %number.of.flees 0 }
+    inc %number.of.items.sold 1
+    writeini $char($1) stuff TimesFled %number.of.flees
+    $achievement_check($1, ScardyCat)
+    set %fled $true
+  }
+  else {
+    $set_chr_name($1) | $display.system.message($readini(translation.dat, battle, FleeBattleFailed), battle)
+  }
 
   $next
 }
@@ -1184,6 +1238,12 @@ alias endbattle {
     $display.system.message($readini(translation.dat, battle, BattleIsOver), global)
 
     if ((%mode.pvp != on) && (%battle.type != ai)) {
+      if (%fled) {
+        $display.system.message($readini(translation.dat, battle, FledResult), global)
+        db.shenronwish.turncheck
+        set %battleis off | clear_battle | halt
+        halt
+      }
       if (%mode.gauntlet = $null) { var %defeats $readini(battlestats.dat, battle, totalLoss) | inc %defeats 1 | writeini battlestats.dat battle totalLoss %defeats }
       if (%mode.gauntlet != $null) {
         var %gauntlet.record $readini(battlestats.dat, battle, GauntletRecord) 
@@ -1427,6 +1487,7 @@ alias turn {
   $battle.check.for.end
 
   set %wait.your.turn on
+  set %fled $false
 
   if ($person_in_mech($1) = false) { $turn.statuscheck($1) }
 
@@ -1908,6 +1969,15 @@ alias battle.reward.redorbs {
         $achievement_check(%who.battle, StoneWall)
       }
 
+      if (($1 == victory) && ($readini($char(%who.battle), battle, Status) == alive) && (%battle.type == boss) && ($current.battlestreak == 11)) $achievement_check(%who.battle, JustGettingStarted)
+
+      if ($1 == victory) {
+        var %current.hp = $readini($char($1), Battle, HP), %max.hp = $readini($char($1), BaseStats, HP), %hp.percent = $calc((%current.hp / %max.hp)*100)
+        if ((%hp.percent <= 2) && (%hp.percent > 0)) achievement_check %who.battle OnTheEdge
+
+      }
+
+      if ($isfile($char(RareAkuma))) $achievement_check(%who.battle, TheLegendaryOverpoweredFighter)
 
       inc %battletxt.current.line 1 
     }

@@ -170,7 +170,7 @@ SaveBattleStreak=$chr(3) $+ 3 $+  $+ %real.name has saved winning streak # $b
 ClearedBattleSave=$chr(3) $+ 3 $+  $+ %real.name has cleared $gender($nick) battle streak save.
 ReloadBattleStreak=$chr(3) $+ 3 $+  $+ %real.name has reloaded winning streak # $bytes($readini($char($nick), Info, SavedStreak),b) from $gender($nick) file.
 ViewBattleStreak=$chr(3) $+ 3 $+  $+ %real.name currently has winning streak # $bytes(%saved.streak,b) saved in $gender($nick) file
-GiveItemToTarget=$chr(3) $+ 3 $+ %real.name gives $3 $4 $+ $iif($3 < 2, ,s) to $set_chr_name($2) %real.name $+ !
+GiveItemToTarget=$chr(3) $+ 3 $+ %real.name gives $3 $iif($3 < 2, $4, $iif($readini($dbfile(items.db), $4, Plural) == $null, $4 $+ s, $readini($dbfile(items.db), $4, Plural))) to $set_chr_name($2) %real.name $+ !
 FinalGetsugaWarning=$chr(3) $+ 4 $+ This technique is a Final Getsuga type, which means if you use it at the end of the battle you will be reduced back to basically a new character.
 ScoreBoardTitle=$chr(3) $+ 3The Top Players in %battlechan
 DeathBoardTitleMon=$chr(3) $+ 3The Top Monster Deaths in %battlechan
@@ -214,7 +214,7 @@ DoubleDollarWinners=$chr(3) $+ 3 $+ Gambling $iif($lines($txtfile(1vs1gamblers.t
 AuctionWinner=$chr(3) $+ 3 $+ Congratulations! You just won an auction! You just won 1 %auction.item for %auction.cost allied notes.
 AuctionInfo=$chr(3) $+ 1 $+ [4Auction Number:12 $readini(system.dat, auctionInfo, numberOfAuctions) $+ 1] [4Item Up For Bid:12 $readini(system.dat, auctionInfo, current.item) $+ 1] [4Minimum Bid:12 $readini(system.dat, auctionInfo, minimumBid) $+ 1] [4Time Remaining (approx):12 %auction.time.remain $+ 1]
 AuctionHouseBid=$chr(3) $+ 3 $+ You bid $bytes($2,b) allied notes for 1 $readini(system.dat, auctionInfo, current.item) 
-CountItem=$chr(3) $+ 3 $+ %real.name has %player.count.amount  $+ $2 $+ $iif(%player.count.amount  > 1, s) 
+CountItem=$chr(3) $+ 3 $+ %real.name has %player.count.amount  $+ $iif(%player.count.amount < 2, $2, $iif($readini($dbfile(items.db), $2, Plural) == $null, $2 $+ s, $readini($dbfile(items.db), $2, Plural)))
 TechIncrease=$chr(3) $+ 3 $+ Your proficiency with $2 has increased! You have gained +1 to your technique. It is now level $readini($char($1), techniques, $2)
 AccessCommandList=$chr(3) $+ 3 $+ Your character can be controlled by: %player.access.list
 AccessCommandRemove=$chr(3) $+ 3 $+ Your character can be no longer be controlled by $3
@@ -242,7 +242,7 @@ Hurt=$chr(3) $+ 7 $+ Hurt
 Injured=$chr(3) $+ 7 $+ Injured 
 InjuredBadly=$chr(3) $+ 7 $+ Injured Badly 
 Critical=$chr(3) $+ 4 $+ Critical 
-AliveHairBredth=$chr(3) $+ 4 $+ Alive by a hair's bredth 
+AliveHairBredth=$chr(3) $+ 4 $+ Alive by a hair's breadth 
 Dead=$chr(3) $+ 4 $+ Dead 
 Smoking=$chr(3) $+ 2 $+ Smoking 
 Sparking=$chr(3) $+ 7 $+ Sparking 
@@ -491,6 +491,7 @@ GoodHasWonPortal=$chr(3) $+ 12 $+ The forces of good have won this special battl
 GoodHasWonPresident=$chr(3) $+ 12 $+ The forces of good have saved the President of the Allied Forces after %current.turn $iif(%current.turn < 2, turn, turns) $+ !
 BattleIsDraw=$chr(3) $+ 12 $+ The battle has come to a draw after %current.turn $iif(%current.turn < 2, turn, turns) $+ ! 
 DrawPortal=$chr(3) $+ 12 $+ Neither heroes nor monsters have won this battle as it comes to a draw after %current.turn $iif(%current.turn < 2, turn, turns) $+ !
+FledResult=12The forces of good have successfully retreated (at level $bytes($calc($readini(battlestats.dat, Battle, WinningStreak)),b) $+ ) after %current.turn $iif(%current.turn < 2, turn, turns) $+ ! 
 RewardOrbsLoss=$chr(3) $+ 3 $+ For their efforts, these players have been rewarded with $readini(system.dat, system, currency) $+ : %red.orb.winners
 RewardOrbsDraw=$chr(3) $+ 3 $+ For their efforts, these players have been rewarded with $readini(system.dat, system, currency) $+ : %red.orb.winners
 RewardOrbsWin=$chr(3) $+ 3 $+ For their victory, these players have been rewarded with $readini(system.dat, system, currency) $+ : %red.orb.winners
@@ -512,7 +513,8 @@ TauntLaugh=$chr(3) $+ 4 $+  $+ %real.name laughs the taunt off!
 TauntSmile=$chr(3) $+ 4 $+  $+ %real.name gives a large grin! 
 FleeBattle=$chr(3) $+ 4 $+  $+ %real.name has run away from the battle! 
 DroppedOutofBattle=$chr(3) $+ 4 $+  $+ %real.name has been removed from battle due to too many skipped turns! 
-CannotFleeBattle=$chr(3) $+ 4 $+ %real.name attempts to flee the battle...but fails.
+FleeBattleFailed=$chr(3) $+ 4 $+ %real.name attempts to flee the battle...but fails.
+CannotFleeBattle=$chr(3) $+ 4 $+ %real.name is unable to flee!
 DarknessWarning=$chr(3) $+ 4 $+ Darkness will overcome the battlefield in 5 turns..
 DarknessCoversBattlefield=$chr(3) $+ 4 $+ Darkness covers the battlefield enhancing the strength of all remaining monsters!
 TurnMessage=$chr(3) $+ 3 $+ It is %real.name $+ 's turn [Health Status: %hstats $+ 3] [Status Effects:4 %all_status $+ 3] [Active Skills:4 %all_skills $+ 3]
@@ -529,7 +531,7 @@ PerformsA6HitAttack=$chr(3) $+ 4 $+ %real.name performs a six hit $iif($4 = te
 PerformsA7HitAttack=$chr(3) $+ 4 $+ %real.name performs a seven hit $iif($4 = tech, attack!, $iif($readini($char($1), weapons, equippedLeft) != $null, attack against %enemy using two weapons!, attack against %enemy $+ !))
 PerformsA8HitAttack=$chr(3) $+ 4 $+ %real.name performs an eight hit $iif($4 = tech, attack!, $iif($readini($char($1), weapons, equippedLeft) != $null, attack against %enemy using two weapons!, attack against %enemy $+ !))
 EnemyDefeated=$chr(3) $+ 4 $+ %enemy $+  $iif($readini($char(%target), descriptions, DeathMessage) = $null, has been defeated by %user $+ !, $readini($char(%target), p, descriptions, DeathMessage))  %overkill
-AttackDidDamage=The attack did4 $bytes(%attack.damage,b) damage %style.rating
+AttackDidDamage=The attack did $+ %damage_colour $bytes(%attack.damage,b) damage %style.rating
 TargetCovered=$chr(3) $+ 7 $+ $set_chr_name(%cover.target) $+ %real.name jumps in front of the attack to shield $set_chr_name($1) %real.name $+ !
 InactiveAlive=$chr(3) $+ 4 $+ %enemy comes to life after the attack and readies for battle.
 NotAllowedBattleCondition=$chr(3) $+ 4 $+ $+ %real.name is not allowed to do that action due to the current battle conditions!
@@ -624,7 +626,7 @@ DefenseDownWornOff=$chr(3) $+ 3 $+  $+ %real.name $+ 's defense down status ha
 CurrentlyDefenseUp=$chr(3) $+ 4 $+ %real.name $+ 's body feels more defensive. 
 DefenseUpWornOff=$chr(3) $+ 3 $+  $+ %real.name $+ 's defense up status has worn off. 
 CurrentlyStrengthDown=$chr(3) $+ 4 $+ %real.name $+ 's body strength feels weaker. 
-CurrentlyIntDown=$chr(3) $+ 4 $+ %real.name $+ 's IQ feels lower. 
+CurrentlyIntDown=$chr(3) $+ 4 $+ %real.name $+ 's magical power feels weaker. 
 CurrentlyWeaponLocked=$chr(3) $+ 4 $+ %real.name $+ 's weapon is locked and $gender3($1) is unable to change it. 
 StrengthDownWornOff=$chr(3) $+ 3 $+  $+ %real.name $+ 's strength down status has worn off. 
 IntDownWornOff=$chr(3) $+ 3 $+  $+ %real.name $+ 's int down status has worn off. 
@@ -696,7 +698,7 @@ Tech Related Messages
 StolenPower=$chr(3) $+ 3 $+ %real.name has stolen and absorbs %amount.of.str strength, %amount.of.def defense, %amount.of.int intelligence and %amount.of.spd speed from $set_chr_name($3) %real.name $+ !
 StolenStatus=$chr(3) $+ 3 $+ %real.name has also stolen and absorbed %stolen.status.effects from $set_chr_name($3) %real.name $+ !
 SuicideUseAllHP=$chr(3) $+ 4 $+ %real.name uses all of $gender($1) health to perform this technique!
-DisplayAOEDamage=The attack did4 $bytes(%attack.damage,b) damage to %enemy $+ ! %element.desc  $+ %style.rating %statusmessage.display
+DisplayAOEDamage=The attack did $+ %damage_colour $bytes(%attack.damage,b) damage to %enemy $+ ! %element.desc  $+ %style.rating %statusmessage.display
 AbsorbHPBack=$chr(3) $+ 3 $+ %user absorbs $bytes(%absorb.amount,b) HP back from the damage.
 
 
@@ -762,6 +764,10 @@ ICanQuitBettingAnyTimeIWant=$chr(3) $+ 10 $+ %real.name has unlocked the achie
 DoIHear500=$chr(3) $+ 10 $+ %real.name has unlocked the achievement: Do I Hear 500? and receives $bytes($3,b) $readini(system.dat, system, currency) as a reward!
 SoldToTheOneInFront=$chr(3) $+ 10 $+ %real.name has unlocked the achievement: Sold! To the One in Front and receives $bytes($3,b) $readini(system.dat, system, currency) as a reward!
 MasteredTechnique=$chr(3) $+ 10 $+ %real.name has unlocked the achievement: Mastered a Technique! and receives $bytes($3,b) $readini(system.dat, system, currency) as a reward!
+JustGettingStarted=$chr(3) $+ 10 $+ %real.name has unlocked the achievement: Just Getting Started and receives $bytes($3,b) black orb as a reward!
+ALightInTheDark=$chr(3) $+ 10 $+ %real.name has unlocked the achievement: A Light in the Dark and receives $bytes($3,b) red orbs as a reward!
+TheLegendaryOverpoweredFighter=$chr(3) $+ 10 $+ %real.name has unlocked the achievement: The Legendary Overpowered Fighter and receives $bytes($3,b) red orbs as a reward!
+OnTheEdge=$chr(3) $+ 10 $+ %real.name has unlocked the achievement: On the Edge and receives $bytes($3,b) SuperPotion as a reward!
 
 =======================
 Style Levels

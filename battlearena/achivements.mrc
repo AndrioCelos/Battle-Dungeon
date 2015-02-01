@@ -459,6 +459,33 @@ alias achievement_check {
     var %current.redorbs $readini($char($1), stuff, redorbs) | inc %current.redorbs 10000 | writeini $char($1) stuff redorbs %current.redorbs
   }
 
+  if ($2 == JustGettingStarted) {
+    writeini $char($1) achievements $2 true 
+    $announce_achievement($1, $2, 1)
+    var %current.blackorbs $readini($char($1), stuff, BlackOrbs) | inc %current.blackorbs 1 | writeini $char($1) stuff BlackOrbs %current.blackorbs
+  }
+
+  if ($2 = ALightInTheDark) {
+    var %total.souls $readini($char($1), stuff, LostSoulsKilled)
+    if (%total.souls >= 1) {
+      writeini $char($1) achievements $2 true 
+      $announce_achievement($1, $2, 1000)
+      var %current.redorbs $readini($char($1), stuff, redorbs) | inc %current.redorbs 1000 | writeini $char($1) stuff redorbs %current.redorbs
+    }
+  }
+
+  if ($2 = TheLegendaryOverpoweredFighter) {
+    writeini $char($1) achievements $2 true 
+    $announce_achievement($1, $2, 1000)
+    var %current.redorbs $readini($char($1), stuff, redorbs) | inc %current.redorbs 1000 | writeini $char($1) stuff redorbs %current.redorbs
+  }
+
+  if ($2 == OnTheEdge) {
+    writeini $char($1) achievements $2 true 
+    $announce_achievement($1, $2, 1)
+    var %current.potions $readini($char($1), stuff, SuperPotion) | inc %current.potions | writeini $char($1) Items SuperPotion %current.potions
+  }
+
 }
 
 alias achievement_already_unlocked {

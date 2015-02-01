@@ -363,7 +363,7 @@ alias ai.flee {
   if (%flee.chance > 60) {  
     $set_chr_name($1)
 
-    $display.system.message($readini(translation.dat, battle, CannotFleeBattle), battle)
+    $display.system.message($readini(translation.dat, battle, FleeBattleFailed), battle)
 
     /.timerCheckForDoubleTurnWait 1 1 /check_for_double_turn $1 | halt 
   }

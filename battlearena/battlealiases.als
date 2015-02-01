@@ -519,38 +519,14 @@ monster_spend_points {
 
   if ($readini(system.dat, system, PlayersMustDieMode) = true) { inc %unspent.monster.points $rand(200,400) }
 
-  if (%unspent.monster.points <= 0) { return }
+  if (%unspent.monster.points <= 1) { return }
+  var %total.points = $calc(%str + %def + %int + %spd / 2 + %unspent.monster.points)
+  var %boost_ratio = $calc(%total.points / (%str + %def + %int + %spd / 2))
 
-  var %total.percent 100
-
-  var %str.percent $rand(40,45)
-  dec %total.percent %str.percent
-
-  var %def.percent $rand(30,35)
-  dec %total.percent %def.percent
-
-  var %int.percent $rand(25,35)
-  dec %total.percent %int.percent
-
-  var %spd.percent %total.percent
-  if (%spd.percent <= 0) { var %spd.percent 1 }
-
-  var %str.points $round($calc((%str.percent * .01) * %unspent.monster.points),0)
-  dec %unspent.monster.points %str.points
-
-  var %def.points $round($calc((%def.percent * .01) * %unspent.monster.points),0)
-  dec %unspent.monster.points %def.points
-
-  var %int.points $round($calc((%int.percent * .01) * %unspent.monster.points),0)
-  dec %unspent.monster.points %int.points
-
-  var %spd.points %unspent.monster.points
-  dec %unspent.monster.points %spd.points
-
-  %str = $round($calc(%str + %str.points),0) 
-  %def = $round($calc(%def + %def.points),0) 
-  %int = $round($calc(%int + %int.points),0) 
-  %spd = $round($calc(%spd + %spd.points),0) 
+  %str = $round($calc(%str * %boost_ratio * ($rand(95, 105) / 100)),0)
+  %def = $round($calc(%def * %boost_ratio * ($rand(95, 105) / 100)),0)
+  %int = $round($calc(%int * %boost_ratio * ($rand(95, 105) / 100)),0)
+  %spd = $round($calc(%spd * %boost_ratio * ($rand(95, 105) / 100)),0)
 
   writeini $char($1) BaseStats Str %str
   writeini $char($1) BaseStats Def %def
@@ -919,7 +895,7 @@ display_damage {
   if (((((((%double.attack = $null) && (%triple.attack = $null) && (%fourhit.attack = $null) && (%fivehit.attack = $null) && (%sixhit.attack = $null) && (%sevenhit.attack = $null) && (%eighthit.attack = $null))))))) { 
 
     if ($3 != aoeheal) {
-      if (%guard.message = $null) {  $display.system.message(The attack did4 $bytes(%attack.damage,b) damage to %enemy %style.rating, battle) 
+      if (%guard.message = $null) {  $display.system.message(The attack did $+ %damage_colour $bytes(%attack.damage,b) damage to %enemy %style.rating, battle) 
       }
       if (%guard.message != $null) { $display.system.message(%guard.message,battle) 
       }
@@ -928,7 +904,7 @@ display_damage {
       }
     }
     if ($3 = aoeheal) { 
-      if (%guard.message = $null) {  $display.system.message(The attack did4 $bytes(%attack.damage,b) damage to %enemy %style.rating, battle)    }
+      if (%guard.message = $null) {  $display.system.message(The attack did $+ %damage_colour $bytes(%attack.damage,b) damage to %enemy %style.rating, battle)    }
       if (%guard.message != $null) { $display.system.message(%guard.message,battle)  }
       if (%element.desc != $null) {  $display.system.message(%element.desc,battle) 
         unset %element.desc 
@@ -937,14 +913,14 @@ display_damage {
   }
 
   if (%double.attack = true) { 
-    if (%guard.message = $null) {  var %damage.message 1The first attack did4 $bytes(%attack.damage1,b) damage.  The second attack did4 $bytes(%attack.damage2,b) damage.  Total physical damage:4 $bytes(%attack.damage,b)  $+ %style.rating 
+    if (%guard.message = $null) {  var %damage.message The first attack did $+ %damage_colour $bytes(%attack.damage1,b) damage.  The second attack did $+ %damage_colour $bytes(%attack.damage2,b) damage.  Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating 
       $display.system.message(%damage.message,battle)
     }
     if (%guard.message != $null) { $display.system.message(%guard.message,battle)  }
     unset %attack.damage1 | unset %attack.damage2 | unset %attack.damage3 | unset %attack.damage5 | unset %attack.damage6 | unset %attack.damage7 | unset %attack.damage8 | unset %double.attack | unset %triple.attack | unset %fourhit.attack | unset %fivehit.attack | unset %sixhit.attack | unset %sevenhit.attack | unset %eighthit.attack 
   }
   if (%triple.attack = true) {  
-    if (%guard.message = $null) { var %damage.message 1The first attack did4 $bytes(%attack.damage1,b) damage.  The second attack did4 $bytes(%attack.damage2,b) damage.  The third attack did4 $bytes(%attack.damage3,b) damage.  Total physical damage:4 $bytes(%attack.damage,b)  $+ %style.rating
+    if (%guard.message = $null) { var %damage.message The first attack did $+ %damage_colour $bytes(%attack.damage1,b) damage.  The second attack did $+ %damage_colour $bytes(%attack.damage2,b) damage.  The third attack did $+ %damage_colour $bytes(%attack.damage3,b) damage.  Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating
       $display.system.message(%damage.message,battle) 
     }
     if (%guard.message != $null) { $display.system.message(%guard.message,battle)  }
@@ -952,7 +928,7 @@ display_damage {
   }
 
   if (%fourhit.attack = true) { 
-    if (%guard.message = $null) { var %damage.message 1The first attack did4 $bytes(%attack.damage1,b) damage.  The second attack did4 $bytes(%attack.damage2,b) damage.  The third attack did4 $bytes(%attack.damage3,b) damage. The fourth attack did4 $bytes(%attack.damage4,b) damage. Total physical damage:4 $bytes(%attack.damage,b)  $+ %style.rating
+    if (%guard.message = $null) { var %damage.message The first attack did $+ %damage_colour $bytes(%attack.damage1,b) damage.  The second attack did $+ %damage_colour $bytes(%attack.damage2,b) damage.  The third attack did $+ %damage_colour $bytes(%attack.damage3,b) damage. The fourth attack did $+ %damage_colour $bytes(%attack.damage4,b) damage. Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating
       $display.system.message(%damage.message,battle) 
     }
     if (%guard.message != $null) {  $display.system.message(%guard.message,battle)   }
@@ -960,7 +936,7 @@ display_damage {
   }
 
   if (%fivehit.attack = true) { 
-    if (%guard.message = $null) { var %damage.message 1The first attack did4 $bytes(%attack.damage1,b) damage.  The second attack did4 $bytes(%attack.damage2,b) damage.  The third attack did4 $bytes(%attack.damage3,b) damage. The fourth attack did4 $bytes(%attack.damage4,b) damage. The fifth attack did4 $bytes(%attack.damage5,b) damage. Total physical damage:4 $bytes(%attack.damage,b)  $+ %style.rating 
+    if (%guard.message = $null) { var %damage.message The first attack did $+ %damage_colour $bytes(%attack.damage1,b) damage.  The second attack did $+ %damage_colour $bytes(%attack.damage2,b) damage.  The third attack did $+ %damage_colour $bytes(%attack.damage3,b) damage. The fourth attack did $+ %damage_colour $bytes(%attack.damage4,b) damage. The fifth attack did $+ %damage_colour $bytes(%attack.damage5,b) damage. Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating 
       $display.system.message(%damage.message,battle) 
     }
     if (%guard.message != $null) { $display.system.message(%guard.message,battle)  }
@@ -968,7 +944,7 @@ display_damage {
   }
 
   if (%sixhit.attack = true) { 
-    if (%guard.message = $null) { var %damage.message 1The first attack did4 $bytes(%attack.damage1,b) damage.  The second attack did4 $bytes(%attack.damage2,b) damage.  The third attack did4 $bytes(%attack.damage3,b) damage. The fourth attack did4 $bytes(%attack.damage4,b) damage. The fifth attack did4 $bytes(%attack.damage5,b) damage. The sixth attack did4 $bytes(%attack.damage6,b) damage.  Total physical damage:4 $bytes(%attack.damage,b)  $+ %style.rating
+    if (%guard.message = $null) { var %damage.message The first attack did $+ %damage_colour $bytes(%attack.damage1,b) damage.  The second attack did $+ %damage_colour $bytes(%attack.damage2,b) damage.  The third attack did $+ %damage_colour $bytes(%attack.damage3,b) damage. The fourth attack did $+ %damage_colour $bytes(%attack.damage4,b) damage. The fifth attack did $+ %damage_colour $bytes(%attack.damage5,b) damage. The sixth attack did $+ %damage_colour $bytes(%attack.damage6,b) damage.  Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating
       $display.system.message(%damage.message,battle) 
     }
     if (%guard.message != $null) { $display.system.message(%guard.message,battle)   }
@@ -976,7 +952,7 @@ display_damage {
   }
 
   if (%sevenhit.attack = true) { 
-    if (%guard.message = $null) { var %damage.message 1The first attack did4 $bytes(%attack.damage1,b) damage.  The second attack did4 $bytes(%attack.damage2,b) damage.  The third attack did4 $bytes(%attack.damage3,b) damage. The fourth attack did4 $bytes(%attack.damage4,b) damage. The fifth attack did4 $bytes(%attack.damage5,b) damage. The sixth attack did4 $bytes(%attack.damage6,b) damage. The seventh attack did4 $bytes(%attack.damage7,b) damage.  Total physical damage:4 $bytes(%attack.damage,b)  $+ %style.rating 
+    if (%guard.message = $null) { var %damage.message The first attack did $+ %damage_colour $bytes(%attack.damage1,b) damage.  The second attack did $+ %damage_colour $bytes(%attack.damage2,b) damage.  The third attack did $+ %damage_colour $bytes(%attack.damage3,b) damage. The fourth attack did $+ %damage_colour $bytes(%attack.damage4,b) damage. The fifth attack did $+ %damage_colour $bytes(%attack.damage5,b) damage. The sixth attack did $+ %damage_colour $bytes(%attack.damage6,b) damage. The seventh attack did $+ %damage_colour $bytes(%attack.damage7,b) damage.  Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating 
       $display.system.message(%damage.message,battle) 
     }
     if (%guard.message != $null) { $display.system.message(%guard.message,battle) 
@@ -985,7 +961,7 @@ display_damage {
   }
 
   if (%eighthit.attack = true) { 
-    if (%guard.message = $null) { var %damage.message 1The first attack did4 $bytes(%attack.damage1,b) damage.  The second attack did4 $bytes(%attack.damage2,b) damage.  The third attack did4 $bytes(%attack.damage3,b) damage. The fourth attack did4 $bytes(%attack.damage4,b) damage. The fifth attack did4 $bytes(%attack.damage5,b) damage. The sixth attack did4 $bytes(%attack.damage6,b) damage. The seventh attack did4 $bytes(%attack.damage7,b) damage.  The eight attack did4 $bytes(%attack.damage8,b) damage. Total physical damage:4 $bytes(%attack.damage,b)  $+ %style.rating
+    if (%guard.message = $null) { var %damage.message The first attack did $+ %damage_colour $bytes(%attack.damage1,b) damage.  The second attack did $+ %damage_colour $bytes(%attack.damage2,b) damage.  The third attack did $+ %damage_colour $bytes(%attack.damage3,b) damage. The fourth attack did $+ %damage_colour $bytes(%attack.damage4,b) damage. The fifth attack did $+ %damage_colour $bytes(%attack.damage5,b) damage. The sixth attack did $+ %damage_colour $bytes(%attack.damage6,b) damage. The seventh attack did $+ %damage_colour $bytes(%attack.damage7,b) damage.  The eighth attack did $+ %damage_colour $bytes(%attack.damage8,b) damage. Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating
       $display.system.message(%damage.message,battle) 
     }
     if (%guard.message != $null) { $display.system.message(%guard.message,battle)  }
@@ -1032,6 +1008,7 @@ display_damage {
   }
 
   unset %guard.message
+  set %damage_colour 4
 
 
   ; Check for inactive..
@@ -1069,6 +1046,7 @@ display_damage {
 
     $spawn_after_death(%target)
     remini $char(%target) Renkei
+    $achievement_check($1, ALightInTheDark)
     $achievement_check($1, FillYourDarkSoulWithLight)
   }
 
@@ -1205,6 +1183,7 @@ display_aoedamage {
     }
 
     $spawn_after_death(%target)
+    $achievement_check($1, ALightInTheDark)
     $achievement_check($1, FillYourDarkSoulWithLight)
   }
 
@@ -1269,6 +1248,7 @@ display_heal {
   if ($readini($char($2), battle, HP) <= 0) { 
     $set_chr_name($2) 
     $display.system.message(4 $+ %enemy has been defeated by %user $+ !  %overkill,battle) 
+    $achievement_check($1, ALightInTheDark)
     $achievement_check($1, FillYourDarkSoulWithLight)
   }
 
@@ -1886,7 +1866,7 @@ inflict_status {
   if ($3 = bored) { set %status.type bored | var %status.grammar bored of the battle  }
   if ($3 = confuse) { set %status.type confuse  | var %status.grammar confused }
   if ($3 = removeboost) { set %status.type removeboost | var %status.grammar no longer boosted }
-  if ($3 = defenseup) { set %status.type defenseup | var %status.grammar gains defense up }
+  if ($3 = defenseup) { set %status.type defenseup | var %status.grammar under defense up }
 
   if (%status.grammar = $null) { echo -a 4Invalid status type: $3 | return }
 
@@ -2565,8 +2545,8 @@ counter_melee_action {
   unset %weapon.type
 
   if ($readini($char($2), info, flag) = $null) { 
-    if (($readini($char($1), info, flag) = npc) || ($readini($char($1), info, flag) = monster)) {
-    %attack.damage = $round($calc(%attack.damage * 100),0) }
+    ;if (($readini($char($1), info, flag) = npc) || ($readini($char($1), info, flag) = monster)) {
+    ;%attack.damage = $round($calc(%attack.damage * 100),0) }
     inc %attack.damage $rand(1,25)
     if (%attack.damage >= 999) { set %attack.damage $rand(900,1500) }
   }
@@ -2802,6 +2782,11 @@ renkei.calculate {
 ; BATTLEFIELD stuff
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 random.battlefield.pick {
+  ; MOD: Warp skill
+  if (%warp.battlefield != $null) {
+    %current.battlefield = %warp.battlefield
+    return
+  }
   if (%current.battlefield != $null) { return }
 
   set %battlefields.total $lines($lstfile(battlefields.lst))
@@ -3717,6 +3702,7 @@ modifer_adjust {
 
   ; If it's over 1, then it means the target is weak to the element/weapon so we can adjust the target's def a little as an extra bonus.
   if (%modifier.adjust.value > 1) {
+    if ($2 isin fire.ice.water.lightning.wind.earth.light.dark) set %damage_colour 7
     var %mon.temp.def $readini($char($1), battle, def)
     var %mon.temp.def = $round($calc(%mon.temp.def - (%mon.temp.def * .10)),0)
     if (%mon.temp.def < 0) { var %mon.temp.def 0 }
@@ -3726,6 +3712,7 @@ modifer_adjust {
   ; If it's under 1, it means the target is resistant to the element/weapon.  Let's make the monster stronger for using something it's resistant to.
 
   if (%modifier.adjust.value < 1) {
+    if ($2 isin fire.ice.water.lightning.wind.earth.light.dark) if (%damage_colour != 7) set %damage_colour 6
     var %mon.temp.str $readini($char($1), battle, str)
     var %mon.temp.str = $round($calc(%mon.temp.str + (%mon.temp.str * .10)),0)
     if (%mon.temp.str < 0) { var %mon.temp.str 0 }

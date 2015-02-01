@@ -104,6 +104,7 @@ Fullbringdesc=draws out the soul from the potion.  The potion's soul is drawn to
 Currency=none
 
 [Bruce'sJuice]
+Plural=bottles of Bruce's juice
 Type=heal
 Target=Single
 Amount=15000
@@ -164,6 +165,7 @@ SellPrice=320
 Desc=pulls out a small bottle of bubbling tonic and hands it to %enemy who drinks it.  After a few seconds, %enemy feels $gender($4) body being restored from most status effects.
 
 [BoxOfTissues]
+Plural=boxes of tissues
 Type=CureStatus
 Cost=0
 SellPrice=100
@@ -201,6 +203,7 @@ BATTLE ITEMS
 =========================
 
 [Holy_Water]
+Plural=vials of holy water
 Type=Damage
 Target=Single
 Amount=80
@@ -296,6 +299,7 @@ FullbringAmount=100
 Fullbringdesc=draws out the soul from the angon.  The soul splits into large javalins that slam into all of the enemies on the battlefield.
 
 [SauceAmpulla]
+Plural=flasks of sauce ampulla
 Type=Status
 ShopNPC=TravelMerchant
 Target=Single
@@ -366,6 +370,7 @@ Fullbringdesc=draws out the soul from the wind vane.  The soul glows a bright gr
 ShopNPC=BattleMerchant
 
 [Love_Potion]
+Plural=vials of love potion
 Type=Status
 Target=Single
 StatusType=charm
@@ -375,6 +380,7 @@ SellPrice=5000
 Desc=takes out a pink glowing potion and tosses it to %enemy who decides to drink it. Hey, why not?  When life gives you a glowing pink potion, you drink it! %enemy begins to feel a bit enamored with %user $+ !
 
 [Eggnog]
+Plural=bottles of eggnog
 Type=Status
 Target=Single
 StatusType=drunk
@@ -401,6 +407,7 @@ ConquestItem=false
 IgnoreMetalDefense=true
 
 [Dynamite]
+Plural=sticks of dynamite
 Type=Damage
 Target=Single
 Amount=310
@@ -472,6 +479,7 @@ Cost=5000000
 SellPrice=1000
 
 [Ramen]
+Plural=bowls of ramen
 Type=food
 Target=def
 Amount=10
@@ -504,6 +512,7 @@ Cost=5000000
 SellPrice=1000
 
 [DragonMeat]
+Plural=pieces of dragon meat
 Type=food
 Target=str
 Amount=10
@@ -512,6 +521,7 @@ Cost=5000000
 SellPrice=1000
 
 [CerberusMeat]
+Plural=pieces of Cerberus meat
 Type=food
 Target=str
 Amount=10
@@ -520,6 +530,7 @@ Cost=5000000
 SellPrice=1000
 
 [WereMeat]
+Plural=pieces of werewolf meat
 Type=food
 Target=str
 Amount=15
@@ -528,6 +539,7 @@ Cost=5000000
 SellPrice=2000
 
 [AlphaWereMeat]
+Plural=pieces of alpha werewolf meat
 Type=food
 Target=str
 Amount=25
@@ -552,6 +564,7 @@ Cost=5000000
 SellPrice=1000
 
 [FireDragonWine]
+Plural=bottles of Fire Dragon Wine
 Type=food
 Target=def
 Amount=10
@@ -560,6 +573,7 @@ Cost=5000000
 SellPrice=1000
 
 [Ambrosia]
+Plural=bottles of ambrosia
 Type=food
 Target=style
 Amount=30
@@ -568,6 +582,7 @@ Cost=10000000
 SellPrice=5000
 
 [FoieGras]
+Plural=plates of foie gras
 Type=Food
 Target=spd
 Amount=10
@@ -592,6 +607,7 @@ Cost=5000000
 SellPrice=1000
 
 [FishAndChips]
+Plural=baskets of fish and chips
 Type=food
 Target=int
 Amount=10
@@ -608,6 +624,7 @@ SellPrice=5000
 
 
 [RottingMeat]
+Plural=slabs of rotting meat
 type=food
 Target=str
 Amount=-10
@@ -615,6 +632,7 @@ Desc=pulls out a slab of brown, smelly, rotting meat. Ugh, who would ever eat th
 SellPrice=2000
 
 [Slurm]
+Plural=cans of Slurm
 Type=food
 Target=style
 Amount=15
@@ -631,6 +649,7 @@ Cost=10000000
 SellPrice=2000
 
 [Rum]
+Plural=bottles of rum
 Type=food
 Target=style
 Amount=10
@@ -713,6 +732,7 @@ Cost=10000000
 SellPrice=2000
 
 [BookOfSkulls]
+Plural=books of skulls
 Type=Food
 Target=int
 Amount=10
@@ -919,6 +939,7 @@ SummonName=Titan
 ShopNPC=BattleMerchant
 
 [Pokeball]
+Plural=Poké Balls
 Type=summon
 Cost=10000
 SellPrice=400
@@ -937,6 +958,7 @@ Desc=A small zircon. It is often mistaken for a diamond at first glance but isn'
 Currency=AlliedNotes
 
 [Topaz]
+Plural=topazes
 Type=gem
 Cost=50
 SellPrice=70
@@ -951,6 +973,7 @@ Desc=A small sapphire
 Currency=AlliedNotes
 
 [Onyx]
+Plural=onyxes
 Type=gem
 Cost=90
 SellPrice=100
@@ -972,6 +995,7 @@ Desc=A small green emerald
 Currency=AlliedNotes
 
 [Ruby]
+Plural=rubies
 Type=gem
 Cost=205
 SellPrice=150
@@ -1152,6 +1176,7 @@ Desc=A necklace with the power to ignore Quicksilver.
 SellPrice=2000
 
 [Roshi's-Glasses]
+Plural=Roshi's glasses
 Type=accessory
 AccessoryType=Stylish
 Cost=80000
@@ -1329,6 +1354,7 @@ IncreaseCriticalHits.Amount=5
 BlockAllStatus.Amount=10
 
 [Lucky-Rabbit'sFoot]
+Plural=lucky rabbit's feet
 Type=accessory
 Cost=9999999999
 AccessoryType=IncreaseCriticalHits
@@ -1355,13 +1381,14 @@ SellPrice=5000
 [Spear-Pin]
 Type=accessory
 Cost=$iif($left($adate,2) = 06, 30000, 0)
-AccessoryType=IncreasePolearmDamage
+AccessoryType=IncreaseSpearDamage
 Desc=A small pin that is shaped like a spear. This accessory will increase melee damage done with a spear weapon.
-IncreasePolearmDamage.Amount=.30
+IncreaseSpearDamage.Amount=.30
 SellPrice=3000
 ShopNPC=TravelMerchant
 
 [Prism-Specs]
+Plural=pairs of prism specs
 Type=accessory
 Cost=9999999999
 AccessoryType=ElementalDefense
@@ -1422,6 +1449,7 @@ SellPrice=3000
 ShopNPC=TravelMerchant
 
 [PendantOfPower]
+Plural=pendants of power
 Type=accessory
 Cost=9999999
 AccessoryType=IncreaseSwordDamage
@@ -1430,15 +1458,16 @@ IncreaseSwordDamage.Amount=.45
 SellPrice=3000
 
 [PendantOfWisdom]
+Plural=pendants of wisdom
 Type=accessory
 Cost=9999999
 AccessoryType=IncreaseMagic
-Desc=A bright blue pendant tha
-t is said to enhance a wearer's spell power. This accessory will increase damage done with magic.
+Desc=A bright blue pendant that is said to enhance a wearer's spell power. This accessory will increase damage done with magic.
 IncreaseMagic.Amount=.45
 SellPrice=3000
 
 [PendantOfCourage]
+Plural=pendants of courage
 Type=accessory
 Cost=9999999
 AccessoryType=EnhanceBlocking
@@ -1534,6 +1563,7 @@ Exclusive=yes
 Currency=AlliedNotes
 
 [AtlantianThreadSpool]
+Plural=spools of Atlantian thread
 Type=misc
 Desc=A spool of thread from Atlantis. It glows with an ancient power.
 Cost=0
@@ -1659,6 +1689,7 @@ GardenType=Plant
 
 
 [Ink]
+Plural=tubes of ink
 Type=misc
 Cost=50
 SellPrice=20
@@ -1666,6 +1697,7 @@ Desc=A small tube of black ink.
 Currency=AlliedNotes
 
 [Paper]
+Plural=pieces of paper
 Type=misc
 Cost=50
 SellPrice=20
@@ -1687,6 +1719,7 @@ Desc=A rusted hatchet.
 Currency=AlliedNotes
 
 [IronOre]
+Plural=chunks of iron ore
 Type=misc
 Cost=50
 SellPrice=20
@@ -1701,6 +1734,7 @@ Desc=A splintered lance that is no use as a weapon in its current state.
 Currency=AlliedNotes
 
 [Ectoplasm]
+Plural=ectoplasm
 Type=misc
 Cost=200
 SellPrice=80
@@ -1757,6 +1791,7 @@ Desc=A perfectly round brown sphere that's pulsing with energy.
 Currency=AlliedNotes
 
 [Sand]
+Plural=sand
 Type=misc
 Cost=20
 SellPrice=5
@@ -1764,6 +1799,7 @@ Desc=Some sand. Watch out, it gets everywhere.
 Currency=none
 
 [Glass]
+Plural=pieces of glass
 Type=misc
 Cost=20
 SellPrice=5
@@ -1771,6 +1807,7 @@ Desc=A piece of glass.
 Currency=AlliedNotes
 
 [Cloth]
+Plural=pieces of cloth
 type=misc
 Cost=20
 SellPrice=10
@@ -1785,6 +1822,7 @@ Desc=a hammer used to repair armor
 Currency=AlliedNotes
 
 [GoldOre]
+Plural=chunks of gold ore
 type=misc
 Cost=100
 SellPrice=50
@@ -1792,6 +1830,7 @@ Desc=a chunk of gold ore
 Currency=AlliedNotes
 
 [SilverOre]
+Plural=chunks of silver ore
 type=misc
 Cost=100
 SellPrice=50
@@ -1799,6 +1838,7 @@ Desc=a chunk of silver ore
 Currency=AlliedNotes
 
 [DarksteelOre]
+Plural=chunks of darksteel ore
 type=misc
 Cost=150
 SellPrice=80
@@ -1891,6 +1931,7 @@ Desc=A sheet of darksteel forged in the Far East.
 Currency=AlliedNotes
 
 [DiabolicSilk]
+Plural=pieces of diabolic silk
 type=misc
 cost=200
 SellPrice=80
@@ -1906,6 +1947,7 @@ Currency=AlliedNotes
 ConquestItem=true
 
 [JewelOfArdor]
+Plural=jewels of Ardor
 type=misc
 cost=1500
 SellPrice=500
@@ -1914,6 +1956,7 @@ Currency=AlliedNotes
 ConquestItem=true
 
 [JewelOfWieldance]
+Plural=jewels of wieldance
 type=misc
 cost=1500
 SellPrice=500
@@ -1922,6 +1965,7 @@ Currency=AlliedNotes
 ConquestItem=true
 
 [StoneOfWieldance]
+Plural=stones of wieldace
 type=misc
 cost=0
 SellPrice=500
@@ -1931,6 +1975,7 @@ ConquestItem=true
 
 
 [UtopianGoldThread]
+Plural=spools of Utopian gold thread
 type=misc
 cost=200
 SellPrice=80
@@ -1947,6 +1992,7 @@ Currency=AlliedNotes
 ConquestItem=true
 
 [ChameleonYarn]
+Plural=spools of chameleon yarn
 type=misc
 cost=200
 SellPrice=80
@@ -1954,6 +2000,7 @@ Desc=This peculiar spool of yarn changes color to match the surrounding envirome
 Currency=AlliedNotes
 
 [GlitteringYarn]
+Plural=spools of glittering yarn
 type=misc
 cost=200
 SellPrice=80
@@ -1961,6 +2008,7 @@ Desc=This thread glitters when touched by light.
 Currency=AlliedNotes
 
 [BenedictSilk]
+Plural=pieces of benedict silk
 type=misc
 cost=200
 SellPrice=80
@@ -1968,6 +2016,7 @@ Desc=Blesses by a saint in ancient times, this silk cloth gleams with an awe-ins
 Currency=AlliedNotes
 
 [CoinOfBalance]
+Plural=coins of balance
 type=misc
 cost=300
 SellPrice=90
@@ -1976,6 +2025,7 @@ Currency=AlliedNotes
 ConquestItem=true
 
 [Demonite_Ore]
+Plural=chunks of demonite ore
 Type=misc
 Desc=An ore of metal which glows with a purple aura.
 Cost=0
@@ -1990,6 +2040,7 @@ SellPrice=100
 Currency=AlliedNotes
 
 [Crimtane_Ore]
+Plural=chunks of crimtane ore
 Type=misc
 Desc=An ore of metal which glows with a crimson aura.
 Cost=0
@@ -1997,6 +2048,7 @@ SellPrice=100
 Currency=AlliedNotes
 
 [SoulOfSight]
+Plural=Souls of Sight
 Type=misc
 Desc=The essence of omniscient watchers.
 Cost=0
@@ -2004,6 +2056,7 @@ SellPrice=100
 Currency=AlliedNotes
 
 [SoulOfMight]
+Plural=Souls of Might
 Type=misc
 Desc=The essence of the destroyer.
 Cost=0
@@ -2011,6 +2064,7 @@ SellPrice=100
 Currency=AlliedNotes
 
 [SoulOfFright]
+Plural=Souls of Fright
 Type=misc
 Desc=The essence of pure terror.
 Cost=0
@@ -2018,6 +2072,7 @@ SellPrice=100
 Currency=AlliedNotes
 
 [Chlorophyte_Ore]
+Plural=chunks of chlorophyte ore
 Type=misc
 Desc=An ore of metal which glows with a deep green aura.
 Cost=0
@@ -2025,6 +2080,7 @@ SellPrice=100
 Currency=AlliedNotes
 
 [EyeOfTheGolem]
+Plural=eyes of the Golem
 Type=misc
 Desc=An eye taken from the Lihzahrd Golem.
 Cost=0
@@ -2032,6 +2088,7 @@ SellPrice=100
 Currency=AlliedNotes
 
 [Titanium_Ore]
+Plural=piece of titanium ore
 Type=misc
 Desc=An ore of metal which is sparkling dark gray with miniscule spots of green and pink.
 Cost=0
@@ -2060,6 +2117,7 @@ SellPrice=100
 Currency=AlliedNotes
 
 [UnkaiArmorPiece]
+Plural=pieces of Unkai armour
 Type=misc
 Desc=A piece ornately decorated armor for use by Samurai. Once used by a great Hero of Abyssea, the true potential of this Empyrean armor is currently sealed.
 Cost=0
@@ -2068,6 +2126,7 @@ Exclusive=yes
 Currency=AlliedNotes
 
 [EstoqueurArmorPiece]
+Plural=pieces of Estoqueur armour
 Type=misc
 Desc=A piece of ornately decorated armor in scarlet and gold for use by Red Mages. Once used by a great Hero of Abyssea, the true potential of this Empyrean armor is currently sealed.
 Cost=0
@@ -2076,6 +2135,7 @@ Exclusive=yes
 Currency=AlliedNotes
 
 [SilverSwordParts]
+Plural=silver sword parts
 Type=misc
 Desc=Parts for a mysterious and powerful sword.
 Cost=0
@@ -2218,6 +2278,7 @@ AlliedNotes=50
 Exclusive=yes
 
 [WormFood]
+Plural=cans of worm food
 type=portal
 cost=5
 currency=BeastmenSeal
@@ -2262,6 +2323,7 @@ AlliedNotes=500
 Exclusive=yes
 
 [BookOfMudora]
+Plural=books of Mudora
 type=portal
 cost=15
 Currency=BeastmenSeal
@@ -2295,6 +2357,7 @@ AlliedNotes=500
 Exclusive=yes
 
 [CorruptWormFood]
+Plural=pieces of corrupt worm food
 type=portal
 Cost=15
 Currency=BeastmenSeal
@@ -2353,6 +2416,7 @@ Exclusive=yes
 ; Kindred Seal Portal Items
 
 [IgnisFatuus]
+Plural=Ignis Fatuus
 type=portal
 cost=20
 currency=KindredSeal
@@ -2397,6 +2461,7 @@ AlliedNotes=2500
 Exclusive=yes
 
 [GemOfTheWest]
+Plural=Gems of the West
 type=portal
 Cost=15
 Currency=KindredSeal
@@ -2408,6 +2473,7 @@ AlliedNotes=1200
 Exclusive=yes
 
 [GemOfTheNorth]
+Plural=Gems of the North
 type=portal
 Cost=15
 Currency=KindredSeal
@@ -2419,6 +2485,7 @@ AlliedNotes=1200
 Exclusive=yes
 
 [GemOfTheEast]
+Plural=Gems of the East
 type=portal
 Cost=15
 Currency=KindredSeal
@@ -2430,6 +2497,7 @@ AlliedNotes=1200
 Exclusive=yes
 
 [GemOfTheSouth]
+Plural=Gems of the South
 type=portal
 Cost=15
 Currency=KindredSeal
@@ -2551,13 +2619,14 @@ AlliedNotes=1500
 Exclusive=yes
 
 [AvatarBlood]
+Plural=bottles of avatar blood
 type=portal
 Cost=20
 Currency=KindredSeal
 Battlefield=Abyssea - Uleguerand Range
 Weather=Snowy
 Monster=Awahondo
-Desc=takes out a bottle of avatar blood and tosses it to the ground. It shatters and telepports everyone to Abyssea - Uleguerand Range.
+Desc=takes out a bottle of avatar blood and tosses it to the ground. It shatters and teleports everyone to Abyssea - Uleguerand Range.
 AlliedNotes=1500
 Exclusive=yes
 
@@ -2621,7 +2690,7 @@ Exclusive=yes
 
 [JungleOrb]
 type=portal
-Cost=$iif($readini(garden.dat, gardenstats, level) <= 5, 15, 20)
+Cost=$iif($readini(garden.dat, gardenstats, level) >= 5, 15, 20)
 Currency=KindredCrest
 Battlefield=Deep Jungle
 Weather=calm
@@ -2713,6 +2782,7 @@ Exclusive=yes
 SPECIAL ITEMS
 =========================
 [Blueprints:X-Buster]
+Plural=X-Buster blueprints
 Type=special
 Cost=0
 SellPrice=5000
@@ -2722,6 +2792,7 @@ Weapon=X-Buster
 Desc=pulls out a set of blueprints for an X-Buster $iif($2 != $1, and hands it to $set_chr_name($2) %real.name $+ .) %real.name then gets to work and builds a beautiful and functional X-Buster ready for use.
 
 [Blueprints:SilverSword]
+Plural=Silver Sword blueprints
 Type=special
 Cost=0
 SellPrice=5000
@@ -2731,6 +2802,7 @@ Weapon=SilverSword
 Desc=pulls out a set of blueprints for the Silver Sword $iif($2 != $1, and hands it to $set_chr_name($2) %real.name $+ .) %real.name then gets to work and builds the beautiful and powerful Silver Sword, ready for use.
 
 [Blueprints:Genbu'sShield]
+Plural=Genbu's Shield blueprints
 Type=special
 Cost=0
 SellPrice=5000
@@ -2740,6 +2812,7 @@ Weapon=Genbu'sShield
 Desc=pulls out a set of blueprints for the $iif($2 != $1, Genbu's Shield and hands it to $set_chr_name($2) %real.name $+ , Genbu's Shield.) %real.name then gets to work and builds a beautiful and functional Genbu's Shield ready for use.
 
 [MasterSwordMap]
+Plural=Master Sword maps
 Type=special
 Cost=0
 SellPrice=5000
@@ -2753,6 +2826,7 @@ Desc=$iif($2 != $1,pulls out an ancient map from Hyrule and hands it to $set_ch
 SONGS (subset of special)
 =========================
 [Songsheet:Knight'sMinne]
+Plural=Knight's Minne songsheets
 Type=special
 Cost=10000
 ShopNPC=SongMerchant
@@ -2763,6 +2837,7 @@ Song=Knight'sMinne
 Desc=pulls out a sheet of music and begins to study it. After some time passes, %real.name has learned how to perform the Knight's Minne using a flute. 
 
 [Songsheet:Army'sPaeon]
+Plural=Army's Paeon songsheets
 Type=special
 Cost=15000
 ShopNPC=SongMerchant
@@ -2773,6 +2848,7 @@ Song=Army'sPaeon
 Desc=pulls out a sheet of music and begins to study it. After some time passes, %real.name has learned how to perform the Army's Paeon using a lute.
 
 [Songsheet:FoeLullaby]
+Plural=Foe Lullaby songsheets
 Type=special
 Cost=0
 ShopNPC=SongMerchant
@@ -2783,6 +2859,7 @@ Song=FoeLullaby
 Desc=pulls out a sheet of music and begins to study it. After some time passes, %real.name has learned how to perform the Foe Lullaby using a harp.
 
 [Songsheet:ToxicMelody]
+Plural=Toxic Melody songsheets
 Type=special
 Cost=0
 ShopNPC=SongMerchant
@@ -2793,6 +2870,7 @@ Song=ToxicMelody
 Desc=pulls out a sheet of music and begins to study it. After some time passes, %real.name has learned how to perform the Toxic Melody using a lute.
 
 [Songsheet:SongOfPeace]
+Plural=Song of Peace songsheets
 Type=special
 Cost=15000
 ShopNPC=SongMerchant

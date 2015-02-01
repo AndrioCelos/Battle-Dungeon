@@ -1,7 +1,5 @@
 ; Weapons.db is used to store the weapon lists, weapon information, shield lists and shield information.
 
-
-
 [Weapons]
 HandToHand=Fists.Cerberus.Ifrit.Verethragna.Spharai
 Swords=Mythril_Sword.Joyeuse.Rebellion.Excalibur.Murgleis.JewelSword.SilverSword.MasterSword
@@ -909,7 +907,6 @@ Hits=1
 BasePower=1
 Upgrade=200
 
-
 [Glyphs]
 Cost=30
 Type=Glyph
@@ -917,6 +914,17 @@ Info=Powerful magical energy used by Shanoa that can become a variety of weapons
 Abilities=Ignis.Grando.Fulgur.Nitesco.Globus.Acerbatus.Luminatio.Dominus
 Element=None
 Hits=2
+BasePower=40
+Upgrade=1500
+2Handed=true
+
+[Tomes]
+Cost=30
+Type=Glyph
+Info=A series of tomes that can be used to cast powerful magic.
+Abilities=Fire,Elfire,Blizzard,Tornado,Thunder,Elthunder,Shine,Flux,Nosferatu,Luna
+Element=None
+Hits=1
 BasePower=40
 Upgrade=1500
 2Handed=true

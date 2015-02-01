@@ -1,3 +1,16 @@
+; MOD: DCC CHAT in IRC mode
+on 3:TEXT:!dcc*:*:{
+  if ($2 == close) {
+    close -c $nick
+    notice $nick Your DCC session has been closed.
+  }
+  else {
+    unset %dcc.alreadyloggedin
+    dcc.check.for.double.login $nick
+    if (!%dcc.alreadyloggedin) dcc chat $nick
+  }
+}
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; DCC CHAT CMDS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -17,6 +30,9 @@ on 2:open:=: {
   }
 
   $dcc.who'sonline($nick)
+
+  ; MOD: Show the address the player is connecting from.
+  msg $nick Received your DCC CHAT connection from $address $+ . Use !logout if this is not you.
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -53,7 +69,10 @@ on 2:close:=: { var %p 1
     else {  msg = $+ $chat(%p) 14###4 $nick has left the game. | inc %p 1 }
   }
   close -c $nick
-  .auser 1 $nick | mode %battlechan -v $nick | .flush 1
+  ; MOD: DCC CHAT in IRC mode
+  if ($readini(system.dat, system, botType) == DCCChat) {
+    .auser 1 $nick | mode %battlechan -v $nick | .flush 1
+  }
 }
 
 
@@ -168,10 +187,10 @@ on 2:Chat:!ig: {
 }
 on 2:Chat:!orbs*: { 
   if ($2 != $null) { $checkchar($2) | var %orbs.spent $bytes($readini($char($2), stuff, RedOrbsSpent),b) | var %blackorbs.spent $bytes($readini($char($2), stuff, BlackOrbsSpent),b) | $set_chr_name($2) 
-    $dcc.private.message($readini(translation.dat, system, ViewOthersOrbs))
+    $dcc.private.message($nick, $readini(translation.dat, system, ViewOthersOrbs))
   }
   else { var %orbs.spent $bytes($readini($char($nick), stuff, RedOrbsSpent),b) | var %blackorbs.spent $bytes($readini($char($nick), stuff, BlackOrbsSpent),b) | $set_chr_name($nick) 
-    $dcc.private.message($readini(translation.dat, system, ViewMyOrbs))
+    $dcc.private.message($nick, $readini(translation.dat, system, ViewMyOrbs))
   }
 }
 ON 2:Chat:!desc*: { 
@@ -493,7 +512,7 @@ alias wield_weapondcc {
   if ($2 = both) { writeini $char($1) weapons equipped $3 | remini $char($1) weapons equippedLeft }
 
   $set_chr_name($1) 
-  if (%battleis = off) { $dcc.private.message($readini(translation.dat, system, EquipWeaponPlayer)) }
+  if (%battleis = off) { $dcc.private.message($1, $readini(translation.dat, system, EquipWeaponPlayer)) }
   if (%battleis = on) { $dcc.battle.message($readini(translation.dat, system, EquipWeaponPlayer)) }
 
 

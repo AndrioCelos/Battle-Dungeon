@@ -1,0 +1,27 @@
+h1 {
+	font-size: 36pt;
+	font-weight: bold;
+	text-align: center;
+}
+
+.scoreboard {
+	width: 100%;
+	border: 1px solid #FFCC00;
+	background-color: #FFFFCC;
+	border-spacing: 3px;
+	text-align: right;
+}
+
+.name {
+	text-align: left;
+}
+
+.scoreboard tr th {
+	text-align: center;
+}
+
+.scoreboard tr th, .scoreboard tr td {
+	border: 1px solid #FFCC00;
+	background-color: #FFFFCC;
+	border-spacing: 3px;
+}

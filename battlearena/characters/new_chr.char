@@ -8,7 +8,6 @@ Spd=5
 IgnitionGauge=0
 Name=
 
-
 [Battle]
 Hp=150
 Tp=20
@@ -19,12 +18,9 @@ Spd=5
 IgnitionGauge=0
 Status=alive
 
-
 [Rage]
 RageBar=0
 RageCountDown=0
-
-
 
 [Descriptions]
 Char=needs to set a desc by typing !cdesc <desc here>
@@ -115,18 +111,16 @@ DoublePunch=1
 
 
 [Item_Amount]
-potion=1
+Potion=1
 
 [scoreboard]
 score=0
 
 [equipment]
-accessory=none
 Head=nothing
 Body=nothing
 Legs=nothing
 Feet=nothing
 Hands=nothing
+Accessory=none
 
-[DCCchat]
-Room=Lobby

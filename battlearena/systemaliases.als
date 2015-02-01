@@ -464,11 +464,11 @@ display.system.message {
   var %message.to.display $1
   if ($allowcolors = false) { var %message.to.display $strip(%message.to.display, c) }
 
-  if ($readini(system.dat, system, botType) = IRC) {  query %battlechan %message.to.display  }
+  if ($readini(system.dat, system, botType) = IRC) {  msg %battlechan %message.to.display  }
   if ($readini(system.dat, system, botType) = TWITCH) {
     var %twitch.delay $readini(system.dat, system, TwitchDelayTime)
     if (%twitch.delay = $null) { var %twitch.delay 2 }
-    /.timerThrottleDisplayMessage $+ $2 $+ $rand(1,100) $+ $rand(a,z) $+ $rand(1,1000) 1 %twitch.delay /query %battlechan %message.to.display 
+    /.timerThrottleDisplayMessage $+ $2 $+ $rand(1,100) $+ $rand(a,z) $+ $rand(1,1000) 1 %twitch.delay /msg %battlechan %message.to.display 
   }
   if ($readini(system.dat, system, botType) = DCCchat) { 
     if ((%battle.type = ai) && ($2 = battle)) { $dcc.global.message(%message.to.display) | return } 
@@ -491,14 +491,14 @@ display.system.message.delay {
   if (%delay.time = $null) { var %delay.time 1 }
 
   if ($readini(system.dat, system, botType) = IRC) { 
-    /.timerThrottleDisplayMessage $+ $2 $+ $rand(1,100) $+ $rand(a,z) $+ $rand(1,1000) 1 %delay.time /query %battlechan %message.to.display
+    /.timerThrottleDisplayMessage $+ $2 $+ $rand(1,100) $+ $rand(a,z) $+ $rand(1,1000) 1 %delay.time /msg %battlechan %message.to.display
   }
 
   if ($readini(system.dat, system, botType) = TWITCH) { 
     var %twitch.delay $readini(system.dat, system, TwitchDelayTime)
     if (%twitch.delay = $null) { var %twitch.delay 2 }
     inc %delay.time %twitch.delay
-    /.timerThrottleDisplayMessage $+ $2 $+ $rand(1,100) $+ $rand(a,z) $+ $rand(1,1000) 1 %delay.time /query %battlechan %message.to.display
+    /.timerThrottleDisplayMessage $+ $2 $+ $rand(1,100) $+ $rand(a,z) $+ $rand(1,1000) 1 %delay.time /msg %battlechan %message.to.display
   }
 
   if ($readini(system.dat, system, botType) = DCCchat) { 
@@ -516,47 +516,51 @@ display.private.message {
 
   if ($allowcolors = false) { var %message.to.display $strip(%message.to.display, c) }
 
-  if ($readini(system.dat, system, botType) = IRC) {
-    /.timerDisplayPM $+ $rand(1,1000) $+ $rand(a,z) $+ $rand(1,1000) 1 1 /.msg $nick %message.to.display 
+  ; MOD: DCC CHAT in IRC mode
+  if (($event == chat) || ($readini(system.dat, system, botType) = DCCchat)) { $dcc.private.message($nick, %message.to.display) }
+  else {
+    if ($readini(system.dat, system, botType) = IRC) {
+      /.timerDisplayPM $+ $rand(1,1000) $+ $rand(a,z) $+ $rand(1,1000) 1 1 /.msg $nick %message.to.display 
+    }
+    if ($readini(system.dat, system, botType) = TWITCH) { 
+      var %twitch.delay $readini(system.dat, system, TwitchDelayTime)
+      if (%twitch.delay = $null) { var %twitch.delay 2 }
+      /.timerDisplayPM $+ $rand(1,1000) $+ $rand(a,z) $+ $rand(1,1000) 1 %twitch.delay /msg %battlechan %message.to.display
+    }
   }
-  if ($readini(system.dat, system, botType) = TWITCH) { 
-    var %twitch.delay $readini(system.dat, system, TwitchDelayTime)
-    if (%twitch.delay = $null) { var %twitch.delay 2 }
-    /.timerDisplayPM $+ $rand(1,1000) $+ $rand(a,z) $+ $rand(1,1000) 1 %twitch.delay /query %battlechan %message.to.display
-  }
-  if ($readini(system.dat, system, botType) = DCCchat) { $dcc.private.message($nick, %message.to.display) }
 }
 display.private.message2 {
   var %message.to.display $2
 
   if ($allowcolors = false) { var %message.to.display $strip(%message.to.display, c) }
 
-  if ($readini(system.dat, system, botType) = IRC) {
-    /.timerDisplayPM $+ $rand(1,1000) $+ $rand(a,z) $+ $rand(1,1000) 1 1 /.msg $1 %message.to.display 
+  if (($event == chat) || ($readini(system.dat, system, botType) = DCCchat)) { $dcc.private.message($nick, %message.to.display) }
+  else {
+    if ($readini(system.dat, system, botType) = IRC) {
+      /.timerDisplayPM $+ $rand(1,1000) $+ $rand(a,z) $+ $rand(1,1000) 1 1 /.msg $1 %message.to.display 
+   }
+    if ($readini(system.dat, system, botType) = TWITCH) { 
+      var %twitch.delay $readini(system.dat, system, TwitchDelayTime)
+      if (%twitch.delay = $null) { var %twitch.delay 2 }
+      /.timerDisplayPM $+ $rand(1,1000) $+ $rand(a,z) $+ $rand(1,1000) 1 %twitch.delay /msg %battlechan %message.to.display
+    }
   }
-  if ($readini(system.dat, system, botType) = DCCchat) { $dcc.private.message($1, %message.to.display) }
-
-  if ($readini(system.dat, system, botType) = TWITCH) { 
-    var %twitch.delay $readini(system.dat, system, TwitchDelayTime)
-    if (%twitch.delay = $null) { var %twitch.delay 2 }
-    /.timerDisplayPM $+ $rand(1,1000) $+ $rand(a,z) $+ $rand(1,1000) 1 %twitch.delay /query %battlechan %message.to.display
-  }
-
 }
 display.private.message.delay {
   var %message.to.display $1
   if ($allowcolors = false) { var %message.to.display $strip(%message.to.display, c) }
 
-  if ($readini(system.dat, system, botType) = IRC) {
-    /.timerDisplayPM $+ $rand(1,1000) $+ $rand(a,z) $+ $rand(1,1000) 1 2 /.msg $nick %message.to.display 
-  }
-  if ($readini(system.dat, system, botType) = DCCchat) { $dcc.private.message($nick, %message.to.display) }
-
-  if ($readini(system.dat, system, botType) = TWITCH) { 
-    var %twitch.delay $readini(system.dat, system, TwitchDelayTime)
-    if (%twitch.delay = $null) { var %twitch.delay 2 }
-    inc %twitch.delay 1 
-    /.timerDisplayPM $+ $rand(1,1000) $+ $rand(a,z) $+ $rand(1,1000) 1 %twitch.delay /query %battlechan %message.to.display
+  if (($event == chat) || ($readini(system.dat, system, botType) = DCCchat)) { $dcc.private.message($nick, %message.to.display) }
+  else {
+    if ($readini(system.dat, system, botType) = IRC) {
+      /.timerDisplayPM $+ $rand(1,1000) $+ $rand(a,z) $+ $rand(1,1000) 1 2 /.msg $nick %message.to.display 
+    }
+    if ($readini(system.dat, system, botType) = TWITCH) { 
+      var %twitch.delay $readini(system.dat, system, TwitchDelayTime)
+      if (%twitch.delay = $null) { var %twitch.delay 2 }
+      inc %twitch.delay 1 
+      /.timerDisplayPM $+ $rand(1,1000) $+ $rand(a,z) $+ $rand(1,1000) 1 %twitch.delay /msg %battlechan %message.to.display
+    }
   }
 }
 display.private.message.delay.custom {
@@ -564,27 +568,28 @@ display.private.message.delay.custom {
   var %message.to.display $1
   if ($allowcolors = false) { var %message.to.display $strip(%message.to.display, c) }
 
-  if ($readini(system.dat, system, botType) = IRC) {
-    /.timerDisplayPM $+ $rand(1,1000) $+ $rand(a,z) $+ $rand(1,1000) 1 $2 /.msg $nick %message.to.display 
+  if (($event == chat) || ($readini(system.dat, system, botType) = DCCchat)) { $dcc.private.message($nick, %message.to.display) }
+  else {
+    if ($readini(system.dat, system, botType) = IRC) {
+      /.timerDisplayPM $+ $rand(1,1000) $+ $rand(a,z) $+ $rand(1,1000) 1 $2 /.msg $nick %message.to.display 
+    }
+    if ($readini(system.dat, system, botType) = TWITCH) { 
+      var %twitch.delay $readini(system.dat, system, TwitchDelayTime)
+      if (%twitch.delay = $null) { var %twitch.delay 2 }
+      inc %twitch.delay $2
+      /.timerDisplayPM $+ $rand(1,1000) $+ $rand(a,z) $+ $rand(1,1000) 1 %twitch.delay /msg %battlechan %message.to.display
+    }
   }
-  if ($readini(system.dat, system, botType) = DCCchat) { $dcc.private.message($nick, %message.to.display) }
-
-  if ($readini(system.dat, system, botType) = TWITCH) { 
-    var %twitch.delay $readini(system.dat, system, TwitchDelayTime)
-    if (%twitch.delay = $null) { var %twitch.delay 2 }
-    inc %twitch.delay $2
-    /.timerDisplayPM $+ $rand(1,1000) $+ $rand(a,z) $+ $rand(1,1000) 1 %twitch.delay /query %battlechan %message.to.display
-  }
-
 }
 
 ; This particular display alias is actually defunct, but leaving it in just in case I missed something.
 display.battle.message {
   ; $1 = the message
-  if (($readini(system.dat, system, botType) = IRC) || ($readini(system.dat, system, botType) = TWITCH)) {  query %battlechan $1  }
+  if (($readini(system.dat, system, botType) = IRC) || ($readini(system.dat, system, botType) = TWITCH)) {  msg %battlechan $1  }
   if ($readini(system.dat, system, botType) = DCCchat) {  $dcc.battle.message($1)   }
 }
 
+; MOD:
 get.unspentpoints {
   ; $1 = monster
   ; $2 = level it should be
@@ -742,7 +747,7 @@ amnesia.check {
   }
 }
 
-id_login { set %idwho $1 | unset %newbie | unset %password | unset %userlevel | unset %character.description | .dns %idwho | $clr_passhurt($1) | writeini $char($1) Info LastSeen $fulldate | .close -m* |  unset %guess  | unset %gender | halt }
+id_login { set %idwho $1 | unset %newbie | unset %password | unset %userlevel | unset %character.description | writeini $char($nick) info lastIP $site | $clr_passhurt($1) | writeini $char($1) Info LastSeen $fulldate | clear %idwho |  unset %guess  | unset %gender | halt }
 okdesc { 
   $display.private.message2($1,$readini(translation.dat, system,OKDesc)) 
   return 
@@ -2069,6 +2074,13 @@ get_maximum_streak {
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 get_mon_list {
   unset %monster.list
+
+  ; MOD: Check for the battlefield's monster list.
+  set -u0 %battlefield_pool $null
+  if (($1 != portal) && ($1 != nofield) && ($rand(0, 3) != 0)) {
+    set -u0 %battlefield_pool $readini($dbfile(battlefields.db), %current.battlefield, monsters)
+  }
+
   if ($1 = portal) { set %nosouls true }
 
   set %current.winning.streak.value $readini(battlestats.dat, battle, WinningStreak) 
@@ -2094,7 +2106,12 @@ get_mon_list {
   .remove $txtfile(temporary_mlist.txt)
   unset %token.value | unset %current.winning.streak.value | unset %difficulty | unset %current.month
   unset %monster.info.streak | unset %monster.info.streak.max | unset %nosouls
+
+  if ((%battlefield_pool != $null) && ((%monster.list == $null) || (%monster.list == Lost_Soul))) get_mon_list_sub
   return
+}
+get_mon_list_sub {
+  get_mon_list nofield
 }
 
 mon_list_add {
@@ -2112,6 +2129,9 @@ mon_list_add {
   ; Check the winning streak #..  some monsters won't show up until a certain streak or higher.
   $get_minimum_streak(mon, %name)
   $get_maximum_streak(mon, %name)
+
+  ; MOD: Check the battlefield pool.
+  if ((%battlefield_pool != $null) && (%name !isin %battlefield_pool) && ($readini($mon(%name), monster, type) !isin %battlefield_pool)) return
 
   if ($readini($mon(%name), info, month) = %current.month) { write $txtfile(temporary_mlist.txt) %name  | inc %value 1 }
   if ($readini($mon(%name), info, month) != %current.month) { 
@@ -2134,7 +2154,7 @@ mon_list_add {
       write $txtfile(temporary_mlist.txt) %name
 
     }
-  }
+  }  
 }
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Get a list of bosses eligable
@@ -2439,6 +2459,8 @@ clear_variables {
   unset %fullbring.type | unset %fullbring.target | unset %fullbring.status | unset %item.base | unset %timer.time | unset %savethepresident
   unset %real.name | unset %weapon.name | unset %weapon.price | unset %steal.item | unset %skip.ai | unset %file.to.read.lines 
   unset %attacker.spd | unset %playerstyle.* | unset %stylepoints.to.add | unset %current.playerstyle.* | unset %styles | unset %wait.your.turn | unset %weapon.list2
+  ; MOD: Mod variables
+  unset %warp.battlefield
 }
 clear_variables2 {
   unset %max.demonwall.turns | unset %demonwall.name | unset %styles.list | unset %style.name | unset %style.level | unset %player.style.level | unset %style.price | unset %styles

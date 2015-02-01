@@ -59,6 +59,7 @@ alias use.skill {
   if ($3 = justrelease) { $skill.justrelease($1, $4, !justrelease) } 
   if ($3 = retaliation) { $skill.retaliation($1) } 
   if (($3 = lockpicking) || ($3 = lockpick)) { $skill.lockpicking($1) } 
+  if ($3 = warp) { $skill.warp($1, $4) } 
 
   ; Below are monster-only skills
 
@@ -3140,3 +3141,36 @@ alias skill.justrelease { $set_chr_name($1)
   ; Time to go to the next turn
   if (%battleis = on)  { $check_for_double_turn($1) }
 }
+
+;=================
+; WARP
+;=================
+on 3:TEXT:!warp *:*: { $skill.warp($nick, $2) }
+on 3:TEXT:!warp *:*: { $skill.warp($nick, $2) }
+
+alias skill.warp { $set_chr_name($1)
+  if ($skillhave.check($1, warp) = false) { $set_chr_name($1) | $display.system.message($readini(translation.dat, errors, DoNotHaveSkill), private)  | halt }
+  if ((%battleis == on) && (%battleisopen != on)) { $display.system.message($readini(translation.dat, errors, Can'tUseSkillInBattle), private) | halt }
+  if (%warp.battlefield != $null) { $display.system.message(4The Warp skill has already been used this battle!, private) | halt }
+
+  ; Check the battlefield.
+  var %battlefield = $read($lstfile(battlefields.lst), w, $2)
+  if (%battlefield == $null) {
+    $display.private.message2($1, 4There is no such battlefield or you cannot warp to it using this skill.) | halt    
+  }
+
+  ; Check for 2k orbs
+  set %check.item $readini($char($1), stuff, RedOrbs)
+  if ((%check.item = $null) || (%check.item <= 2000)) { $display.system.message(4Error: %real.name does not have enough $readini(system.dat, system, currency) to perform this skill [need $calc(2000 - %check.item) more!], private) | halt }
+  dec %check.item 2000
+  writeini $char($1) stuff RedOrbs %check.item
+  
+  set %warp.battlefield %battlefield
+
+  ; Display the desc. 
+  if ($readini($char($1), descriptions, warp) = $null) { $set_chr_name($1) | set %skill.description uses 2000 $readini(system.dat, system, currency) to warp to the $2 battlefield!  }
+  else { set %skill.description $readini($char($1), descriptions, warp) }
+  $set_chr_name($1) | $display.system.message(12 $+ %real.name  $+ %skill.description, battle) 
+  
+}
+

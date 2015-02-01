@@ -4586,7 +4586,7 @@ Desc=$set_chr_name($2) %real.name ... $set_chr_name($2) %real.name ..... it hurt
 BasePower=40
 Element=Dark
 Cost=0
-Magic=None
+Magic=No
 stat=str
 
 [PKRockin]
@@ -4606,7 +4606,7 @@ Desc=cuts his wrist, casuing some blood to spill out. The blood then turns into 
 BasePower=40
 Element=Dark
 Cost=0
-Magic=None
+Magic=No
 stat=int
 
 [AtlantianBlast]
@@ -4616,7 +4616,7 @@ Desc=cuts his wrist, casuing some blood to spill out. The blood then turns into 
 BasePower=40
 Element=Dark
 Cost=0
-Magic=None
+Magic=No
 stat=int
 DestroyShadows=3
 
@@ -7986,7 +7986,7 @@ BasePower=30
 Element=dark
 Cost=0
 Magic=no
-Stat=into
+Stat=int
 
 [DarkBurst]
 Type=AOE
@@ -8549,7 +8549,7 @@ Type=Single
 TP=10
 Desc=changes its left arm into a cannon and fires a burst of energy towards %enemy $+ .
 BasePower=50
-Element=Nne
+Element=None
 Cost=0
 Magic=No
 stat=int
@@ -9503,7 +9503,7 @@ Cost=0
 Magic=Yes
 stat=int
 
-[ShunkoRaigeki]
+[ShunkouRaigeki]
 Type=AOE
 TP=10
 Desc=raises her arms into the air as she gathers power. Lightning appears around Yoruichi as she aims her arms forward. A moment later, a large blast of lightning shoots through the battlefield, hitting everything in range!
@@ -11097,9 +11097,83 @@ example only.
 [AsuraStrike]
 cost=999999999
 type=single
-basepower=$calc( ( $readini(weapons.db, $readini($char($1), Weapons, Equipped), basepower) + ($readini($char($1), battle, str) / 5 ) ) * (8 + (%previous.tp) / 10 ) ) + 250 + (150 * $readini($char($1), Techniques, AsuraStrike) ) ) | unset %previous.tp
+basepower=$calc( ( ( $readini(weapons.db, $readini($char($1), Weapons, Equipped), basepower) + ($readini($char($1), battle, str) / 5 ) ) * (8 + (%previous.tp) / 10 ) ) + 250 + (150 * $readini($char($1), Techniques, AsuraStrike) ) ) | unset %previous.tp
 TP=$readini($char($1), Battle, TP) | set %previous.tp $readini($char($1), battle, TP)
 Desc=pours all of the energy to $gender($1) fist and then punches %enemy $+ with an earth shattering punch! [Asura Strike!]
 magic=no
 stat=str
 selfstatus=curse
+
+
+Fire,Elfire,Blizzard,Tornado,Thunder,Elthunder,Shine,Flux,Nosferatu,Luna
+[Elfire]
+Type=Single
+TP=30
+Desc=holds the Elfire tome aloft, summoning a great pillar of fire upon %enemy $+ .
+BasePower=45
+Element=Fire
+Cost=2000
+Magic=Yes
+stat=int
+
+[Blizzard]
+Type=Single
+TP=50
+Desc=holds the Blizzard tome aloft, encasing %enemy in a crystal of ice, which then shatters.
+BasePower=60
+Element=Ice
+Cost=3000
+Magic=Yes
+Stat=INT
+
+[Elthunder]
+Type=Single
+TP=30
+Desc=holds the Elthunder tome aloft, causing three bolts of lightning to strike %enemy $+ .
+BasePower=40
+Element=Lightning
+Cost=2000
+Magic=Yes
+Stat=INT
+
+[Shine]
+Type=Single
+TP=30
+Desc=holds the Shine tome aloft, summoning several wheels of light around %enemy $+ , which then explode to cause damage.
+BasePower=40
+Element=Light
+Cost=2000
+Magic=Yes
+Stat=INT
+
+[Flux]
+Type=Single
+TP=15
+Desc=holds the Flux tome aloft, summoning an orb of darkness from under %enemy $+ , which then engulfs $gender2($2) $+ .
+BasePower=20
+Element=Dark
+Cost=1000
+Magic=Yes
+Stat=INT
+
+[Nosferatu]
+Type=Single
+TP=60
+Desc=holds the Nosferatu tome aloft, summoning a dark energy that steals some health from %enemy $+ .
+BasePower=40
+Element=Dark
+Cost=6000
+Magic=Yes
+Absorb=Yes
+Stat=INT
+
+[Luna]
+Type=Single
+TP=120
+Desc=holds the Luna tome aloft, summoning several orbs of darkness that circle %enemy before striking $gender2($2) $+ .
+BasePower=40
+Element=Dark
+Cost=10000
+Magic=Yes
+IgnoreDefense=50
+Stat=INT

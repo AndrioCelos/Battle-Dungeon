@@ -27,11 +27,13 @@ alias portal.usage.check {
   }
 }
 
-on 3:TEXT:!count*:#: {  
+on 3:TEXT:!count*:#: { 
+  if ($0 == 1) halt
   if ($3 = $null) { $item.countcmd($nick, $2, public) }
   if ($3 != $null) { $checkchar($2) | $item.countcmd($2, $3, public) }
 }
 on 3:TEXT:!count*:?: {  
+  if ($0 == 1) halt
   if ($3 = $null) { $item.countcmd($nick, $2, private) }
   if ($3 != $null) { $checkchar($2) | $item.countcmd($2, $3, private) }
 }
@@ -570,8 +572,9 @@ alias display_Statusdamage_item {
     $display.system.message(3 $+ %user $+  $readini($dbfile(items.db), $4, desc), battle)
   }
 
-  if (%guard.message = $null) { $display.system.message(The attack did4 $bytes(%attack.damage,b) damage %style.rating, battle) }
+  if (%guard.message = $null) { $display.system.message(The attack did $+ %damage_colour $bytes(%attack.damage,b) damage %style.rating, battle) }
   if (%guard.message != $null) { $display.system.message(%guard.message, battle) | unset %guard.message }
+  set %damage_colour 4
 
   ; Did the person die?  If so, show the death message.
   if ($readini($char($2), battle, HP) <= 0) { 

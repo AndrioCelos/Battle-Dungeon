@@ -4,15 +4,15 @@
 
 raw 421:*:echo -a 4,1Unknown Command: ( $+ $2 $+ ) | echo -a 4,1Location: %debug.location | halt
 CTCP *:PING*:?:if ($nick == $me) haltdef
-CTCP *:BOTVERSION*:ctcpreply $nick BOTVERSION $battle.version
+CTCP *:VERSION*:*:ctcpreply $nick VERSION Battle Dungeon $battle.version
+CTCP *:BOTVERSION*:*:ctcpreply $nick BOTVERSION Battle Dungeon $battle.version
 on 1:QUIT: { 
-  if ($nick = %bot.name) { /nick %bot.name | /.timer 1 15 /identifytonickserv } 
+  if ($nick = %bot.name) { /nick %bot.name | /.timer 1 3 /identifytonickserv } 
   .auser 1 $nick | .flush 1 
 } 
-on 1:EXIT: {  .auser 1 $nick | .flush 1 }
-on 1:PART:%battlechan:.auser 1 $nick | .flush 1
-on 1:KICK:%battlechan:.auser 1 $knick | .flush 1 
-on 1:JOIN:%battlechan:{ 
+on  1:PART:%battlechan:.auser 1 $nick | .flush 1
+on  1:KICK:%battlechan:.auser 1 $knick | .flush 1 
+on !1:JOIN:%battlechan:{ 
   .auser 1 $nick | .flush 1 
 
   if ($readini(system.dat, system, botType) = TWITCH) {
@@ -28,10 +28,6 @@ on 1:JOIN:%battlechan:{
 }
 on 3:NICK: { .auser 1 $nick | mode %battlechan -v $newnick | .flush 1 }
 on *:CTCPREPLY:PING*:if ($nick == $me) haltdef
-on *:DNS: { 
-  if ($isfile($char($nick)) = $true) { writeini $char($nick) info lastIP $iaddress  }
-  set %ip.address. [ $+ [ $nick ] ] $iaddress
-}
 
 on 2:TEXT:!bot admin*:*: {  $bot.admin(list) }
 
@@ -138,7 +134,7 @@ on 1:START: {
   echo 12*** You are currently using mIRC version4 $version 12 ***
 
   if ($version < 6.3) {   echo 4*** Your version is older than the recommended version for this bot. Some things may not work right.  It is recommended you update. 12 *** }
-  if ($version > 6.3) {   echo 4*** Your version is newer than the recommended version for this bot. While it should work, it is currently untested and may have quirks or bugs.  It is recommended you downgrade if you run into any problems. 12 *** }
+  if ($version > 6.3) {   echo 4*** Your version is newer than the recommended version for this bot. No issues have so far been found here, but they may exist. It is recommended you downgrade if you run into any problems. 12 *** }
 
 }
 
@@ -147,11 +143,11 @@ on 1:CONNECT: {
   /.timerKeepAlive 0 300 /.ctcp $!me PING 
 
   ; Join the channel
-  /join %battlechan
+  .timerJoin 1 5 join %battlechan
 
   ; Get rid of a ghost, if necessary, and send password
   var %bot.pass $readini(system.dat, botinfo, botpass)
-  if ($me != %bot.name) { /.msg NickServ GHOST %bot.name %bot.pass | /nick %bot.name } 
+  if ($me != %bot.name) { /.msg NickServ GHOST %bot.name %bot.pass | timerNick 1 3 nick %bot.name } 
   $identifytonickserv
 
   ; Recalculate how many battles have happened.
@@ -159,7 +155,15 @@ on 1:CONNECT: {
 
   ; Unset the key in use check.
   unset %keyinuse
+}
 
+on 1:DISCONNECT:{
+  .timerBattleStart off
+  .timerBattleNext off
+  .timerBattleBegin off
+}
+
+on me:JOIN:%battlechan:{
   ; If a battle was on when the bot turned off, let's check it and do something with it.
   if (%battleis = on) { 
     if ($readini($txtfile(battle2.txt), BattleInfo, Monsters) = $null) { $clear_battle }

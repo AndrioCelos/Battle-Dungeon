@@ -2,6 +2,11 @@ generate.scoreboard {
   set %totalplayers 0
   .echo -q $findfile( $char_path , *.char, 0 , 0, get.score $1-)
 
+  ; Generate a JSON table if we need to.
+  if (($readini(system.dat, system, GenerateJSON) = $null) || ($readini(system.dat, system, GenerateJSON) = true)) {
+    json.generate
+  }
+
   if (%totalplayers <= 2) { $display.system.message($readini(translation.dat, errors, ScoreBoardNotEnoughPlayers), private)  | unset %totalplayers | halt }
 
   ; Generate the scoreboard.
@@ -133,8 +138,10 @@ generate.scoreboard {
     $html.generate(endpage)
   }
 
-
-
+  ; Generate a JSON table if we need to.
+  if (($readini(system.dat, system, GenerateJSON) = $null) || ($readini(system.dat, system, GenerateJSON) = true)) {
+    json.generate
+  }
 
   $display.system.message($readini(translation.dat, system, ScoreBoardTitle), private)
   $display.system.message($chr(3) $+ 2 $+ %score.list, private)
@@ -581,28 +588,30 @@ generate.bossdeathboard {
 ; HTML page
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 html.generate {
-
   if ($1 = startpage) { 
-
-    .remove scoreboard.html
-    write scoreboard.html <center><B> <font size=13> $readini(system.dat, botinfo, questchan) Stats</font> </B></center> <BR><BR> 
-
-    write scoreboard.html <table border="1" bordercolor="#FFCC00" style="background-color:#FFFFCC" width="100%" cellpadding="3" cellspacing="3">
-
-    write scoreboard.html  <tr>
-    write scoreboard.html  <td><B>NAME</B></td>
-    write scoreboard.html  <td><B>SCORE</B></td>
-    write scoreboard.html  <td><B>Health</B></td>
-    write scoreboard.html  <td><B>TP</B></td>
-    write scoreboard.html  <td><B>STR</B></td>
-    write scoreboard.html  <td><B>DEF</B></td>
-    write scoreboard.html  <td><B>INT</B></td>
-    write scoreboard.html  <td><B>SPD</B></td>
-    write scoreboard.html  <tr>
+    write -c scoreboard.html <!DOCTYPE HTML>
+    write scoreboard.html <html> <head> 
+    write scoreboard.html <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    write scoreboard.html <title> $+ $readini(system.dat, botinfo, questchan) stats</title> <link rel="stylesheet" href="scoreboard.css">
+    write scoreboard.html </head>
+    write scoreboard.html <body> <h1> $+ $readini(system.dat, botinfo, questchan) stats</h1>
+    write scoreboard.html <table class="scoreboard">
+    write scoreboard.html <tr>
+    write scoreboard.html <th class="name">Name</th>
+    write scoreboard.html <th>Score</th>
+    write scoreboard.html <th>Level</th>
+    write scoreboard.html <th>Health</th>
+    write scoreboard.html <th>TP</th>
+    write scoreboard.html <th>STR</th>
+    write scoreboard.html <th>DEF</th>
+    write scoreboard.html <th>INT</th>
+    write scoreboard.html <th>SPD</th>
+    write scoreboard.html </tr>
   }
 
   if ($1 = tableline) { 
     var %html.score  $bytes($readini($char($2), scoreboard, score),b)
+    var %html.level  $bytes($get.level($2),b)
     var %html.health $bytes($readini($char($2),basestats, hp),b)
     var %html.tp $bytes($readini($char($2),basestats, tp),b)
     var %html.str $bytes($readini($char($2),basestats, str),b)
@@ -610,24 +619,44 @@ html.generate {
     var %html.int $bytes($readini($char($2),basestats, int),b)
     var %html.spd $bytes($readini($char($2),basestats, spd),b)
 
-    write scoreboard.html  <tr>
-    write scoreboard.html  <td> $2 </td>
-    write scoreboard.html  <td> %html.score </td>
-    write scoreboard.html  <td> %html.health </td>
-    write scoreboard.html  <td> %html.tp </td>
-    write scoreboard.html  <td> %html.str </td>
-    write scoreboard.html  <td> %html.def </td>
-    write scoreboard.html  <td> %html.int </td>
-    write scoreboard.html  <td> %html.spd </td>
-    write scoreboard.html  </tr>
-
+    write scoreboard.html <tr>
+    write scoreboard.html <td class="name"> $+ $2 $+ </td>
+    write scoreboard.html <td> $+ %html.score $+ </td>
+    write scoreboard.html <td> $+ %html.level $+ </td>
+    write scoreboard.html <td> $+ %html.health $+ </td>
+    write scoreboard.html <td> $+ %html.tp $+ </td>
+    write scoreboard.html <td> $+ %html.str $+ </td>
+    write scoreboard.html <td> $+ %html.def $+ </td>
+    write scoreboard.html <td> $+ %html.int $+ </td>
+    write scoreboard.html <td> $+ %html.spd $+ </td>
+    write scoreboard.html </tr>
   }
 
   if ($1 = endpage) { 
-
-    write scoreboard.html  </table>
-
+    write scoreboard.html </table>
+    write scoreboard.html </body> </html>
   }
+}
 
+json.generate {
+  write -cn scoreboard.json $chr(91)
 
+  set %current.line 1
+  while (%current.line <= %totalplayers) {
+    set %who.score $read(scoreboard.txt, %current.line)
+
+    if (%current.line != 1) write -n scoreboard.json ,
+    write -n scoreboard.json $chr(123) $+ "Name":" $+ %who.score $+ ",
+    write -n scoreboard.json "Score":  $+ $readini($char(%who.score), scoreboard, score) $+ ,
+    write -n scoreboard.json "Level":  $+ $get.level(%who.score) $+ ,
+    write -n scoreboard.json "Health": $+ $readini($char(%who.score), BaseStats, HP) $+ ,
+    write -n scoreboard.json "TP":     $+ $readini($char(%who.score), BaseStats, TP) $+ ,
+    write -n scoreboard.json "STR":    $+ $readini($char(%who.score), BaseStats, STR) $+ ,
+    write -n scoreboard.json "DEF":    $+ $readini($char(%who.score), BaseStats, DEF) $+ ,
+    write -n scoreboard.json "INT":    $+ $readini($char(%who.score), BaseStats, INT) $+ ,
+    write -n scoreboard.json "SPD":    $+ $readini($char(%who.score), BaseStats, SPD) $+ $chr(125)
+
+    inc %current.line 1
+  }
+  write -n scoreboard.json $chr(93)
 }
