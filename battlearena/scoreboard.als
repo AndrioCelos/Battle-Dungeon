@@ -138,11 +138,6 @@ generate.scoreboard {
     $html.generate(endpage)
   }
 
-  ; Generate a JSON table if we need to.
-  if (($readini(system.dat, system, GenerateJSON) = $null) || ($readini(system.dat, system, GenerateJSON) = true)) {
-    json.generate
-  }
-
   $display.system.message($readini(translation.dat, system, ScoreBoardTitle), private)
   $display.system.message($chr(3) $+ 2 $+ %score.list, private)
   if (%score.list.2 != $null) { $display.system.message($chr(3) $+ 2 $+ %score.list.2, private)  }

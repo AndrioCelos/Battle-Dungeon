@@ -3,6 +3,8 @@
 ; by Andrio Celos
 ;
 ; Changelog:
+;   Version 1.3:
+;     Updated for Battle Arena 2.6 beta 01/31/15.
 ;   Version 1.2:
 ;     Updated for Battle Arena 2.6 beta 10/07/14.
 ;     Expressions in character files containing references to $char or battle txt files are no longer checked fully.
@@ -22,12 +24,12 @@ check {
   if ($2 != ignoreversion) {
     ; Do a quick check on the Arena version.
     if ($regex($battle.version(), ^(\d\.\d)$) > 0) {
-      if ($regml(1) > 2.5) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
+      if ($regml(1) > 2.6) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
     }
     else if ($regex($battle.version(), ^(\d\.\d)beta_(\d\d)(\d\d)(\d\d)$) > 0) {
       if ($regml(1) > 2.6) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
-      if ($regml(4) > 14) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
-      if (($regml(4) = 14) && ($regml(2) > 11)) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
+      if ($regml(4) > 4) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
+      if (($regml(4) = 4) && ($regml(2) > 1)) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
     }
     else {
       echo 4 Could not parse the Arena version ($battle.version).
@@ -67,7 +69,7 @@ check_techs {
     var %technique_name = $ini($dbfile(techniques.db), %current_technique)
     if (%technique_name = techs) continue
     if (%technique_name = ExampleTech) continue
-    titlebar Battle Arena $battle.version – Checking technique %current_technique / %total_techniques : %technique_name ...
+    titlebar Battle Arena $battle.version � Checking technique %current_technique / %total_techniques : %technique_name ...
 
     ; Spaces and = can't be in technique names.
     if (($chr(32) isin %technique_name) || (= isin %technique_name)) /log_issue Moderate Technique %technique_name has an invalid name: technique will be unusable.
@@ -205,7 +207,7 @@ check_items {
   ;    No parameters
 
   window @issues
-  titlebar Battle Arena $battle.version – Checking item lists...
+  titlebar Battle Arena $battle.version � Checking item lists...
 
   ; Read in the lists at the top of the database, and make sure there are no broken references there.
   check_db_item_lists Gems gem
@@ -233,7 +235,7 @@ check_items {
 
     var %item_name = $ini($dbfile(items.db), %current_item)
     if (%item_name = Items) continue
-    titlebar Battle Arena $battle.version – Checking item %current_item / %total_items : %item_name ...
+    titlebar Battle Arena $battle.version � Checking item %current_item / %total_items : %item_name ...
 
     check_item new_chr %item_name on new_chr
   }
@@ -540,7 +542,7 @@ check_monster_file {
   set -u0 %file_path $1-
   var %file = $nopath($1-)
   if (%file = Note.txt) return
-  titlebar Battle Arena $battle.version – Checking $lower(%category) %file ...
+  titlebar Battle Arena $battle.version � Checking $lower(%category) %file ...
 
   ; Check the file extension.
   noop $regex(%file, ^.*\.([^.]+)$)
@@ -633,7 +635,7 @@ check_monster {
     inc %i
     var %skill = $ini(%file_path, skills, %i)
     if (;* iswm %skill) continue
-    if ((. isin %skill) || (%skill isin CoverTarget.shadowcopy_name.Summon.resist-weaponlock.Singing)) continue
+    if ((. isin %skill) || (%skill isin CoverTarget.shadowcopy_name.Summon.resist-weaponlock.Singing.Resist-Disarm)) continue
     if (%skill isin CocoonEvolve.MonsterConsume.Snatch.MagicShift.DemonPortal.MonsterSummon.RepairNaturalArmor.ChangeBattlefield.Quicksilver) noop
     else if (%skill = Resist-Paralyze) continue
     else if (%skill = Wizardy) continue
