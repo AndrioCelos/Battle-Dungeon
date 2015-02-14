@@ -2077,8 +2077,25 @@ get_mon_list {
 
   ; MOD: Check for the battlefield's monster list.
   set -u0 %battlefield_pool $null
-  if (($1 != portal) && ($1 != nofield) && ($rand(0, 3) != 0)) {
-    set -u0 %battlefield_pool $readini($dbfile(battlefields.db), %current.battlefield, monsters)
+  if (($1 != portal) && ($1 != nofield)) {  ; Anything can appear out of a demon portal.
+    echo 2 -a Battlefield: %current.battlefield
+    var %rand = $rand(0, 9)
+
+    if (%rand < 2) {
+      ; 20 % chance to use the common list, or the uncommon list if there's no common list.
+      echo 2 -a Selected the common monster list.
+      set -u0 %battlefield_pool $readini($dbfile(battlefields.db), %current.battlefield, CommonMonsters)
+      if (%battlefield_pool == $null) {
+        echo 6 -a The %current.battlefield battlefield has no common monster list; falling back to the uncommon list.
+        set -u0 %battlefield_pool $readini($dbfile(battlefields.db), %current.battlefield, Monsters)
+      } 
+    }
+    else if (%rand < 7) {
+      ; 50 % chance to use the uncommon list.
+      echo 2 -a Selected the uncommon monster list.
+      set -u0 %battlefield_pool $readini($dbfile(battlefields.db), %current.battlefield, Monsters)
+    }
+    else echo 2 -a Selected no monster list.
   }
 
   if ($1 = portal) { set %nosouls true }
@@ -2106,11 +2123,14 @@ get_mon_list {
   .remove $txtfile(temporary_mlist.txt)
   unset %token.value | unset %current.winning.streak.value | unset %difficulty | unset %current.month
   unset %monster.info.streak | unset %monster.info.streak.max | unset %nosouls
+  
+  echo 2 -a Monsters: %monster.list
 
   if ((%battlefield_pool != $null) && ((%monster.list == $null) || (%monster.list == Lost_Soul))) get_mon_list_sub
   return
 }
 get_mon_list_sub {
+  echo 6 -a No monsters were found; falling back on no monster list.
   get_mon_list nofield
 }
 

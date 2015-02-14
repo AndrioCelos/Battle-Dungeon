@@ -3145,8 +3145,8 @@ alias skill.justrelease { $set_chr_name($1)
 ;=================
 ; WARP
 ;=================
-on 3:TEXT:!warp *:*: { $skill.warp($nick, $2) }
-on 3:TEXT:!warp *:*: { $skill.warp($nick, $2) }
+on 3:TEXT:!warp *:*: { $skill.warp($nick, $2-) }
+on 3:TEXT:!warp *:*: { $skill.warp($nick, $2-) }
 
 alias skill.warp { $set_chr_name($1)
   if ($skillhave.check($1, warp) = false) { $set_chr_name($1) | $display.system.message($readini(translation.dat, errors, DoNotHaveSkill), private)  | halt }
