@@ -216,8 +216,8 @@ check_techs {
         var %status.value = 1
         while (%status.value <= %number.of.statuseffects) { 
           var %current.status.effect = $gettok(%status.type.list, %status.value, 46)
-          if (%current.status.effect !isin stop.poison.silence.blind.virus.amnesia.paralysis.zombie.slow.stun.curse.charm.intimidate.defensedown.strengthdown.intdown.petrify.bored.confuse.random) $&
-            log_issue Minor Technique %technique_name uses an invalid status type! Use one of: stop, poison, silence, blind, virus, amnesia, paralysis, zombie, slow, stun, curse, charm, intimidate, defensedown, strengthdown, intdown, petrify, bored, confuse, random
+          if (%current.status.effect !isin stop.poison.silence.blind.virus.amnesia.paralysis.zombie.slow.stun.curse.charm.intimidate.defensedown.strengthdown.intdown.petrify.bored.confuse.sleep.random) $&
+            log_issue Minor Technique %technique_name uses an invalid status type! Use one of: stop, poison, silence, blind, virus, amnesia, paralysis, zombie, slow, stun, curse, charm, intimidate, defensedown, strengthdown, intdown, petrify, bored, confuse, sleep, random
           inc %status.value 1
         }  
       }
@@ -486,7 +486,7 @@ check_item {
       var %status.value = 1
       while (%status.value <= %number.of.statuseffects) { 
         set %current.status.effect $gettok(%status.type.list, %status.value, 46)
-        if (%current.status.effect !isin stop.poison.silence.blind.virus.amnesia.paralysis.zombie.slow.stun.curse.charm.intimidate.defensedown.strengthdown.intdown.petrify.bored.confuse.random) $&
+        if (%current.status.effect !isin stop.poison.silence.blind.virus.amnesia.paralysis.zombie.slow.stun.curse.charm.intimidate.defensedown.strengthdown.intdown.petrify.bored.confuse.sleep.random) $&
           log_issue Moderate Item $2 uses an invalid status type. Use one of: stop, poison, silence, blind, virus, amnesia, paralysis, zombie, slow, stun, curse, charm, intimidate, defensedown, strengthdown, intdown, petrify, bored, confuse, random
         inc %status.value 1
       }  
@@ -693,7 +693,7 @@ check_monster {
     else if (%skill == Wizardy) continue
     else if (Resist- isin %skill) {
       var %status_resisted = $gettok(%skill, 2-, 45)
-      if (%status_resisted !isin stop.poison.silence.blind.drunk.virus.amnesia.paralysis.zombie.slow.stun.curse.charm.intimidate.defensedown.strengthdown.intdown.petrify.bored.confuse) $&
+      if (%status_resisted !isin stop.poison.silence.blind.drunk.virus.amnesia.paralysis.zombie.slow.stun.curse.charm.intimidate.defensedown.strengthdown.intdown.petrify.bored.confuse.sleep) $&
         var %missing_resists = $addtok(%missing_resists, Resist- $+ %status_resisted, 46)
     }
     else if (-killer isin %skill) continue
@@ -1037,8 +1037,8 @@ check_weapons {
         var %status.value = 1
         while (%status.value <= %weapon_status_count) { 
           var %current.status.effect = $gettok(%weapon_status, %status.value, 46)
-          if (%current.status.effect !isin stop.poison.silence.blind.virus.amnesia.paralysis.zombie.slow.stun.curse.charm.intimidate.defensedown.strengthdown.intdown.petrify.bored.confuse.random) $&
-            log_issue Minor Weapon %weapon_name uses an invalid status type! Use one of: stop, poison, silence, blind, virus, amnesia, paralysis, zombie, slow, stun, curse, charm, intimidate, defensedown, strengthdown, intdown, petrify, bored, confuse, random
+          if (%current.status.effect !isin stop.poison.silence.blind.virus.amnesia.paralysis.zombie.slow.stun.curse.charm.intimidate.defensedown.strengthdown.intdown.petrify.bored.confuse.sleep.random) $&
+            log_issue Minor Weapon %weapon_name uses an invalid status type! Use one of: stop, poison, silence, blind, virus, amnesia, paralysis, zombie, slow, stun, curse, charm, intimidate, defensedown, strengthdown, intdown, petrify, bored, confuse, sleep, random
           inc %status.value
         }  
       }
@@ -1050,7 +1050,7 @@ check_weapons {
 check_shield {
   ; Checks an individual shield definition for errors.
   ;   $1 : The name of the shield.
-  
+
   ; Block chance
   var %weapon_blockchance = $readini($dbfile(weapons.db), $1, BlockChance)
   if (%weapon_blockchance !isnum) log_issue Moderate Shield $1 $+ 's block chance is not a number: it will be useless.

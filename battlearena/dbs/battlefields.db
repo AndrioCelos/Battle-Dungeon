@@ -1,11 +1,11 @@
 [weather]
-current=hot
+current=calm
 list=calm.bright.gloomy.rainy.stormy.snowy.windy.hot.dry
 boost=.25
 
 [MoonPhase]
-CurrentMoonPhase=Full
-CurrentMoonTurn=3
+CurrentMoonPhase=Quarter
+currentMoonTurn=1
 
 [MoonPhaseTime]
 full=3
@@ -17,7 +17,7 @@ blood=1
 BloodMoonChance=60
 
 [TimeOfDay]
-Currenttimeofday=Night
+Currenttimeofday=Noon
 currentTimeOfDayTurn=1
 
 [TimeOfDayTime]
@@ -644,3 +644,9 @@ Weather=rainy
 NumberOfEvents=0
 limitations=no-mech.no-playerignition
 scavenge=Sapphire.Onyx.Ruby.Diamond.BombFlower
+
+[Ancient Mayan Ruins]
+Weather=dry.calm
+NumberOfEvents=0
+limitations=no-mech.no-playerignition
+scavenge=Sapphire.Onyx.Ruby.Diamond.RepairHammer

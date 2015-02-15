@@ -165,7 +165,7 @@ MPRegenerating=no
 
 [Weapons]
 Equipped=CthulhuRetina
-ChtulhuRetina=$current.battlestreak
+CthulhuRetina=$current.battlestreak
 
 
 [Skills]

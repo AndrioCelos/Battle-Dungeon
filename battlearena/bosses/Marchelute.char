@@ -26,7 +26,7 @@ RageCountDown=0
 
 
 [Descriptions]
-Char=Was an Elvaan slain in battle but rose up again as a Formor White Mage. It carries a staff in hand.
+Char=Was an Elvaan slain in battle but rose up again as a Fomor White Mage. He carries a staff in hand.
 Rage=screams in rage 
 BossQuote=.....
 
@@ -124,8 +124,8 @@ stun=no
 MPRegenerating=no
 
 [Weapons]
-Equipped=FomorPower
-FomorPower=1000
+Equipped=FormorPower
+FormorPower=1000
 ; It is possible to make monsters weak or strong against certain weapon types:
 ; Weapon types are: HandToHand.Whip.Sword.Gun.Rifle.Katana.Wand.Spear.Scythe.Glyph.GreatSword
 ; Weakness=list.weapon.types  

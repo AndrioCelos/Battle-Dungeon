@@ -116,7 +116,7 @@ BloodSpirit=10
 [Techniques]
 Ignis=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
 Grando=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-Fulgar=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
+Fulgur=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
 Nitesco=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
 Globus=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
 Acerbatus=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)

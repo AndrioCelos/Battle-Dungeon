@@ -4,9 +4,9 @@
 
 # Data files
 auction_winners.txt
-lsts/monsterdeaths.lst
-lsts/wheelgame.lst
-txts/auction_winners.txt
+**/lsts/monsterdeaths.lst
+**/lsts/wheelgame.lst
+**/txts/auction_winners.txt
 battlestats.dat
 garden.dat
 scoreboard.html
