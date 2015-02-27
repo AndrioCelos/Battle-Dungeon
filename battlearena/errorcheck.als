@@ -1,8 +1,11 @@
 ; A Battle Arena error checking script
-; version 1.4 (Friday 13 February 2015)
+; version 1.4.1 (Sunday 22 February 2015)
 ; by Andrio Celos
 ;
 ; Changelog:
+;   Version 1.4.1:
+;     Updated for Battle Arena 3.0 beta 02/21/15.
+;     Added some error handlers.
 ;   Version 1.4:
 ;     Most commands in this script can no longer be used as a function by default.
 ;     Added checks for weapons.
@@ -31,22 +34,27 @@ check {
     .timer -do 1 1 check $1-
     halt
   }
-  if ($2 != ignoreversion) {
+  if (($2 != ignoreversion) && ($3 != ignoreversion)) {
     ; Do a quick check on the Arena version.
     if ($regex($battle.version(), ^(\d\.\d)$) > 0) {
       if ($regml(1) > 3.0) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
+      else if ($regml(1) < 3.0) set -u0 %old $true
     }
     else if ($regex($battle.version(), ^(\d\.\d)beta_(\d\d)(\d\d)(\d\d)$) > 0) {
       if ($regml(1) > 3.0) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
-      if ($regml(4) > 15) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
-      if (($regml(4) == 15) && ($regml(2) > 3)) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
+      else if ($regml(1) < 3.0) set -u0 %old $true
+      else if ($regml(4) > 15) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
+      else if ($regml(4) < 15) set -u0 %old $true
+      else if ($regml(2) > 3) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
+      else if ($regml(2) < 2) set -u0 %old $true
+      else if (($regml(2) == 2) && ($regml(3) < 21)) set -u0 %old $true
     }
     else {
       echo 4 Could not parse the Arena version ($battle.version).
     }
   }
 
-  if ($0 < 1) { echo 2 Usage: /check <category> [ignoreversion] | echo 2 The following can be checked: techs, items, NPCs, weapons, all. | halt }
+  if ($0 < 1) { echo 2 Usage: /check category [subcategory] [ignoreversion] | echo 2 The following can be checked: techs, items, NPCs, weapons, all. Subcategories for NPCs are monsters, allies and bosses. | halt }
 
   var %old_title = $titlebar
   set %issues_total 0
@@ -68,9 +76,15 @@ check {
   else if (($1 == techs) || ($1 == techniques)) check_techs new_chr DoublePunch new_chr
   ; Those parameters are there in case of techniques like Asura Strike that need to reference a character.
   else if (($1 == items)) check_items
-  else if (($1 == monsters) || ($1 == npcs)) check_monsters
+  else if (($1 == monsters) || ($1 == npcs)) {
+    if (($2 == monsters) || ($2 == mons)) set -u0 %subcategory monsters
+    else if (($2 == allies) || ($2 == npcs)) set -u0 %subcategory allies
+    else if ($2 == bosses) set -u0 %subcategory bosses
+    else if (($2 != null) && ($2 != ignoreversion)) { echo 2 ' $+ $2 $+ ' isn't a known subcategory. Use monsters, allies or bosses. | halt }
+    check_monsters
+  }
   else if (($1 == weapons)) check_weapons
-  else { echo 2 Usage: /check <category> [ignoreversion] | echo 2 The following can be checked: techs, items, NPCs, weapons, all. | halt }
+  else { echo 2 Usage: /check category [subcategory] [ignoreversion] | echo 2 The following can be checked: techs, items, NPCs, weapons, all. Subcategories for NPCs are monsters, allies and bosses. | halt }
 
   titlebar %old_title
 }
@@ -91,7 +105,7 @@ check_techs {
     var %technique_name = $ini($dbfile(techniques.db), %current_technique)
     if (%technique_name == techs) continue
     if (%technique_name == ExampleTech) continue
-    titlebar Battle Arena $battle.version � Checking technique %current_technique / %total_techniques : %technique_name ...
+    titlebar Battle Arena $battle.version — Checking technique %current_technique / %total_techniques : %technique_name ...
 
     ; Spaces and = can't be in technique names.
     if (($chr(32) isin %technique_name) || (= isin %technique_name)) log_issue Moderate Technique %technique_name has an invalid name: technique will be unusable.
@@ -198,9 +212,20 @@ check_techs {
     if ((%technique_magic != $null) && (%technique_magic != yes) && (%technique_magic != no)) log_issue Minor Technique %technique_name $+ 's magic field is specified, but not as 'yes': field will be ignored.
 
     ; Check the element.
-    var %tech.element = $readini($dbfile(techniques.db), %technique_name, element)
-    if ((%tech.element) && ((. isin %tech.element) || (%tech.element !isin none.fire.water.ice.lightning.wind.earth.light.dark))) $&
-      log_issue Minor Technique %technique_name uses an unknown element ( $+ %tech.element $+ ): it will be unaffected by weather.
+    var %tech.elements = $readini($dbfile(techniques.db), %technique_name, element)
+    if ((%tech.elements != $null) && (%tech.elements != none) && (%tech.elements != no)) {
+      var %count = $numtok(%tech.elements, 46) 
+
+      if (%count >= 1) {
+        var %i = 1
+        while (%i <= %count) { 
+          var %element = $gettok(%tech.elements, %i, 46)
+          if (%element !isin fire.water.ice.lightning.wind.earth.light.dark) $&
+            log_issue Minor Technique %technique_name uses an unknown element ( $+ %element $+ ): it will be unaffected by weather.
+          inc %i
+        }  
+      }
+    }
 
     ; Check that the ignore defense percent is a number and not a decimal.
     var %ignore.defense.percent = $readini($dbfile(techniques.db), %technique_name, IgnoreDefense)
@@ -209,23 +234,18 @@ check_techs {
 
     ; Check that the status types are valid.
     var %status.type.list = $readini($dbfile(techniques.db), %technique_name, StatusType)
-    if (%status.type.list != $null) { 
-      var %number.of.statuseffects = $numtok(%status.type.list, 46) 
-
-      if (%number.of.statuseffects >= 1) {
-        var %status.value = 1
-        while (%status.value <= %number.of.statuseffects) { 
-          var %current.status.effect = $gettok(%status.type.list, %status.value, 46)
-          if (%current.status.effect !isin stop.poison.silence.blind.virus.amnesia.paralysis.zombie.slow.stun.curse.charm.intimidate.defensedown.strengthdown.intdown.petrify.bored.confuse.sleep.random) $&
-            log_issue Minor Technique %technique_name uses an invalid status type! Use one of: stop, poison, silence, blind, virus, amnesia, paralysis, zombie, slow, stun, curse, charm, intimidate, defensedown, strengthdown, intdown, petrify, bored, confuse, sleep, random
-          inc %status.value 1
-        }  
-      }
-    }
+    if (%status.type.list != $null) check_statuseffects %status.type.list Technique  $+ %technique_name $+ 
+    var %selfstatus.type.list = $readini($dbfile(techniques.db), %technique_name, SelfStatus)
+    if (%selfstatus.type.list != $null) check_statuseffects %selfstatus.type.list Technique  $+ %technique_name $+ 's SelfStatus field
 
     ; Check the number of hits.
     var %tech.howmany.hits = $readini($dbfile(techniques.db), %technique_name, hits)
     if ((%tech.howmany.hits) && (%tech.howmany.hits !isnum)) /log_issue Minor Technique %technique_name $+ 's number of hits is not a number: it will be zeroed.
+
+    continue
+    :error
+    log_issue Critical Checking technique %technique_name failed: $error
+    reseterror
   }
   if (%issues_total == 0) echo -a 12Checked $calc(%current_technique - 1) techniques and found no issues. Yay!
   else echo -a 12Checked $calc(%current_technique - 1) techniques and found %issues_total  $+ $iif(%issues_total = 1, issue, issues) $+ .
@@ -237,7 +257,7 @@ check_items {
   if ($isid) return
 
   window @issues
-  titlebar Battle Arena $battle.version � Checking item lists...
+  titlebar Battle Arena $battle.version — Checking item lists...
 
   ; Read in the lists at the top of the database, and make sure there are no broken references there.
   check_db_item_lists Gems gem
@@ -410,13 +430,13 @@ check_item {
         var %amount = $readini($dbfile(items.db), $2, %type $+ .amount)
         if (%amount = $null) log_issue Moderate Accessory $2 has no %type amount; it will have no effect.
         else if (%amount !isnum) log_issue Moderate Accessory $2 $+ 's %type amount is not a number; it will have no effect.
-        else if ((%amount > -0.5) && (%amount < 0.5)) log_issue Moderate Accessory $2 $+ 's %type amount is very low. It should be a percentage instead of a fraction.
+        else if ((%amount > -0.5) && (%amount < 0.5) && (%amount != 0)) log_issue Moderate Accessory $2 $+ 's %type amount is very low. It should be a percentage instead of a fraction.
       }
       else if (%type isin IncreaseMechEngineLevel.ReduceShopLevel, %i, 46) {
         var %amount = $readini($dbfile(items.db), $2, %type $+ .amount)
         if (%amount = $null) log_issue Moderate Accessory $2 has no %type amount; it will have no effect.
         else if (%amount !isnum) log_issue Moderate Accessory $2 $+ 's %type amount is not a number; it will have no effect.
-        else if ((%amount > -0.5) && (%amount < 0.5)) log_issue Moderate Accessory $2 $+ 's %type amount is very low. It should be a number to add directly instead of a fraction.
+        else if ((%amount > -0.5) && (%amount < 0.5) && (%amount != 0)) log_issue Moderate Accessory $2 $+ 's %type amount is very low. It should be a number to add directly instead of a fraction.
       }
       else if (%type !isin CurseAddDrain.Mug.Stylish.IgnoreQuicksilver) $&
         log_issue Moderate Accessory $2 has unrecognised type %type $+ .
@@ -478,20 +498,8 @@ check_item {
   }
 
   if (%item_type == Status) {
-    var %status.type.list = $readini($dbfile(items.db), $3, StatusType) 
-
-    if (%status.type.list != $null) { 
-      var %number.of.statuseffects = $numtok(%status.type.list, 46) 
-
-      var %status.value = 1
-      while (%status.value <= %number.of.statuseffects) { 
-        set %current.status.effect $gettok(%status.type.list, %status.value, 46)
-        if (%current.status.effect !isin stop.poison.silence.blind.virus.amnesia.paralysis.zombie.slow.stun.curse.charm.intimidate.defensedown.strengthdown.intdown.petrify.bored.confuse.sleep.random) $&
-          log_issue Moderate Item $2 uses an invalid status type. Use one of: stop, poison, silence, blind, virus, amnesia, paralysis, zombie, slow, stun, curse, charm, intimidate, defensedown, strengthdown, intdown, petrify, bored, confuse, random
-        inc %status.value 1
-      }  
-      unset %number.of.statuseffects | unset %current.status.effect
-    }
+    var %status.type.list = $readini($dbfile(items.db), $2, StatusType) 
+    if (%status.type.list != $null) check_statuseffects %status.type.list Item  $+ $2 $+ 
 
     var %fullbring_item.base = $readini($dbfile(items.db), $2, FullbringAmount)
     var %item.base = $readini($dbfile(items.db), $2, Amount)
@@ -561,6 +569,11 @@ check_item {
   }
 
   log_issue Moderate Item $2 $+  has an unrecognised type ( $+ %item_type $+ ). If it's a mod, this script will need to be edited. Otherwise, the item will have no effect.
+
+  return
+  :error
+  log_issue Critical Checking item $2 failed: $error
+  reseterror
 }
 
 check_monsters {
@@ -571,12 +584,18 @@ check_monsters {
   window @issues
   set %monster_count 0
 
-  set -u0 %category Monster
-  noop $findfile($mon_path, *, 0, 0, check_monster_file $1-)
-  set -u0 %category Boss
-  noop $findfile($boss_path, *, 0, 0, check_monster_file $1-)
-  set -u0 %category NPC
-  noop $findfile($npc_path, *, 0, 0, check_monster_file $1-)
+  if ((%subcategory == $null) || (%subcategory == monsters)) {
+    set -u0 %category Monster
+    noop $findfile($mon_path, *, 0, 0, check_monster_file $1-)
+  }
+  if ((%subcategory == $null) || (%subcategory == bosses)) {
+    set -u0 %category Boss
+    noop $findfile($boss_path, *, 0, 0, check_monster_file $1-)
+  }
+  if ((%subcategory == $null) || (%subcategory == allies)) {
+    set -u0 %category NPC
+    noop $findfile($npc_path, *, 0, 0, check_monster_file $1-)
+  }
 
   ; Make sure that the orb fountain is present.
   if (!$isfile($mon(orb_fountain))) log_issue Critical The Red Orb Fountain is missing! ( $+ $mon(orb_fountain) $+ )
@@ -593,7 +612,7 @@ check_monster_file {
   set -u0 %file_path $1-
   var %file = $nopath($1-)
   if (%file == Note.txt) return
-  titlebar Battle Arena $battle.version � Checking $lower(%category) %file ...
+  titlebar Battle Arena $battle.version — Checking $lower(%category) %file ...
 
   ; Check the file extension.
   noop $regex(%file, ^.*\.([^.]+)$)
@@ -623,10 +642,10 @@ check_monster {
 
   if (%hp !isnum) log_issue Moderate %category $+  $1 $+ 's base HP is not a number; their HP will be zeroed.
   if (%tp !isnum) log_issue $iif($readini(%file_path, info, BattleStats) = ignore, Moderate, Minor) %category $+  $1 $+ 's base TP is not a number; their TP will be zeroed.
-  if (%str !isnum) log_issue Moderate %category $+  $1 $+ 's base STR is not a number; their HP will be zeroed.
-  if (%def !isnum) log_issue Moderate %category $+  $1 $+ 's base DEF is not a number; their HP will be zeroed.
-  if (%int !isnum) log_issue Moderate %category $+  $1 $+ 's base INT is not a number; their HP will be zeroed.
-  if (%spd !isnum) log_issue Moderate %category $+  $1 $+ 's base SPD is not a number; their HP will be zeroed.
+  if (%str !isnum) log_issue Moderate %category $+  $1 $+ 's base STR is not a number; their STR will be zeroed.
+  if (%def !isnum) log_issue Moderate %category $+  $1 $+ 's base DEF is not a number; their DEF will be zeroed.
+  if (%int !isnum) log_issue Moderate %category $+  $1 $+ 's base INT is not a number; their INT will be zeroed.
+  if (%spd !isnum) log_issue Moderate %category $+  $1 $+ 's base SPD is not a number; their SPD will be zeroed.
 
   unset %hp %tp %str %def %int %spd
 
@@ -837,6 +856,11 @@ check_monster {
     if ($ini($dbfile(items.db), %modifier)) continue
     log_issue Minor %category $+  $1 references unrecognised modifier %modifier $+ . Use an element, weapon type, weapon or technique name.
   }  
+
+  return
+  :error
+  log_issue Critical Checking %category $+  $1 failed: $error
+  reseterror
 }
 monster_get_hp {
   ; Retrieves a monster's HP.
@@ -889,7 +913,7 @@ check_weapons {
   window @issues
 
   ; Check the weapon lists and make sure there's nothing missing.
-  titlebar Battle Arena $battle.version � Checking weapon lists...
+  titlebar Battle Arena $battle.version — Checking weapon lists...
   var %i = 0
   var %lcount = $ini(weapons.db, weapons, 0)
   while (%i < %lcount) {
@@ -1030,19 +1054,12 @@ check_weapons {
 
     ; Status effect
     var %weapon_status = $readini($dbfile(weapons.db), %weapon_name, StatusType)
-    if (%weapon_status != $null) { 
-      var %weapon_status_count = $numtok(%weapon_status, 46) 
+    if (%weapon_status != $null) check_statuseffects %weapon_status Weapon  $+ %weapon_name $+ 
 
-      if (%weapon_status_count >= 1) {
-        var %status.value = 1
-        while (%status.value <= %weapon_status_count) { 
-          var %current.status.effect = $gettok(%weapon_status, %status.value, 46)
-          if (%current.status.effect !isin stop.poison.silence.blind.virus.amnesia.paralysis.zombie.slow.stun.curse.charm.intimidate.defensedown.strengthdown.intdown.petrify.bored.confuse.sleep.random) $&
-            log_issue Minor Weapon %weapon_name uses an invalid status type! Use one of: stop, poison, silence, blind, virus, amnesia, paralysis, zombie, slow, stun, curse, charm, intimidate, defensedown, strengthdown, intdown, petrify, bored, confuse, sleep, random
-          inc %status.value
-        }  
-      }
-    }
+    continue
+    :error
+    log_issue Critical Checking weapon %weapon_name failed: $error
+    reseterror
   } 
   if (%issues_total == 0) echo -a 12Checked $calc(%current_weapon - 1) weapons and found no issues. Yay!
   else echo -a 12Checked $calc(%current_weapon - 1) weapons and found %issues_total  $+ $iif(%issues_total == 1, issue, issues) $+ .
@@ -1050,6 +1067,7 @@ check_weapons {
 check_shield {
   ; Checks an individual shield definition for errors.
   ;   $1 : The name of the shield.
+  if ($isid) return
 
   ; Block chance
   var %weapon_blockchance = $readini($dbfile(weapons.db), $1, BlockChance)
@@ -1060,6 +1078,28 @@ check_shield {
   var %weapon_blockamount = $readini($dbfile(weapons.db), $1, AbsorbAmount)
   if (%weapon_blockamount !isnum) log_issue Moderate Shield $1 $+ 's block amount is not a number: it will be useless.
   else if (%weapon_blockamount > 0 && %weapon_blockamount < 1) log_issue Minor Shield $1 $+ 's block amount is a decimal where a percentage (0-100) is expected.
+}
+
+check_statuseffects {
+  ; Checks a list of status effects, to make sure that they all exist.
+  ;   $1 : the list of effects
+  ;   $2-: the entry being checked
+  if ($isid) return
+  if ($1 != $null) { 
+    var %count = $numtok($1, 46) 
+
+    if (%count >= 1) {
+      var %i = 1
+      while (%i <= %count) { 
+        var %current.status.effect = $gettok($1, %i, 46)
+        if ((%current.status.effect == sleep) && (%old)) $&
+          log_issue Minor $2- uses the sleep status effect, which may not work in this version of Battle Arena.
+        else if (%current.status.effect !isin stop.poison.silence.blind.drunk.virus.amnesia.paralysis.zombie.slow.stun.curse.charm.intimidate.defensedown.strengthdown.intdown.petrify.bored.confuse.sleep.random) $&
+          log_issue Minor $2- uses an invalid status effect ( $+ %current.status.effect $+ )! Use one of: stop, poison, silence, blind, drunk, virus, amnesia, paralysis, zombie, slow, stun, curse, charm, intimidate, defensedown, strengthdown, intdown, petrify, bored, confuse, sleep, random.
+        inc %i
+      }  
+    }
+  }
 }
 
 log_issue {

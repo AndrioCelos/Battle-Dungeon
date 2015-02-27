@@ -69,16 +69,7 @@ on 1:START: {
     set %bot.owner $readini(system.dat, botinfo, bot.owner) 
     if (%bot.owner = $null) { echo 4*** WARNING: There is no bot admin set.  Please fix this now. 
     set %bot.owner $?="Please enter the bot admin's IRC nick" |  writeini system.dat botinfo bot.owner %bot.owner }
-    else { echo 12*** The bot admin list is currently set to:4 %bot.owner 12***  |  
-
-      var %value 1 | var %number.of.owners $numtok(%bot.owner, 46)
-      while (%value <= %number.of.owners) {
-        set %name.of.owner $gettok(%bot.owner,%value,46)
-        .auser 50 %name.of.owner
-        inc %value 1
-      }
-      unset %name.of.owner
-    }
+    else { echo 12*** The bot admin list is currently set to:4 %bot.owner 12*** }
 
     set %battlechan $readini(system.dat, botinfo, questchan) 
     if (%battlechan = $null) { echo 4*** WARNING: There is no battle channel set.  Please fix this now. 
@@ -163,13 +154,32 @@ on 1:DISCONNECT:{
   .timerBattleBegin off
 }
 
-on me:JOIN:%battlechan:{
+on me:*:JOIN:%battlechan:{
   ; If a battle was on when the bot turned off, let's check it and do something with it.
   if (%battleis = on) { 
     if ($readini($txtfile(battle2.txt), BattleInfo, Monsters) = $null) { $clear_battle }
     else { $next }
   }
-  if (%battleis = off) { $clear_battle } 
+  if (%battleis = off) { $clear_battle
+    ; MOD: Do event ticks with the automated battle system off.
+    if ($readini(system.dat, system, automatedbattlesystem) == off) .timerEventTick 1 900 eventtick
+  } 
+}
+; MOD: Do event ticks with the automated battle system off.
+alias eventtick {
+  if (%battleis != on) {
+    var %max.emptyrounds $readini(system.dat, system, EmptyRoundsBeforeStreakReset)
+    var %current.emptyrounds $readini(battlestats.dat, battle, emptyRounds) 
+    inc %current.emptyrounds 5
+    writeini battlestats.dat battle emptyRounds %current.emptyrounds
+    if (%current.emptyrounds >= %max.emptyrounds) { 
+      if ($readini(battlestats.dat, battle, winningStreak) > 0) { $display.system.message($readini(translation.dat, system, StreakResetTo0),global) }
+      writeini battlestats.dat battle emptyRounds 0
+      writeini battlestats.dat battle winningStreak 0
+      writeini battlestats.dat battle losingStreak 0
+    }
+    clear_battle
+  } 
 }
 
 alias identifytonickserv {
@@ -184,7 +194,8 @@ alias identifytonickserv {
 on 50:TEXT:!zap *:*: {  $set_chr_name($2) | $checkchar($2) | $zap_char($2) | $display.system.message($readini(translation.dat, system, zappedcomplete),global) | halt }
 
 ; Force the bot to quit
-on 50:TEXT:!quit*:*:{ /quit $battle.version }
+on 50:TEXT:!quit*:*:{ if ($0 == 1) quit | else quit $2- }
+on 50:TEXT:!exit*:*:{ if ($0 == 1) quit | else quit $2- | exit -n }
 
 ; Add or remove a bot admin (note: cannot remove the person in position 1 with this command)
 on 50:TEXT:!bot admin*:*: {  
@@ -318,6 +329,8 @@ on 50:TEXT:!toggle automated battle system*:*:{
   else {
     writeini system.dat system automatedbattlesystem off
     $display.system.message($readini(translation.dat, system, AutomatedBattleOff), global)
+    ; MOD: Do event ticks with the automated battle system off.
+    .timerEventTick 1 900 eventtick
   }
 }
 

@@ -166,10 +166,10 @@ ChestDrops=$chr(3) $+ 12 $+ The monsters were protecting a %color.chest treasu
 ChestDestroyed=$chr(3) $+ 4 $+ The unopened chest fades from existence, its contents never to be revealed...
 ChestOpened=$chr(3) $+ 10 $+  $+ %real.name unlocks the treasure chest and obtains %chest.amount %chest.item $+ ! The chest then disappears.
 ChestMimic=$chr(3) $+ 4 $+  $+ %real.name tries to unlock the chest only to discover that the chest is a Mimic! It leaps to life and readies itself for a fight.
-SaveBattleStreak=$chr(3) $+ 3 $+  $+ %real.name has saved winning streak # $bytes($readini(battlestats.dat, Battle, WinningStreak),b) to $gender($nick) file.
-ClearedBattleSave=$chr(3) $+ 3 $+  $+ %real.name has cleared $gender($nick) battle streak save.
-ReloadBattleStreak=$chr(3) $+ 3 $+  $+ %real.name has reloaded winning streak # $bytes($readini($char($nick), Info, SavedStreak),b) from $gender($nick) file.
-ViewBattleStreak=$chr(3) $+ 3 $+  $+ %real.name currently has winning streak # $bytes(%saved.streak,b) saved in $gender($nick) file
+SaveBattleStreak=$chr(3) $+ 3 $+  $+ %real.name has saved Arena level $bytes($readini(battlestats.dat, Battle, WinningStreak),b) to $gender($nick) file.
+ClearedBattleSave=$chr(3) $+ 3 $+  $+ %real.name has cleared $gender($nick) saved Arena level.
+ReloadBattleStreak=$chr(3) $+ 3 $+  $+ %real.name has reloaded Arena level $bytes($readini($char($nick), Info, SavedStreak),b) from $gender($nick) file.
+ViewBattleStreak=$chr(3) $+ 3 $+  $+ %real.name currently has Arena level $bytes(%saved.streak,b) saved in $gender($nick) file
 GiveItemToTarget=$chr(3) $+ 3 $+ %real.name gives $3 $iif($3 < 2, $4, $iif($readini($dbfile(items.db), $4, Plural) == $null, $4 $+ s, $readini($dbfile(items.db), $4, Plural))) to $set_chr_name($2) %real.name $+ !
 FinalGetsugaWarning=$chr(3) $+ 4 $+ This technique is a Final Getsuga type, which means if you use it at the end of the battle you will be reduced back to basically a new character.
 ScoreBoardTitle=$chr(3) $+ 3The Top Players in %battlechan
@@ -201,7 +201,7 @@ TotalDeathNone=$chr(3) $+ 3 $+ %real.name is currently undefeated!
 DamageNowCapped=$chr(3) $+ 3Battle Damage is now capped.
 DamageNotCapped=$chr(3) $+ 3Battle Damage is no longer capped.
 ScoreBoardTypeToggle=$chr(3) $+ The Scoreboard Generation has been toggled to Type %scoreboard.type $+ !
-StreakResetTo0=$chr(3) $+ 12 $+ *** $chr(3) $+ 4 $+ The current winning streak has been reset to 0.
+StreakResetTo0=$chr(3) $+ 12 $+ *** $chr(3) $+ 4 $+ The Arena level has been reset to 0.
 MechRestoredHP=$chr(3) $+ 3 $+ Your $readini($char($1), mech, name) has been repaired by %amount HP.
 MechRestoredEnergy=$chr(3) $+ 3 $+ Your $readini($char($1), mech, name) has been restored %amount energy.
 MechUpgradeEnergy=$chr(3) $+ 2 $+ You pay a crazy engineer %total.price Allied Notes to upgrade your mech's energy levels. When completed, your mech now has + $+ %energy.to.increase more max energy.
@@ -368,12 +368,12 @@ NoChestExists=$chr(3) $+ 4 $+ Error: There is no chest to unlock!
 WrongChestKey=$chr(3) $+ 4 $+ Error: This key does not unlock this color of chest!
 ChestAlreadyBeingOpened=$chr(3) $+ 4 $+ Error: This chest is already being opened..
 Can'tLogIntoThisChar=$chr(3) $+ 4 $+ Error: You cannot log into this character.
-Can'tSaveALosingStreak=$chr(3) $+ 4 $+ Error: %real.name cannot save a losing streak to $gender($nick) file.
-Can'tSaveALowerStreak=$chr(3) $+ 4 $+ Error: %real.name cannot save a winning streak lower than $gender($nick) previous save.
-Can'tReloadOnAWinningStreak=$chr(3) $+ 4 $+ Error: %real.name cannot reload while a winning streak is greater than 10.
-LevelTooLowTOSaveaStreak=$chr(3) $+ 4 $+ Error: %real.name $+ 's level is too low to save this winning streak. The highest level %real.name can save is $round($calc($get.level($nick) + 50),0)
-NoWinningStreakSaved=$chr(3) $+ 4 $+ Error: %real.name does not have a winning streak to reload!
-NoWinningStreakSavedToErase=$chr(3) $+ 4 $+ Error: %real.name does not have a winning streak save to erase!
+Can'tSaveALosingStreak=$chr(3) $+ 4 $+ Error: %real.name cannot save a negative Arena level to $gender($nick) file.
+Can'tSaveALowerStreak=$chr(3) $+ 4 $+ Error: %real.name cannot save an Arena level lower than $gender($nick) previous save.
+Can'tReloadOnAWinningStreak=$chr(3) $+ 4 $+ Error: %real.name cannot reload while the current Arena level is above 10.
+LevelTooLowTOSaveaStreak=$chr(3) $+ 4 $+ Error: %real.name $+ 's level is too low to save this level. The highest level %real.name can save is $round($calc($get.level($nick) + 50),0)
+NoWinningStreakSaved=$chr(3) $+ 4 $+ Error: %real.name does not have a saved level to reload!
+NoWinningStreakSavedToErase=$chr(3) $+ 4 $+ Error: %real.name does not have a saved level to erase!
 NotEnoughTimeToSave=$chr(3) $+ 4 $+ Error: Not enough time has passed since the last save %real.name did. %real.name still has $calc(7200 - %time.difference) seconds left. 
 Can'tGiveToNonChar=$chr(3) $+ 4 $+ Error: %real.name cannot give items to a monster or NPC! 
 Can'tGiveNegativeItem=$chr(3) $+ 4 $+ Error: %real.name cannot give a part or negative amounts of an item.
@@ -470,7 +470,7 @@ BattleOpen=$chr(3) $+ 4 $+ A dimensional portal has been detected.  The enemy fo
 BattleOpenMimic=$chr(3) $+ 4 $+ An evil treasure chest Mimic is ready to fight The battle will begin in %time.to.enter seconds. Type !enter if you wish to join the battle!  
 BattleOpenGauntlet=$chr(3) $+ 4 $+ The doors to the gauntlet are open. Anyone willing to brave the gauntlet has %time.to.enter seconds to enter before the doors close. Type !enter if you wish to join the battle!  
 BattleOpenAIBet=$chr(3) $+ 4 $+ A 1 vs 1 AI Match is about to begin! The battle will begin in %time.to.enter seconds. 
-BattleAIInfo=$chr(3) $+ 12 $+ AI Battle information: [NPC] %ai.npc.name vs [Monster] %ai.monster.name on [Streak Level] %ai.battle.level [Favorite to Win]4 $iif(%favorite.to.win = monster, %ai.monster.name, %ai.npc.name)
+BattleAIInfo=$chr(3) $+ 12 $+ AI Battle information: [NPC] %ai.npc.name vs [Monster] %ai.monster.name on [Arena level] %ai.battle.level [Favorite to Win]4 $iif(%favorite.to.win = monster, %ai.monster.name, %ai.npc.name)
 
 ; commenting this out for now. 
 ; with [Opening Odds] of %odds.npc $+  $+ $chr(58) $+  $+ %odds.monster

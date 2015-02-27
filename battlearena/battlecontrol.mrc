@@ -259,6 +259,10 @@ alias clear_battle {
 
     $display.system.message($readini(translation.dat, Battle, StartBattle), global) 
   }
+  ; MOD: Do event ticks with the automated battle system off.
+  else {
+    .timerEventTick 1 900 eventtick
+  }
 
   ; Check for the conquest tally
   $conquest.tally
@@ -354,6 +358,8 @@ alias startnormal {
   }
 
   set %battleis on | set %battleisopen on
+  ; MOD: Do event ticks with the automated battle system off.
+  .timerEventTick off
 
 
 
