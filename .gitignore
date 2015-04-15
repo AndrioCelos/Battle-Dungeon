@@ -30,6 +30,8 @@ popups.ini
 remote.ini
 servers.ini
 urls.ini
+users.ini
+vars.ini
 
 # OS-generated files
 .DS_Store
