@@ -1,11 +1,11 @@
 [weather]
-current=calm
+current=hot
 list=calm.bright.gloomy.rainy.stormy.snowy.windy.hot.dry
 boost=.25
 
 [MoonPhase]
-CurrentMoonPhase=Quarter
-currentMoonTurn=1
+CurrentMoonPhase=Crescent
+CurrentMoonTurn=2
 
 [MoonPhaseTime]
 full=3
@@ -17,8 +17,8 @@ blood=1
 BloodMoonChance=60
 
 [TimeOfDay]
-Currenttimeofday=Noon
-currentTimeOfDayTurn=1
+Currenttimeofday=Morning
+CurrentTimeOfDayTurn=2
 
 [TimeOfDayTime]
 morning=2

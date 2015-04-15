@@ -93,7 +93,7 @@ Info=It's your fists.  They are not detachable.
 Abilities=DoublePunch.ShoulderTackle.SpinningAttack.AsuranFists
 Element=none
 Hits=2
-BasePower=10
+BasePower=5
 Upgrade=300
 2Handed=true
 

@@ -37,12 +37,15 @@ alias aicheck {
   var %ai.system $readini(system.dat, system, aisystem)
   if ((%ai.system = $null) || (%ai.system = on)) { var %ai.wait.time 6
     if (%battle.type = ai) { inc %ai.wait.time 4 }
+    if (%fast) var %ai.wait.time 0
 
     if ($readini($char($1), info, flag) = monster) { /.timerAIthink $+ $rand(a,z) $+ $rand(1,1000) 1 %ai.wait.time /ai_turn $1 | halt }
     if ($readini($char($1), info, flag) = npc) { /.timerAIthink $+ $rand(a,z) $+ $rand(1,1000) 1 %ai.wait.time /ai_turn $1 | halt }
-    else { return }
+    ; DEBUG:
+    if ($1 isin %auto) { /.timerAIthink $+ $rand(a,z) $+ $rand(1,1000) 1 %ai.wait.time /ai_turn $1 | halt }
+    ;else { return }
   }
-  else { return }
+  ;else { return }
 }
 
 alias ai_turn {
@@ -110,7 +113,7 @@ alias ai_turn {
 
   ; Get the type of opponent we need to search for
   if ($readini($char($1), info, flag) = monster) { set %opponent.flag player }
-  if ($readini($char($1), info, flag) = npc) { set %opponent.flag monster }
+  else { set %opponent.flag monster }
 
   if ($readini($char($1), status, charmed) = yes) { 
     if ($readini($char($1), info, flag) = monster) { set %opponent.flag monster } 
@@ -466,7 +469,7 @@ alias ai_gettarget {
   }
 
   if (%ai.action != tech) { 
-    $covercheck(%ai.target, $1) 
+    covercheck %ai.target $1
     set %ai.target %attack.target 
   }
 

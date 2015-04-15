@@ -295,10 +295,6 @@ on 3:TEXT:!level*:#: { $checkscript($2-)
   if (($1 = !level) && ($2 = sync)) {
     if ($3 = $null) { $display.private.message(4Error: Need to enter a number of level to sync to) | halt }
     if ($3 >= $get.level($nick)) { $display.private.message(4Error: The level to sync to must be lower than your current level) | halt }
-    writeini $char($nick) battle str 0
-    writeini $char($nick) battle def 0
-    writeini $char($nick) battle int 0
-    writeini $char($nick) battle spd 0
     $levelsync($nick, $3)
     writeini $char($nick) info levelsync yes
     writeini $char($nick) info NeedsFulls yes
@@ -318,10 +314,6 @@ on 3:TEXT:!level*:?: {
 on 50:TEXT:!level sync*:#: { $checkscript($2-)
   if ($1 = !leveladjust) { halt }
   if ($3 = $null) { $display.private.message(4Error: Need to enter a number of level to sync to) | halt }
-  writeini $char($nick) battle str 0
-  writeini $char($nick) battle def 0
-  writeini $char($nick) battle int 0
-  writeini $char($nick) battle spd 0
   $levelsync($nick, $3)
   $set_chr_name($nick) |   $display.system.message(4 $+ %real.name is now level $3)
   writeini $char($nick) info levelsync yes

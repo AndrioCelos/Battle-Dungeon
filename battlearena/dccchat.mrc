@@ -804,13 +804,13 @@ on 2:Chat:!mech upgrade *: {
 on 2:Chat:ACTION attacks *: { 
   if ($is_charmed($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyCharmed)) | halt }
   if ($is_confused($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyConfused)) | halt }
-  $set_chr_name($nick) | set %attack.target $3 | $covercheck($3)
+  $set_chr_name($nick) | set %attack.target $3 | covercheck $3
   $attack_cmd($nick , %attack.target) 
 }
 on 2:Chat:attacks *: { 
   if ($is_charmed($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyCharmed)) | halt }
   if ($is_confused($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyConfused)) | halt }
-  $set_chr_name($nick) | set %attack.target $2 | $covercheck($2)
+  $set_chr_name($nick) | set %attack.target $2 | covercheck $2
   $attack_cmd($nick , %attack.target) 
 }
 on 2:Chat:ACTION goes *: { 
@@ -871,13 +871,13 @@ alias revertignition.msg { $dcc.battle.message($readini(translation.dat, system,
 on 2:Chat:ACTION uses * * on *: {
   if ($is_charmed($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyCharmed)) | halt }
   if ($is_confused($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyConfused)) | halt }
-  $set_chr_name($nick) | set %attack.target $6 | $covercheck($6, $4)
+  $set_chr_name($nick) | set %attack.target $6
   $tech_cmd($nick , $4 , %attack.target, $7) | halt 
 } 
 on 2:Chat:uses * * on *: {
   if ($is_charmed($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyCharmed)) | halt }
   if ($is_confused($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyConfused)) | halt }
-  $set_chr_name($nick) | set %attack.target $5 | $covercheck($5, $3)
+  $set_chr_name($nick) | set %attack.target $5
   $tech_cmd($nick , $3 , %attack.target, $6) | halt 
 } 
 on 2:Chat:ACTION sings *: {

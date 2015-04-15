@@ -1443,8 +1443,8 @@ alias skill.clonecontrol {
   var %shadow.command $2 | $set_chr_name($1 $+ _clone)
 
   if (%shadow.command = taunt) {  $taunt($1 $+ _clone, $3) }
-  if (%shadow.command = attack) { set %attack.target $3 | $covercheck($3) |  $attack_cmd($1 $+ _clone , %attack.target) }
-  if (%shadow.command = tech) { set %attack.target $4 | $covercheck($4) |  $tech_cmd($1 $+ _clone, $3, %attack.target) }
+  if (%shadow.command = attack) { set %attack.target $3 | covercheck $3 |  $attack_cmd($1 $+ _clone , %attack.target) }
+  if (%shadow.command = tech) { set %attack.target $4 | covercheck $4 |  $tech_cmd($1 $+ _clone, $3, %attack.target) }
   if (%shadow.command = skill) { $use.skill($1 $+ _clone, $2, $3, $4) } 
 }
 

@@ -713,11 +713,11 @@ alias calculate_damage_items {
 
   var %current.element $readini($dbfile(items.db), $2, element)
   if ((%current.element != $null) && (%current.element != none)) {
-    $modifer_adjust($3, %current.element)
+    modifier_adjust $3 %current.element
   }
 
   ; check to see if the target is weak to the specific item
-  $modifer_adjust($3, $2)
+  modifier_adjust $3 $2
 
   ; Let's increase the attack by a random amount.
   inc %attack.damage $rand(1,10)
@@ -840,7 +840,7 @@ alias calculate_heal_items {
   }
 
   ; check to see if the target is weak to the specific item
-  $modifer_adjust($3, $2)
+  modifier_adjust $3 $2
 
   ; If the blood moon is in effect, healing items won't work as well.
   if (%bloodmoon = on) { %attack.damage = $round($calc(%attack.damage / 2),0) }

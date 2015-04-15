@@ -4,7 +4,7 @@
 
 ON 3:ACTION:attacks *:#:{ 
   $no.turn.check($nick)
-  $set_chr_name($nick) | set %attack.target $2 | $covercheck($2)
+  $set_chr_name($nick) | set %attack.target $2
   $attack_cmd($nick , %attack.target) 
 } 
 on 3:TEXT:!attack *:#:{ 
@@ -18,7 +18,7 @@ ON 50:TEXT:*attacks *:*:{
   else { 
     $no.turn.check($1)
     if ($readini($char($1), Battle, HP) = $null) { halt }
-    $set_chr_name($1) | set %attack.target $3 | $covercheck($3)
+    $set_chr_name($1) | set %attack.target $3
     $attack_cmd($1 , %attack.target) 
   }
 }
@@ -30,7 +30,7 @@ ON 3:TEXT:*attacks *:*:{
   $no.turn.check($1)
   unset %real.name 
   if ($readini($char($1), Battle, HP) = $null) { halt }
-  $set_chr_name($1) | set %attack.target $3 | $covercheck($3)
+  $set_chr_name($1) | set %attack.target $3
   $attack_cmd($1 , %attack.target) 
 }
 
@@ -75,7 +75,8 @@ alias attack_cmd {
   if ($readini($dbfile(weapons.db), %weapon.equipped, target) != aoe) {
 
     ; Calculate, deal, and display the damage..
-    $calculate_damage_weapon($1, %weapon.equipped, $2)
+    var %power = $attack_power_standard($1, %weapon.equipped, $2)
+    set %attack.target $2
 
     if ($person_in_mech($1) = true) { $mech.energydrain($1, melee) }
 
@@ -90,58 +91,468 @@ alias attack_cmd {
         if (%battleis = on)  { $check_for_double_turn($1) | halt } 
       }
     }
+
+    var %intercepted = $covercheck($2, %weapon.equipped)
+
+    if ((%intercepted) && (%wpn.element != none)) {
+      ; The attack was intercepted; check again for elemental absorbs on the new target.
+      var %absorbs = $readini($char(%who.battle), modifiers, heal)
+      if ((%absorbs != none) && (%absorbs != $null)) {
+        if ($istok(%absorbs, %element, 46) = $true) { 
+          unset %wpn.element
+          unset %counterattack
+          $heal_damage($1, $2, %weapon.equipped)
+          $display_heal($1, $2, weapon, %weapon.equipped)
+          if (%battleis = on)  { $check_for_double_turn($1) | halt } 
+        }
+      }
+    }
+
     unset %wpn.element
 
     if ((%counterattack != on) && (%counterattack != shield)) { 
       $drain_samba_check($1)
-      $deal_damage($1, $2, %weapon.equipped)
-      $display_damage($1, $2, weapon, %weapon.equipped)
+
+      ; Determine the number of strikes.
+      set %strikes $readini($dbfile(weapons.db), %weapon.equipped, hits)
+      if (%strikes == $null) %strikes = 1
+
+      if ($augment.check($1, AdditionalHit) = true) { inc %strikes %augment.strength }
+
+      ; Are we dual-wielding?  If so, increase the hits by the # of hits of the second weapon.
+      if ($readini($char($1), weapons, equippedLeft) != $null) {
+        var %left.hits $readini($dbfile(weapons.db), $readini($char($1), weapons, equippedLeft), hits)
+        if (%left.hits = $null) { var %left.hits 1 }
+        inc %strikes %left.hits
+      }
+
+      ; Now strike the opponent.
+      var %strike = 1
+      while (%strike <= %strikes) {
+        strike_standard $1 %weapon.equipped %attack.target %power %strikes %strike
+        inc %strike
+      }
+      multi_strike_check %strikes
+
+      ; Turn off the True Strike skill
+      writeini $char($1) skills truestrike.on off
+
+      $deal_damage($1, %attack.target, %weapon.equipped)
+      $display_damage($1, %attack.target, weapon, %weapon.equipped)
     }
 
     if (%counterattack = on) { 
-      $deal_damage($2, $1, %weapon.equipped)
-      $display_damage($1, $2, weapon, %weapon.equipped)
+      $deal_damage(%attack.target, $1, %weapon.equipped)
+      $display_damage($1, %attack.target, weapon, %weapon.equipped)
     }
 
     if (%counterattack = shield) { 
-      $deal_damage($2, $1, $readini($char($2), weapons, equippedLeft))
-      $display_damage($1, $2, weapon, $readini($char($2), weapons, equippedLeft))
+      $deal_damage(%attack.target, $1, $readini($char(%attack.target), weapons, equippedLeft))
+      $display_damage($1, %attack.target, weapon, $readini($char(%attack.target), weapons, equippedLeft))
     }
-
-
-    unset %attack.damage |  unset %attack.damage1 | unset %attack.damage2 | unset %attack.damage3 | unset %attack.damage4 | unset %attack.damage5 | unset %attack.damage6 | unset %attack.damage7 | unset %attack.damage8 | unset %attack.damage.total
-    unset %drainsamba.on | unset %absorb |  unset %element.desc | unset %spell.element | unset %real.name  |  unset %user.flag | unset %target.flag | unset %trickster.dodged | unset %covering.someone
-    unset %techincrease.check |  unset %double.attack | unset %triple.attack | unset %fourhit.attack | unset %fivehit.attack | unset %sixhit.attack | unset %sevenhit.attack | unset %eighthit.attack
-    unset %multihit.message.on | unset %critical.hit.chance
-
-    $formless_strike_check($1)
-
-    ; Time to go to the next turn
-    if (%battleis = on)  { $check_for_double_turn($1) | halt }
   }
 
   if ($readini($dbfile(weapons.db), %weapon.equipped, target) = aoe) {
+    ; Show the description.
+    $set_chr_name($1) | set %user %real.name
+    if ($person_in_mech($1) = true) { set %user %real.name $+ 's $readini($char($1), mech, name) } 
+    var %enemy all targets
+    var %weapon.type $readini($dbfile(weapons.db), %weapon.equipped, type) |  var %attack.file $txtfile(attack_ $+ %weapon.type $+ .txt) 
 
-    if ($is_charmed($1) = true) { 
-      var %current.flag $readini($char($1), info, flag)
-      if ((%current.flag = $null) || (%current.flag = npc)) { $melee.aoe($1, %weapon.equipped, $2, player) | halt }
-      if (%current.flag = monster) { $melee.aoe($1, %weapon.equipped, $2, monster) | halt }
-    }
-    else {
-      ; check for confuse.
-      if ($is_confused($1) = true) { 
-        var %random.target.chance $rand(1,2)
-        if (%random.target.chance = 1) { var %user.flag monster }
-        if (%random.target.chance = 2) { unset %user.flag }
-      }
+    $display.system.message(3 $+ %user $+  $read(%attack.file) $+ 3., battle)
+    set %showed.melee.desc true
 
-      ; Determine if it's players or monsters
-      if (%user.flag = monster) { $melee.aoe($1, %weapon.equipped, $2, player) | halt }
-      if ((%user.flag = $null) || (%user.flag = npc)) { $melee.aoe($1, %weapon.equipped, $2,monster) | halt }
-    }
-
+    var %power = $attack_power_standard($1, %weapon.equipped, $2)
+    strike_standard_aoe $1 %weapon.equipped $2 %power
   }
 
+
+  unset %attack.damage |  unset %attack.damage1 | unset %attack.damage2 | unset %attack.damage3 | unset %attack.damage4 | unset %attack.damage5 | unset %attack.damage6 | unset %attack.damage7 | unset %attack.damage8 | unset %attack.damage.total
+  unset %drainsamba.on | unset %absorb |  unset %element.desc | unset %spell.element | unset %real.name  |  unset %user.flag | unset %target.flag | unset %trickster.dodged | unset %covering.someone
+  unset %techincrease.check |  unset %double.attack | unset %triple.attack | unset %fourhit.attack | unset %fivehit.attack | unset %sixhit.attack | unset %sevenhit.attack | unset %eighthit.attack
+  unset %multihit.message.on | unset %critical.hit.chance
+
+  $formless_strike_check($1)
+
+  ; Time to go to the next turn
+  if (%battleis = on)  { $check_for_double_turn($1) | halt }
+}
+
+; MOD: Alternate damage mechanics
+alias attack_power_standard {
+  ; $1 = attacker
+  ; $2 = weapon equipped
+  ; $3 = target
+  ; $4 = a special flag for mugger's belt.
+
+  var %weapon_power
+
+  ; Set a defalut modifier to nerf multi-hit attacks.
+  if (%modifiers == $null) {
+    set %tech_hits $readini($dbfile(weapons.db), $2, Hits)
+    ; Multipliers: 1.00 1.50 1.80 2.00 2.20 2.34 2.45 2.56
+    if      (%tech_hits == 2) var %modifiers = 0.75
+    else if (%tech_hits == 3) var %modifiers = 0.60
+    else if (%tech_hits == 4) var %modifiers = 0.50
+    else if (%tech_hits == 5) var %modifiers = 0.44
+    else if (%tech_hits == 6) var %modifiers = 0.39
+    else if (%tech_hits == 7) var %modifiers = 0.35
+    else if (%tech_hits >= 8) var %modifiers = 0.32
+    else var %modifiers = 1
+  }
+
+  if ($4 == mugger's-belt) { %weapon_power = 5 | %modifiers = 0.5 }
+  else %weapon_power = $calc($readini($dbfile(weapons.db), $2, basepower) + $readini($char($1), weapons, $2))
+
+  var %strength = $readini($char($1), battle, str)
+  strength_down_check $1
+
+  ; If the weapon is a hand-to-hand weapon, it will now receive a bonus based on your fists level.
+  if ($readini($dbfile(weapons.db), $2, Type) == HandToHand) inc %weapon_power $calc($readini($char($1), weapons, Fists) / 2)
+
+  ; Add mastery bonuses.
+  mastery_check $1 $2
+  inc %weapon_power %mastery.bonus
+
+  if ($person_in_mech($1) == false) { 
+    ; Let's check for some offensive style enhancements.
+    offensive.style.check $1 $2 melee
+
+    ; And Mighty Strike.
+    if ($mighty_strike_check($1) = true) %modifiers = $calc(%modifiers * 2)
+
+    ; And Desperate Blows.
+    if ($desperate_blows_check($1) = true) {
+      var %health_ratio = $calc(($readini($char($1), Battle, HP) / $readini($char($1), BaseStats, HP)))
+      if      ((%health_ratio <= 0.02)) %modifiers = $calc(%modifiers * 2.5)
+      else if ((%health_ratio <= 0.10)) %modifiers = $calc(%modifiers * 2.0)
+      else if ((%health_ratio <= 0.25)) %modifiers = $calc(%modifiers * 1.5)
+    }
+  }
+
+  ; Check to see if we have an accessory or augment that enhances the weapon type
+  melee.weapontype.enhancements $1
+  unset %weapon.type
+
+  ; Check for Killer Traits
+  killer.trait.check $1 $3
+
+  unset %current.playerstyle | unset %current.playerstyle.level
+
+  if ($person_in_mech($1) = false) { 
+    ; Check for the miser ring accessory
+    if ($accessory.check($1, IncreaseMeleeDamage) = true) {
+      var %redorb.amount $readini($char($1), stuff, redorbs)
+      var %miser-ring.increase $round($calc(%redorb.amount * %accessory.amount),0)
+
+      if (%miser-ring.increase <= 0) { var %miser-ring.increase 1 }
+      if (%miser-ring.increase > 1000) { var %miser-ring.increase 1000 }
+      inc %strength %miser-ring.increase
+      unset %accessory.amount
+    }
+
+    ; Check for the fool's tablet accessory
+    if ($accessory.check($1, IncreaseMeleeAddPoison) = true) {
+      inc %modifiers $calc(%modifiers * %accessory.amount)
+      unset %accessory.amount
+    }
+  }
+  unset %current.accessory.type
+
+  ; Add the Melee Bonus augment modifier.
+  if ($augment.check($1, MeleeBonus) = true) { 
+    inc %modifiers $calc(%modifiers * %augment.strength * 0.25)
+    unset %melee.bonus.augment
+  }
+
+  ; Check for a battle condition modifier
+  if (enhance-melee isin %battleconditions) %modifiers = $calc(%modifiers * 0.1)
+
+  ; Calculate the total power.
+  set %attack_power $calc((%strength + %weapon_power) * 2 * %modifiers)
+  set %attack.damage %attack_power
+
+  ; Adjust the total damage.
+  cap.damage $1 $3 melee
+
+  ; If a player is using a monster weapon, which is considered cheating, set the damage to 0.
+  if (($readini($dbfile(weapons.db), $2, cost) = 0) && ($readini($dbfile(weapons.db), $2, SpecialWeapon) != true)) {
+    if ($readini($char($1), info, flag) == $null) set %attack.damage 0
+  }
+
+  ; Calculate the to-hit chance.
+  set %hit $readini($dbfile(weapons.db), $2, Hit)
+  if (%hit == $null) {
+    if ($readini($char($1), info, flag) == monster) %hit = 95
+    else %hit = 100
+  }
+
+  if ($accessory.check($1, CurseAddDrain) = true) { unset %accessory.amount | set %absorb 0.25 }
+  if ($augment.check($1, Drain) = true) {  set %absorb 0.25 }
+
+  unset %current.accessory | unset %current.accessory.type 
+
+  ; Show the attack power.
+  ; If the power was capped, it will be shown in magenta.
+  if (%attack_power == %attack.damage) debugshow 1 4Strength:12 %strength 4 Weapon power:12 %weapon_power 4 Modifiers:12 %modifiers 4 Attack power:12 %attack.damage 4 Hit rate:12 %hit $iif(%absorb, 4 Life steal:12 %absorb)
+  else                                 debugshow 1 4Strength:12 %strength 4 Weapon power:12 %weapon_power 4 Modifiers:12 %modifiers 4 Attack power:13 %attack.damage 4 Hit rate:12 %hit $iif(%absorb, 4 Life steal:12 %absorb)
+
+  return %attack.damage
+}
+
+alias strike_standard {
+  ; $1 = attacker
+  ; $2 = weapon equipped
+  ; $3 = target
+  ; $4 = attack power
+  ; $5 = number of hits
+  ; $6 = hit number
+
+  var %modifiers = 1
+
+  ; Does the attack hit?
+  unset %guard.message
+  hit_check $1 basic $3
+  if (%guard.message == $null) melee.ethereal.check $1 $2 $3
+  if (%guard.message == $null) invincible.check $1 $2 $3
+  if (%guard.message == $null) trickster_dodge_check $3 $1 physical
+  if (%guard.message == $null) weapon_parry_check $3 $1 $2
+  if (%guard.message == $null) royalguard.check $1 $2 $3
+  if (%guard.message == $null) perfectdefense.check $1 $2 $3
+  if (%guard.message == $null) utsusemi.check $1 $2 $3
+
+  if (%guard.message == $null) {
+    ; Zombies gain weakness to light and fire.
+    set -u0 %element $readini($dbfile(weapons.db), $2, element)
+    if (($readini($char($3), status, zombie) == yes) && ((%element == light) || (%element == fire))) %modifiers = 1.15
+
+    ; Check for character modifiers.
+    if ((%element != $null) && (%element != none)) {
+      set %element_modifier $modifier_adjust($3, %element)
+      if (%element_modifier <= 0) { $set_chr_name($3)
+        set %guard.message $readini(translation.dat, battle, ImmuneToElement) 
+        %modifiers = 0
+      }
+      else %modifiers = $calc(%modifiers * %element_modifier)
+    }
+
+    set -u0 %weapon_type $readini($dbfile(weapons.db), $2, type)
+    if (%weapon_type != $null) {
+      set %weapon_modifier $modifier_adjust($3, %element)
+      if (%weapon_modifier <= 0) { $set_chr_name($3)
+        set %guard.message $readini(translation.dat, battle, ImmuneToWeaponType) 
+        %modifiers = 0
+      }
+      else %modifiers = $calc(%modifiers * %weapon_modifier)
+    }
+
+    ; Elementals are resistant to standard attacks.
+    if ($readini($char($3), monster, type) = elemental) %modifiers = $calc(%modifiers * 0.7)
+
+    ; Now we're ready to calculate the enemy's defense.
+    set %defense $readini($char($3), Battle, DEF)
+    defense_down_check $3
+    defense_up_check $3
+
+    ; Check to see if the weapon has an IgnoreDefense flag. If so, cut the defense down.
+    var %piercing $calc($readini($dbfile(weapons.db), $2, IgnoreDefense) / 100)
+    if ($augment.check($1, IgnoreDefense) = true) inc %piercing $calc(%augment.strength * 0.05)
+    if (%piercing > 1) %defense = 0
+    else if (%piercing > 0) %defense = $calc(%defense * (1 - %piercing))
+
+    ; Check for a critical hit.
+    var %roll = $rand(1,100), %chance = 4
+
+    ; check for the Impetus Passive Skill
+    var %impetus.level = $readini($char($1), skills, Impetus)
+    if (%impetus.level) inc %chance %impetus.level
+
+    ; If the user is using a h2h weapon, increase the critical hit chance by 1.
+    if ($readini($dbfile(weapons.db), $2, type) = HandToHand) { inc %chance 1 }
+
+    if ($accessory.check($1, IncreaseCriticalHits) = true) {
+      if (%accessory.amount = 0) { var %accessory.amount 1 }
+      inc %chance %accessory.amount
+      unset %accessory.amount
+    }
+
+
+    unset %player.accessory | unset %accessory.type | unset %accessory.amount
+
+    if ($augment.check($1, EnhanceCriticalHits) = true) { inc %chance %augment.strength }
+
+    if (%roll <= %chance) {
+      $set_chr_name($1) |  $display.system.message($readini(translation.dat, battle, LandsACriticalHit), battle)
+      %modifiers = $calc(%modifiers * 1.5)
+      %defense = 0
+    }
+
+    ; Calculate the total damage.
+    set %attack.damage $calc(($4 - %defense) * %modifiers * ($rand(90, 110) / 100))
+    debugshow 1 4Hit:12 $6 4of12 $5 4 Power:12 $4 4 Defense:12 %defense 4 Modifiers:12 %modifiers
+
+    ; Adjust the damage based on weapon size vs monster size
+    $monstersize.adjust($3,$2)
+
+
+    ; Check for the Guardian style
+    guardian_style_check $3
+
+    ; Check for metal defense.  If found, set the damage to 1.
+    metal_defense_check $3 $1
+
+    ; Check for a shield block.
+    shield_block_check $3 $1 $2
+
+    ; If the target has Protect on, it will cut  melee damage in half.
+    if ($readini($char($3), status, protect) = yes) { %attack.damage = $round($calc(%attack.damage / 2),0) }
+
+    ; Check for the En-Spell Buff
+    if ($readini($char($1), status, en-spell) != none) { 
+      $magic.effect.check($1, $3, nothing, en-spell) 
+      modifier_adjust $3 $readini($char($1), status, en-spell)
+    }
+
+    if ($person_in_mech($1) = false) { writeini $char($1) skills mightystrike.on off }
+
+    $first_round_dmg_chk($1, $3)
+
+    ; In this bot we don't want the attack to ever be lower than 1 except for rare instances...  
+    if ((%guard.message == $null) && (%attack.damage <= 0)) %attack.damage = 1
+
+    if ($5 == 1) {
+      ; check for melee counter
+      counter_melee $1 $3 $2
+
+      ; Check for countering an attack using a shield
+      shield_reflect_melee $1 $3 $2
+
+      ; Check for the weapon bash skill
+      weapon_bash_check $1 $3
+    }
+
+    guardianmon.check $1 $2 $3
+
+    set -u0 %attack_effect did $+ %damage_colour $bytes(%attack.damage, b) damage 
+  }
+  else set %attack.damage 0
+
+  if ($5 > 1) {
+    set     %attack.damage [ $+ [ $6 ] ] %attack.damage
+    set -u0 %attack_effect [ $+ [ $6 ] ] %attack_effect
+  }
+
+  if (%guard.message == $null) {
+    unset %statusmessage.display
+    set %status.type.list $readini($dbfile(weapons.db), $2, StatusType)
+
+    if (%status.type.list != $null) { 
+      set %number.of.statuseffects $numtok(%status.type.list, 46) 
+
+      if (%number.of.statuseffects = 1) { $inflict_status($1, $3, %status.type.list) | unset %number.of.statuseffects | unset %status.type.list }
+      if (%number.of.statuseffects > 1) {
+        var %status.value 1
+        while (%status.value <= %number.of.statuseffects) { 
+          set %current.status.effect $gettok(%status.type.list, %status.value, 46)
+          $inflict_status($1, $3, %current.status.effect)
+        }
+
+        unset %number.of.statuseffects | unset %current.status.effect
+      }
+    }
+    unset %status.type.list
+  }
+}
+
+
+alias strike_standard_aoe {
+  ; $1 = user
+  ; $2 = weapon equipped
+  ; $3 = target
+  ; $4 = attack power
+
+  var %user_flag = $readini($char($1), info, flag)
+  var %targetcount = 0
+  ; While confused, the targets will be random.
+  if ($is_confused($1) == true) {
+    if ($rand(0, 1) == 0) var %targets = allies
+    else var %targets = monsters
+  } 
+  ; While charmed, healing will target monsters, and attacks will target allies.
+  else if ($is_charmed($1) == true) {
+    if (%user_flag == monster) var %targets = monsters
+    else var %targets = allies
+  }
+  ; While neither, target whatever side the specified character is on.
+  else if ($readini($char($3), info, flag) == monster) var %targets = monsters
+  else var %targets = allies
+
+  ; Determine the number of strikes. 
+  set -u0 %strikes $readini($dbfile(weapons.db), $2, hits)
+  if (%strikes == $null) %strikes = 1
+  set -u0 %element $readini($dbfile(weapons.db), $2, element)
+
+  var %lines $lines($txtfile(battle.txt)) | var %i 1 | set %aoe.turn 1
+  while (%i <= %lines) { 
+    set %who.battle $read -l $+ %i $txtfile(battle.txt)
+    var %flag = $readini($char(%who.battle), info, flag)
+    var %istarget = $false
+
+    var %current.status $readini($char(%who.battle), battle, status)
+    if (%current.status == alive) {
+      if (%targets == monsters) {
+        if (%flag == monster) %istarget = $true
+      }
+      else {
+        if (%flag != monster) %istarget = $true
+      }
+    }
+
+    if (%istarget) {
+      inc %targetcount
+
+      ; Check for elemental absorbs.
+      var %absorbs $readini($char(%who.battle), modifiers, heal)
+      if ((%absorbs != none) && (%absorbs != $null)) {
+        if ($istok(%absorbs, %element, 46) = $true) { 
+          $heal_damage($1, %who.battle, %weapon.equipped)
+          $display_heal($1, %who.battle, AoE, %weapon.equipped)
+          inc %i 1 
+          continue
+        }
+      }
+
+      var %intercepted = $covercheck(%who.battle, $2, AOE)
+
+      if (%intercepted) {
+        ; The attack was intercepted; check again for elemental absorbs on the new target.
+        var %absorbs $readini($char(%who.battle), modifiers, heal)
+        if ((%absorbs != none) && (%absorbs != $null)) {
+          if ($istok(%absorbs, %element, 46) = $true) { 
+            $heal_damage($1, %who.battle, %weapon.equipped)
+            $display_heal($1, %who.battle, AoE, %weapon.equipped)
+            inc %i 1 
+            continue
+          }
+        }
+      }
+
+      ; Now we can finally process the effect.
+      var %strike = 1
+      while (%strike <= %strikes) {
+        strike_standard $1 $2 %who.battle $4 %strikes %strike
+        inc %strike
+      }
+      multi_strike_check %strikes
+      $deal_damage($1, %who.battle, $2, %absorb)
+      $display_aoedamage($1, %who.battle, $2, %absorb)        
+    }
+
+    ; Make sure that the attacker is still alive before continuing.
+    if ($readini($char($1), Battle, HP) <= 0) break
+    inc %i
+  }
+  return %targetcount
 }
 
 alias calculate_damage_weapon {
@@ -307,12 +718,12 @@ alias calculate_damage_weapon {
 
   var %weapon.element $readini($dbfile(weapons.db), $2, element)
   if ((%weapon.element != $null) && (%weapon.element != none)) {
-    $modifer_adjust($3, %weapon.element)
+    modifier_adjust $3 %weapon.element
   }
 
   ; Check for weapon type weaknesses.
   set %weapon.type $readini($dbfile(weapons.db), $2, type)
-  $modifer_adjust($3, %weapon.type)
+  modifier_adjust $3 %weapon.type
 
   ; Elementals are strong to melee
   if ($readini($char($3), monster, type) = elemental) { %attack.damage = $round($calc(%attack.damage - (%attack.damage * .30)),0) } 
@@ -600,7 +1011,7 @@ alias calculate_damage_weapon {
   ; Check for the En-Spell Buff
   if ($readini($char($1), status, en-spell) != none) { 
     $magic.effect.check($1, $3, nothing, en-spell) 
-    $modifer_adjust($3, $readini($char($1), status, en-spell))
+    modifier_adjust $3 $readini($char($1), status, en-spell)
   }
 
   ; Turn off the True Strike skill
@@ -627,8 +1038,6 @@ alias calculate_damage_weapon {
   if (%weapon.howmany.hits = 5) { set %weapon.howmany.hits 5 | $fivehit.attack.check($1, $3, 100) }
   if (%weapon.howmany.hits >= 6) { set %weapon.howmany.hits 6 | $sixhit.attack.check($1, $3, 100) }
 }
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Performs a melee AOE
@@ -685,7 +1094,7 @@ alias melee.aoe {
 
             if (($istok(%target.element.heal,%melee.element,46) = $false) || (%melee.element = none)) { 
 
-              $covercheck(%who.battle, $2, AOE)
+              covercheck %who.battle $2 AOE
 
               $calculate_damage_weapon($1, %weapon.equipped, %who.battle)
               $deal_damage($1, %who.battle, %weapon.equipped)
@@ -730,7 +1139,7 @@ alias melee.aoe {
             }
 
             if (($istok(%target.element.heal,%melee.element,46) = $false) || (%melee.element = none)) { 
-              $covercheck(%who.battle, $2, AOE)
+              covercheck %who.battle $2 AOE
 
 
               $calculate_damage_weapon($1, %weapon.equipped, %who.battle)
@@ -781,9 +1190,9 @@ alias melee.aoe {
 }
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Skill and Mastery checks
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 alias mastery_check {
   var %type.of.weapon $readini($dbfile(weapons.db), $2, type)
   set %mastery.type nonexistant 

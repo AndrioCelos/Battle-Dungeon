@@ -242,8 +242,8 @@ alias tech_cmd {
 
   if (%tech.type = heal) { $tech.heal($1, $2, $3) }
   if (%tech.type = heal-aoe) { $tech.aoeheal($1, $2, $3) }
-  if (%tech.type = single) {  $covercheck($3, $2) | $tech.single($1, $2, %attack.target )  }
-  if (%tech.type = suicide) { $covercheck($3, $2) | $tech.suicide($1, $2, %attack.target )  }
+  if (%tech.type = single) {  covercheck $3 $2 | $tech.single($1, $2, %attack.target )  }
+  if (%tech.type = suicide) { covercheck $3 $2 | $tech.suicide($1, $2, %attack.target )  }
 
   if (%tech.type = suicide-AOE) { 
     if ($is_charmed($1) = true) { 
@@ -258,8 +258,8 @@ alias tech_cmd {
     }
   }
 
-  if (%tech.type = status) { $covercheck($3, $2) | $tech.single($1, $2, %attack.target ) } 
-  if (%tech.type = stealPower) { $covercheck($3, $2) | $tech.stealPower($1, $2, %attack.target ) }
+  if (%tech.type = status) { covercheck $3 $2 | $tech.single($1, $2, %attack.target ) } 
+  if (%tech.type = stealPower) { covercheck $3 $2 | $tech.stealPower($1, $2, %attack.target ) }
 
   if (%tech.type = AOE) { 
     if ($is_charmed($1) = true) { 
@@ -408,6 +408,29 @@ alias tech.buff {
 ; Performs a regular tech
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 alias tech.single {
+  ; Calculate, deal, and display the damage.
+  var %power = $attack_power_tech($1, $2, $3)
+
+  ; Determine the number of strikes. 
+  set %strikes $readini($dbfile(techniques.db), $2, hits)
+  if (%strikes == $null) %strikes = 1
+
+  ; Now strike the opponent.
+  var %strike = 1
+  while (%strike <= %strikes) {
+    strike_tech $1 $2 $3 damage %power %strikes %strike
+    inc %strike
+  }
+  multi_strike_check %strikes
+
+  ; Turn off the True Strike skill
+  writeini $char($1) skills truestrike.on off
+
+  $deal_damage($1, $3, $2, %absorb)
+  $display_damage($1, $3, tech, $2, %absorb)
+}
+
+alias tech.single_old {
   ; $3 = target
 
   var %tech.element $readini($dbfile(techniques.db), $2, element)
@@ -450,12 +473,12 @@ alias tech.stealPower {
 
   set %attack.damage 0
 
-  $calculate_damage_techs($1, $2, $3)
+  ; Calculate the damage.
+  var %power = $attack_power_tech($1, $2, $3)
+  strike_tech $1 $2 $3 damage %power 1 1
 
   ; If it's the blood moon, increase the amount by a random amount.
   if (%bloodmoon = on) { inc %attack.damage $rand(1,100) }
-
-  if (%attack.damage <= 0) { set %attack.damage 5 }
 
   ; Does the target have a guardian that has to be defeated first?  If so, check to see if guardian is dead.  
   ; If it isn't, set the attack damage to 0.
@@ -484,8 +507,8 @@ alias tech.stealPower {
 
   $display.system.message(3 $+ %user $+  $readini($dbfile(techniques.db), $2, desc), battle)
 
-  if ($person_in_mech($3) = false) {  
-
+  if (%guard.message != $null) $display.system.message(%guard.message, battle) 
+  else if ($person_in_mech($3) = false) {  
     if (%guard.message = $null) {
 
       var %attacker.str $readini($char($1), battle, str)
@@ -541,7 +564,7 @@ alias tech.stealPower {
 
     if (%guard.message != $null) { $display.system.message(%guard.message, battle) | unset %guard.message }
   }
-  if ($person_in_mech($3) = true) {  $set_chr_name($1) | $display.system.message($readini(translation.dat, errors, NotWorkOnMech), battle) }
+  else {  $set_chr_name($1) | $display.system.message($readini(translation.dat, errors, NotWorkOnMech), battle) }
 
   ; Turn off the True Strike skill
   writeini $char($1) skills truestrike.on off
@@ -556,21 +579,31 @@ alias tech.suicide {
   $set_chr_name($1)
   $display.system.message($readini(translation.dat, tech, SuicideUseAllHP), battle)
 
-  set %attack.damage 0
-
-  $calculate_damage_techs($1, $2, $3)
+  ; Calculate, deal, and display the damage.
+  var %power = $attack_power_tech($1, $2, $3)
 
   ; If it's the blood moon, increase the amount.
-  if (%bloodmoon = on) { inc %attack.damage $rand(10,50) } 
+  if (%bloodmoon = on) { inc %power $rand(10,50) } 
 
-  writeini $char($1) battle hp 0 | writeini $char($1) battle status dead | $increase.death.tally($1) | $set_chr_name($1) 
-  $deal_damage($1, $3, $2)
+  ; Determine the number of strikes. 
+  set %strikes $readini($dbfile(techniques.db), $2, hits)
+
+  ; Now strike the opponent.
+  var %strike = 1
+  while (%strike <= %strikes) {
+    strike_tech $1 $2 $3 damage %power %strikes %strike
+    inc %strike
+  }
+  multi_strike_check %strikes
 
   ; Turn off the True Strike skill
   writeini $char($1) skills truestrike.on off
 
-  $display_damage($1, $3, tech, $2)
-  return
+  $deal_damage($1, $3, $2, %absorb)
+  $display_damage($1, $3, tech, $2, %absorb)
+
+  ; The attacker now dies.
+  writeini $char($1) battle hp 0 | writeini $char($1) battle status dead | $increase.death.tally($1) | $set_chr_name($1) 
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -581,15 +614,18 @@ alias tech.heal {
   ; $2 = tech
   ; $3 = target
 
-  $calculate_damage_techs($1, $2, $3, heal)
+  var %power = $attack_power_tech($1, $2, $3)
 
   if ($augment.check($1, CuringBonus) = true) {
     set %healing.increase $calc(%augment.strength * .30)
-    inc %attack.damage $round($calc(%attack.damage * %healing.increase),0) 
+    inc %power $round($calc(%power * %healing.increase),0) 
     unset %healing.increase
   }
 
-  if (%bloodmoon = on) { %attack.damage = $round($calc(%attack.damage / 2),0) }
+  if (%bloodmoon = on) { %power = $round($calc(%power / 2),0) }
+  if ($person_in_mech($3) = true) set %attack.damage 0 
+
+  strike_tech $1 $2 $3 heal %power 1 1
 
   var %mon.status $readini($char($3), status, zombie) | var %mon.type $readini($char($3), monster, type)
   var %target.element.heal $readini($char($3), modifiers, heal)
@@ -610,10 +646,6 @@ alias tech.heal {
     if (%attack.damage > %max.heal.amount) {  set %attack.damage $round($calc(%max.heal.amount + (%attack.damage / 100)),0) }
   }
 
-  %attack.damage = $round(%attack.damage,0)
-  if ($3 = demon_portal) { set %attack.damage 0 }
-  if ($person_in_mech($3) = true) { set %attack.damage 0 }
-
   $heal_damage($1, $3, $2)
   $display_heal($1, $3, tech, $2)
 
@@ -629,34 +661,23 @@ alias tech.aoeheal {
   ; $3 = target
   set %wait.your.turn on
 
-  unset %who.battle | set %number.of.hits 0
-  set %attack.damage 0
-
   ; Display the tech description
   $set_chr_name($1) | set %user %real.name
   $set_chr_name($3) | set %enemy %real.name
   $display.system.message(3 $+ %user $+  $readini($dbfile(techniques.db), $2, desc), battle)
 
-  var %caster.flag $readini($char($1), info, flag)
-  if ($readini($char($1), status, confuse) = yes) { var %caster.flag monster }
+  var %power = $attack_power_tech($1, $2, $3, heal)
 
-  if (%caster.flag = $null) { set %target.healing.flag player }
-  if (%caster.flag = npc) { set %target.healing.flag player }
-  if (%caster.flag = monster) { set %target.healing.flag monster }
-
-  ; If it's player, search out remaining players that are alive and deal damage and display damage
-  var %battletxt.lines $lines($txtfile(battle.txt)) | var %battletxt.current.line 1 
-  while (%battletxt.current.line <= %battletxt.lines) { 
-    set %who.battle $read -l $+ %battletxt.current.line $txtfile(battle.txt)
-    set %who.battle.flag $readini($char(%who.battle), info, flag)
-
-    if ((%target.healing.flag = player) && (%who.battle.flag = $null)) {  $do_aoe_heal($1, $2, $3) }
-    if ((%target.healing.flag = player) && (%who.battle.flag = npc)) { $do_aoe_heal($1, $2, $3) }
-    if ((%target.healing.flag = monster) && (%who.battle.flag = monster)) { $do_aoe_heal($1, $2, $3) }
-
-    inc %battletxt.current.line 1 
+  if ($augment.check($1, CuringBonus) = true) {
+    set %healing.increase $calc(%augment.strength * .30)
+    inc %power $round($calc(%power * %healing.increase),0) 
+    unset %healing.increase
   }
 
+  if (%bloodmoon = on) { %power = $round($calc(%power / 2),0) }
+  if ($person_in_mech($3) = true) set %attack.damage 0 
+
+  var %targetcount = $strike_tech_aoe($1, $2, $3, heal, %power)
 
   unset %statusmessage.display | unset %target.healing.flag
   if ($readini($char($1), battle, hp) > 0) {
@@ -667,61 +688,6 @@ alias tech.aoeheal {
 
   /.timerCheckForDoubleSleep $+ $rand(a,z) $+ $rand(1,1000) 1 5 /check_for_double_turn $1
   halt
-}
-
-alias do_aoe_heal {
-  var %current.status $readini($char(%who.battle), battle, status)
-  if ((%current.status = dead) || (%current.status = runaway)) { inc %battletxt.current.line 1 | return }
-  else { 
-    inc %number.of.hits 1
-
-
-    $calculate_aoe_heal($1, $2, $3)
-
-    ;If the target is a zombie, do damage instead of healing it.
-    var %mon.status $readini($char(%who.battle), status, zombie) | var %mon.type $readini($char(%who.battle), monster, type)
-    if ((%mon.status = yes) || (%mon.type = undead)) {
-      $deal_damage($1, %who.battle, $2)
-      $display_damage($1, %who.battle, aoeheal, $2)
-    } 
-
-    else {   
-
-
-      $heal_damage($1, %who.battle, $2)
-      $display_heal($1, %who.battle ,aoeheal, $2)
-    }
-  }
-}
-
-
-alias calculate_aoe_heal {
-  ; First things first, let's find out the base power.
-  $calculate_damage_techs($1, $2, $3)
-  inc %attack.damage %item.base
-
-  if ($augment.check($1, CuringBonus) = true) { 
-    set %healing.increase $calc(%augment.strength * .30)
-    inc %attack.damage $round($calc(%attack.damage * %healing.increase),0) 
-    unset %healing.increase
-  }
-
-  if ($readini(system.dat, system, IgnoreDmgCap) != true) { 
-    var %max.heal.amount $readini($dbfile(techniques.db), $2, cappedamount)
-    if (%max.heal.amount = $null) { var %max.heal.amount 2000 }
-
-    if (%attack.damage > %max.heal.amount) {  set %attack.damage $round($calc(%max.heal.amount + (%attack.damage / 100)),0) }
-  }
-
-
-  ; Let's increase the attack by a random amount.
-  inc %attack.damage $rand(1,10)
-
-  if (%bloodmoon = on) { %attack.damage = $round($calc(%attack.damage / 2),0) }
-
-  ; In this bot we don't want the attack to ever be lower than 1.  
-  if (%attack.damage <= 0) { set %attack.damage 1 }
-  if ($3 = demon_portal) { set %attack.damage 0 }
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -893,108 +859,12 @@ alias tech.aoe {
 
   if ($readini($dbfile(techniques.db), $2, absorb) = yes) { set %absorb absorb }
 
-  var %tech.element $readini($dbfile(techniques.db), $2, element)
+  var %power = $attack_power_tech($1, $2, $3, damage)
 
-  ; If it's player, search out remaining players that are alive and deal damage and display damage
-  if ($4 = player) {
-    var %battletxt.lines $lines($txtfile(battle.txt)) | var %battletxt.current.line 1 
-    while (%battletxt.current.line <= %battletxt.lines) { 
-      set %who.battle $read -l $+ %battletxt.current.line $txtfile(battle.txt)
-      if ($readini($char(%who.battle), info, flag) = monster) { inc %battletxt.current.line }
-      else { 
-
-        if (($readini($char($1), status, confuse) != yes) && ($1 = %who.battle)) { inc %battletxt.current.line 1 }
-
-        var %current.status $readini($char(%who.battle), battle, status)
-        if ((%current.status = dead) || (%current.status = runaway)) { inc %battletxt.current.line 1 }
-        else { 
-
-          if ($readini($char($1), battle, hp) > 0) {
-            inc %number.of.hits 1
-            var %target.element.heal $readini($char(%who.battle), modifiers, heal)
-            if ((%tech.element != none) && (%tech.element != $null)) {
-              if ($istok(%target.element.heal,%tech.element,46) = $true) { 
-                $tech.heal($1, $2, %who.battle, %absorb)
-                inc %battletxt.current.line 1 
-              }
-            }
-
-            if (($istok(%target.element.heal,%tech.element,46) = $false) || (%tech.element = none)) { 
-
-              $covercheck(%who.battle, $2, AOE)
-
-              if (($readini($char(%who.battle), status, reflect) = yes) && ($readini($dbfile(techniques.db), $2, magic) = yes)) {
-                $calculate_damage_techs($1, $2, $1)
-                if (%attack.damage >= 4000) { set %attack.damage $rand(2800,3500) }
-                unset %absorb
-                $deal_damage($1, $1, $2, %absorb)
-              }
-              else {
-                $calculate_damage_techs($1, $2, %who.battle)
-                $deal_damage($1, %who.battle, $2, %absorb)
-              }
-
-              $display_aoedamage($1, %who.battle, $2, %absorb)
-              unset %attack.damage
-
-            }
-          }
-
-          inc %battletxt.current.line 1 
-        } 
-      }
-    }
-  }
-
-
-  ; If it's monster, search out remaining monsters that are alive and deal damage and display damage.
-  if ($4 = monster) { 
-    var %battletxt.lines $lines($txtfile(battle.txt)) | var %battletxt.current.line 1 | set %aoe.turn 1
-    while (%battletxt.current.line <= %battletxt.lines) { 
-      set %who.battle $read -l $+ %battletxt.current.line $txtfile(battle.txt)
-      if ($readini($char(%who.battle), info, flag) != monster) { inc %battletxt.current.line }
-      else { 
-        inc %number.of.hits 1
-        var %current.status $readini($char(%who.battle), battle, status)
-        if ((%current.status = dead) || (%current.status = runaway)) { inc %battletxt.current.line 1 }
-        else { 
-          if ($readini($char($1), battle, hp) > 0) {
-
-            var %target.element.heal $readini($char(%who.battle), modifiers, heal)
-            if ((%tech.element != none) && (%tech.element != $null)) {
-              if ($istok(%target.element.heal,%tech.element,46) = $true) { 
-                $tech.heal($1, $2, %who.battle, %absorb)
-              }
-            }
-
-            if (($istok(%target.element.heal,%tech.element,46) = $false) || (%tech.element = none)) { 
-              $covercheck(%who.battle, $2, AOE)
-
-              ; Check for Reflect
-              if (($readini($char(%who.battle), status, reflect) = yes) && ($readini($dbfile(techniques.db), $2, magic) = yes)) {
-                $calculate_damage_techs($1, $2, $1)
-                if (%attack.damage >= 4000) { set %attack.damage $rand(2800,3500) }
-                unset %absorb
-                $deal_damage($1, $1, $2, %absorb)
-                $display_aoedamage($1, %who.battle, $2, %absorb)
-              }
-
-              else {
-                $calculate_damage_techs($1, $2, %who.battle)
-                $deal_damage($1, %who.battle, $2, %absorb)
-                $display_aoedamage($1, %who.battle, $2, %absorb)
-              }
-            }
-          }
-
-          inc %battletxt.current.line 1 | inc %aoe.turn 1 | unset %attack.damage
-        } 
-      }
-    }
-  }
+  var %targetcount = $strike_tech_aoe($1, $2, $3, damage, %power)
 
   unset %element.desc | unset %showed.tech.desc | unset %aoe.turn
-  set %timer.time $calc(%number.of.hits * 1.1) 
+  set %timer.time $calc(%targetcount * 1.1) 
 
   if ($readini($dbfile(techniques.db), $2, magic) = yes) {
     ; Clear elemental seal
@@ -1019,6 +889,372 @@ alias tech.aoe {
 
   /.timerCheckForDoubleSleep $+ $rand(a,z) $+ $rand(1,1000) 1 %timer.time /check_for_double_turn $1
   halt
+}
+
+; MOD: Alternate damage mechanics
+alias attack_power_tech {
+  ; $1 = user
+  ; $2 = technique used
+  ; $3 = target
+  ; $4 = optional flag ("heal")
+
+  var %modifiers = $readini($dbfile(techniques.db), $2, Modifier)
+  ; Set a default modifier to nerf multi-hit attacks.
+  if (%modifiers == $null) {
+    set %tech_hits $readini($dbfile(techniques.db), $2, hits)
+    ; Multipliers: 1.00 1.50 1.80 2.00 2.20 2.34 2.45 2.56
+    if      (%tech_hits == 2) var %modifiers = 0.75
+    else if (%tech_hits == 3) var %modifiers = 0.60
+    else if (%tech_hits == 4) var %modifiers = 0.50
+    else if (%tech_hits == 5) var %modifiers = 0.44
+    else if (%tech_hits == 6) var %modifiers = 0.39
+    else if (%tech_hits == 7) var %modifiers = 0.35
+    else if (%tech_hits >= 8) var %modifiers = 0.32
+    else var %modifiers = 1
+  }
+
+  var %weapon_power
+
+  ; First things first, let's find out the base power.
+  set %base.stat.needed $readini($dbfile(techniques.db), $2, stat)
+  if (%base.stat.needed = $null) set %base.stat.needed int
+
+  set %base.stat $readini($char($1), battle, %base.stat.needed)
+  if      (%base.stat.needed == str) strength_down_check $1
+  else if (%base.stat.needed == int) int_down_check $1
+
+  var %tech_power = $readini($dbfile(techniques.db), p, $2, BasePower)
+
+  ; Add the power of the weapon.
+  if ($person_in_mech($1) == true) set %weapon $readini($char($1), mech, equippedWeapon)
+  else set %weapon $readini($char($1), weapons, equipped)
+
+  set %weapon_power $readini($dbfile(weapons.db), %weapon, basepower)
+  if (%weapon_power == $null) set %weapon_power 5
+
+  ; If the weapon is a hand-to-hand weapon, it will now receive a bonus based on your fists level.
+  if ($readini($dbfile(weapons.db), %weapon, Type) == HandToHand) inc %weapon_power $calc($readini($char($1), weapons, Fists) / 2)
+
+  set %weapon_level $readini($char($1), weapons, %weapon)
+  if (%weapon_level = $null) set %weapon 1
+  inc %weapon_power %weapon_level
+
+  ; Does the user have a mastery in the weapon?  We can add a bonus as well.
+  mastery_check $1 %weapon
+  inc %weapon_power %mastery.bonus
+  inc %tech_power %weapon_power
+  unset %weapon_*
+
+  if ($person_in_mech($1) == false) { 
+    ; Let's check for some offensive style enhancements.
+    offensive.style.check $1 $2 melee
+
+    ; And Desperate Blows.
+    if ($desperate_blows_check($1) = true) {
+      var %health_ratio = $calc(($readini($char($1), Battle, HP) / $readini($char($1), BaseStats, HP)))
+      if      ((%health_ratio <= 0.02)) %modifiers = $calc(%modifiers * 2.5)
+      else if ((%health_ratio <= 0.10)) %modifiers = $calc(%modifiers * 2.0)
+      else if ((%health_ratio <= 0.25)) %modifiers = $calc(%modifiers * 1.5)
+    }
+  }
+
+  if ($augment.check($1, TechBonus) = true) inc %modifiers $calc(%modifiers * %augment.strength * 0.25)
+
+  ; Check to see if we have an accessory or augment that enhances the weapon type
+  melee.weapontype.enhancements $1
+  unset %weapon.type
+
+  ; Check for Killer Traits
+  killer.trait.check $1 $3
+
+  unset %current.playerstyle | unset %current.playerstyle.level
+
+  ; Check for a battle condition modifier
+  if (enhance-tech isin %battleconditions) %modifiers = $calc(%modifiers * 0.1)
+
+  ; Calculate the total power.
+  set %attack_power $calc((%base.stat + %tech_power) * 2 * %modifiers)
+  set %attack.damage %attack_power
+
+  ; Adjust the total damage.
+  cap.damage $1 $3 tech
+
+  ; If a player is using a monster weapon, which is considered cheating, set the damage to 0.
+  if (($readini($dbfile(weapons.db), $2, cost) = 0) && ($readini($dbfile(weapons.db), $2, SpecialWeapon) != true)) {
+    if ($readini($char($1), info, flag) == $null) set %attack.damage 0
+  }
+
+  ; Calculate the to-hit chance.
+  set %hit $readini($dbfile(techniques.db), $2, Hit)
+  if (%hit == $null) {
+    if ($readini($char($1), info, flag) == monster) %hit = 92
+    else %hit = 100
+  }
+
+  if ($accessory.check($1, CurseAddDrain) = true) { unset %accessory.amount | set %absorb 0.25 }
+  if ($augment.check($1, Drain) = true) {  set %absorb 0.25 }
+
+  unset %current.accessory | unset %current.accessory.type 
+
+  ; Show the attack power.
+  ; If the power was capped, it will be shown in magenta.
+  if (%attack_power == %attack.damage) debugshow 1 $iif(%base.stat.needed == STR, 4Strength:12, $iif(%base.stat.needed == INT, 4Magical power:12, 4 $+ %base.stat.needed $+ :12)) %base.stat 4 Base power:12 %tech_power 4 Modifiers:12 %modifiers 4 Attack power:12 %attack.damage 4 Hit rate:12 %hit $iif(%absorb, 4 Life steal:12 %absorb)
+  else                                 debugshow 1 $iif(%base.stat.needed == STR, 4Strength:12, $iif(%base.stat.needed == INT, 4Magical power:12, 4 $+ %base.stat.needed $+ :12)) %base.stat 4 Base power:12 %tech_power 4 Modifiers:12 %modifiers 4 Attack power:13 %attack.damage 4 Hit rate:12 %hit $iif(%absorb, 4 Life steal:12 %absorb)
+
+  return %attack.damage
+}
+
+alias strike_tech {
+  ; $1 = user
+  ; $2 = technique used
+  ; $3 = target
+  ; $4 = optional flag ("heal")
+  ; $5 = attack power
+  ; $6 = number of hits
+  ; $7 = hit number
+
+  var %modifiers = 1
+
+  if ($4 == heal) {
+    ; Healing techniques should never be blocked.
+    set %attack.damage $calc($5 * ($rand(90, 110) / 100))
+    set -u0 %attack_effect did $+ %damage_colour $bytes(%attack.damage, b) damage 
+  }
+  else {
+    if ($readini($char($3), info, ai_type) = counteronly) { set %attack.damage 0 | return }
+
+    ; Does the attack hit?
+    unset %guard.message
+    var %tech_magic = $readini($dbfile(techniques.db), $2, Magic)
+
+    hit_check $1 $iif(%tech_magic, spell, technique) $3
+    if (%guard.message == $null) tech.ethereal.check $1 $2 $3
+    if (%guard.message == $null) invincible.check $1 $2 $3
+    if (%guard.message == $null) trickster_dodge_check $3 $1 tech
+    if (%guard.message == $null) weapon_parry_check $3 $1 $2
+    if (%guard.message == $null) manawall.check $1 $2 $3
+    if (%guard.message == $null) perfectdefense.check $1 $2 $3
+    if (%guard.message == $null) utsusemi.check $1 $2 $3
+
+    if (%guard.message == $null) {
+      ; Zombies gain weakness to light and fire.
+      set -u0 %element $readini($dbfile(techniques.db), $2, element)
+      if (($readini($char($3), status, zombie) == yes) && ((%element == light) || (%element == fire))) %modifiers = 1.15
+
+      ; Now we're ready to calculate the enemy's defense.
+      var %defense $readini($char($3), battle, def), %magic = $readini($char($3), battle, int)
+      if ($readini($char($3), status, DefenseDown) = yes) var %defense $round($calc(%defense / 2),0)
+      if ($readini($char($3), status, DefenseUp) = yes) var %defense $round($calc(3 * (%defense / 2)),0)
+      if ($readini($char($3), status, INTDown) = yes) var %magic $round($calc(3 * (%magic / 4)),0)
+
+      ; For defense against techniques, the enemy's magical power will play a part too. More so against magic attacks.
+      if (%tech_magic == yes) {
+        var %shield = $round($calc(%defense / 2 + %magic / 2), 0)
+
+        ; Check for Shell.
+        if ($readini($char($3), status, Shell) = yes) %modifiers = $calc(%modifiers * 0.75)
+      }
+      else var %shield = $round($calc(3 * (%defense / 4) + %magic / 4), 0)
+
+      ; Check to see if the weapon has an "IgnoreDefense=" flag.  If so, cut the def down.
+      var %piercing $readini($dbfile(techniques.db), $2, IgnoreDefense)
+      if ($augment.check($1, IgnoreDefense) = true) inc %piercing $calc(%augment.strength * 2)
+      if (%piercing >= 100) var %shield = 0
+      else if (%piercing > 0) var %shield = $calc(%shield * ((100 - %piercing) / 100))
+
+      ; Check for the modifier adjustments.
+      if ((%element != $null) && (%element != none)) {
+        set %element_modifier $modifier_adjust($3, %element)
+        if (%element_modifier <= 0) {
+          set_chr_name $3
+          set %guard.message $readini(translation.dat, battle, ImmuneToElement) 
+          %modifiers = 0
+        }
+        else %modifiers = $calc(%modifiers * %element_modifier)
+      }
+
+      ; Check to see if the target is resistant/weak to the tech itself
+      set %tech_modifier $modifier_adjust($3, $2)
+      if (%tech_modifier <= 0) {
+        set_chr_name $3
+        set %guard.message $readini(translation.dat, battle, ImmuneToTechName) 
+        %modifiers = 0
+      }
+      else %modifiers = $calc(%modifiers * %tech_modifier)
+
+      if (%shield < 0) var %shield = 0
+
+      ; Calculate the total damage.
+      set %attack.damage $calc(($5 - %shield) * %modifiers * ($rand(90, 110) / 100))
+      debugshow 1 4Hit:12 $7 4of12 $6 4 Power:12 $5 4 Shield:12 %shield 4 Modifiers:12 %modifiers
+
+      ; Check for the Guardian style
+      guardian_style_check $3
+
+      ; Check for metal defense.  If found, set the damage to 1.
+      metal_defense_check $3 $1
+
+      ; Check for blocks.
+      shield_block_check $3 $1 $2
+
+      first_round_dmg_chk $1 $3
+
+      ; In this bot we don't want the attack to ever be lower than 1 except for rare instances...  
+      if ((%guard.message == $null) && (%attack.damage <= 0)) %attack.damage = 1
+
+      guardianmon.check $1 $2 $3 $4
+
+      set -u0 %attack_effect did $+ %damage_colour $bytes(%attack.damage, b) damage 
+    }
+  }
+
+  if ($6 > 1) {
+    set     %attack.damage [ $+ [ $7 ] ] %attack.damage
+    set -u0 %attack_effect [ $+ [ $7 ] ] %attack_effect
+  }
+
+  if (%guard.message == $null) {
+    unset %statusmessage.display
+    set %status.type.list $readini($dbfile(techniques.db), $2, StatusType)
+
+    if (%status.type.list != $null) { 
+      set %number.of.statuseffects $numtok(%status.type.list, 46) 
+
+      if (%number.of.statuseffects = 1) { $inflict_status($1, $3, %status.type.list) | unset %number.of.statuseffects | unset %status.type.list }
+      if (%number.of.statuseffects > 1) {
+        var %status.value 1
+        while (%status.value <= %number.of.statuseffects) { 
+          set %current.status.effect $gettok(%status.type.list, %status.value, 46)
+          $inflict_status($1, $3, %current.status.effect)
+        }
+
+        unset %number.of.statuseffects | unset %current.status.effect
+      }
+    }
+    unset %status.type.list
+  }
+}
+
+alias strike_tech_aoe {
+  ; $1 = user
+  ; $2 = technique used
+  ; $3 = target
+  ; $4 = optional flag ("heal")
+  ; $5 = attack power
+
+  var %user_flag = $readini($char($1), info, flag)
+  var %targetcount = 0
+  ; While confused, the targets will be random.
+  if ($is_confused($1) == true) {
+    if ($rand(0, 1) == 0) var %targets = allies
+    else var %targets = monsters
+  } 
+  ; While charmed, healing will target monsters, and attacks will target allies.
+  else if ($is_charmed($1) == true) {
+    if ($4 == heal) {
+      if (%user_flag == monster) var %targets = allies
+      else var %targets = monsters
+    }
+    else {
+      if (%user_flag == monster) var %targets = monsters
+      else var %targets = allies
+    }
+  }
+  ; While neither, target whatever side the specified character is on.
+  else if ($readini($char($3), info, flag) == monster) var %targets = monsters
+  else var %targets = allies
+
+  ; Determine the number of strikes. 
+  set -u0 %strikes $readini($dbfile(techniques.db), $2, hits)
+  if (%strikes == $null) %strikes = 1
+  set -u0 %element $readini($dbfile(techniques.db), $2, element)
+
+  var %lines $lines($txtfile(battle.txt)) | var %i 1 | set %aoe.turn 1
+  while (%i <= %lines) { 
+    set %who.battle $read -l $+ %i $txtfile(battle.txt)
+    var %flag = $readini($char(%who.battle), info, flag)
+    var %istarget = $false
+
+    var %current.status $readini($char(%who.battle), battle, status)
+    if (%current.status == alive) {
+      if (%targets == monsters) {
+        if (%flag == monster) %istarget = $true
+      }
+      else {
+        if (%flag != monster) %istarget = $true
+      }
+    }
+
+    if (%istarget) {
+      var %damage = $true
+      inc %targetcount
+      
+      if ($4 == heal) {
+        var %zombie = $readini($char(%who.battle), status, zombie), %monstertype = $readini($char(%who.battle), monster, type)
+        if ((%zombie != yes) && (%monstertype != undead)) %damage = $false
+      }
+
+      if (%damage) {
+        ; Check for elemental absorbs.
+        var %absorbs $readini($char(%who.battle), modifiers, heal)
+        if ((%absorbs != none) && (%absorbs != $null)) {
+          if ($istok(%absorbs, %element, 46) = $true) { 
+            $tech.heal($1, $2, %who.battle, %absorb)
+            inc %i 1 
+            continue
+          }
+        }
+  
+        var %intercepted = $covercheck(%who.battle, $2, AOE)
+  
+        ; Check for Magic Mirror effects.
+        if (($readini($char(%who.battle), status, reflect) = yes) && ($readini($dbfile(techniques.db), $2, magic) = yes)) {
+          %who.battle = $1
+          %intercepted = $true
+        }
+  
+        if (%intercepted) {
+          ; The attack was intercepted; check again for elemental absorbs on the new target.
+          if ($4 == heal) {
+            var %zombie = $readini($char(%who.battle), status, zombie), %monstertype = $readini($char(%who.battle), monster, type)
+            if ((%zombie != yes) && (%monstertype != undead)) %damage = $false
+          }  
+
+          if (%damage) {
+            var %absorbs $readini($char(%who.battle), modifiers, heal)
+            if ((%absorbs != none) && (%absorbs != $null)) {
+              if ($istok(%absorbs, %element, 46) = $true) { 
+                $tech.heal($1, $2, %who.battle, %absorb)
+                inc %i 1 
+                continue
+              }
+            }
+          }
+        }
+      }
+
+      ; Now we can finally process the effect.
+      if (%damage) {
+        var %strike = 1
+        while (%strike <= %strikes) {
+          strike_tech $1 $2 %who.battle $4 $5 %strikes %strike
+          inc %strike
+        }
+        multi_strike_check %strikes
+        $deal_damage($1, %who.battle, $2, %absorb)
+        $display_aoedamage($1, %who.battle, $2, %absorb)        
+      }
+      else {
+        $heal_damage($1, %who.battle, $2)
+        $display_heal($1, %who.battle, aoeheal, $2)
+      }
+    }
+
+    ; Make sure that the attacker is still alive before continuing.
+    if ($readini($char($1), Battle, HP) <= 0) break
+    inc %i
+  }
+  return %targetcount
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1172,11 +1408,11 @@ alias calculate_damage_techs {
   ; Check for the modifier adjustments.
   var %tech.element $readini($dbfile(techniques.db), $2, element)
   if ((%tech.element != $null) && (%tech.element != none)) {
-    $modifer_adjust($3, %tech.element)
+    modifier_adjust $3 %tech.element
   }
 
   ; Check to see if the target is resistant/weak to the tech itself
-  $modifer_adjust($3, $2)
+  modifier_adjust $3 $2
 
   if (%enemy.defense <= 0) { set %enemy.defense 1 }
 

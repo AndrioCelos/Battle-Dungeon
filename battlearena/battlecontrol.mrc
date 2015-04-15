@@ -254,6 +254,8 @@ alias clear_battle {
       if (%president.chance <= 5) { var %president.flag boss savethepresident }
     }
 
+    ; DEBUG:
+    if (%auto != $null) var %president.flag = monster
     if ($readini(system.dat, system, automatedaibattlecasino) = on) {  /.timerBattleStart 0 %timer.time /startnormal ai }
     else {  /.timerBattleStart 0 %timer.time /startnormal %president.flag }
 
@@ -369,6 +371,30 @@ alias startnormal {
   if (%time.to.enter = $null) { var %time.to.enter 120 }
 
   /.timerBattleBegin 0 %time.to.enter /battlebegin
+
+  ; DEBUG:
+  if (%auto != $null) {
+    var %r = $rand(0, 7)
+    if      (%r == 0) set %level    5
+    else if (%r == 1) set %level   10
+    else if (%r == 2) set %level   20
+    else if (%r == 3) set %level   50
+    else if (%r == 4) set %level  100
+    else if (%r == 5) set %level  200
+    else if (%r == 6) set %level  500
+    else if (%r == 7) set %level 1000
+    writeini battlestats.dat battle winningstreak %level
+    $display.system.message(3The winning streak has been set to: %level, global)
+
+    var %count = $numtok(%auto, $asc(.)), %i = 1
+    while (%i <= %count) {
+      var %name = $gettok(%auto, %i, $asc(.))
+
+      enter %name
+
+      inc %i
+    }
+  }
 }
 
 
@@ -591,6 +617,25 @@ alias battlebegin {
       $clear_battle | halt 
     }
   }
+
+  ; DEBUG:
+  if (%auto != $null) {
+    set %level $readini(battlestats.dat, Battle, WinningStreak)
+
+    var %count = $numtok(%auto, $asc(.)), %i = 1
+    while (%i <= %count) {
+      var %name = $gettok(%auto, %i, $asc(.))
+
+      if (%level >= 100) writeini $char(%name) BaseStats HP 10000
+      else writeini $char(%name) BaseStats HP $calc(%level * 100)
+      if (%level >= 100) writeini $char(%name) Battle HP 10000
+      else writeini $char(%name) Battle HP $calc(%level * 100)
+      levelsync %name %level
+
+      inc %i
+    }
+  }
+
 
   set %ignore.clearfiles no
 
@@ -1533,7 +1578,8 @@ alias turn {
   $display.system.message.delay(%status.message, battle, 1)
 
   if (($lines($txtfile(temp_status.txt)) != $null) && ($lines($txtfile(temp_status.txt)) > 0)) { 
-    /.timerThrottle $+ $rand(a,z) $+ $rand(1,1000) $+ $rand(a,z) 1 1 /display.statusmessages $1 
+    if (%fast) display.statusmessages $1 
+    else /.timerThrottle $+ $rand(a,z) $+ $rand(1,1000) $+ $rand(a,z) 1 1 /display.statusmessages $1 
   } 
 
   if ($readini($char($1), status, curse) != yes) {
@@ -1557,6 +1603,7 @@ alias turn {
   if ($lines($txtfile(temp_status.txt)) != $null) { 
     set %file.to.read.lines $lines($txtfile(temp_status.txt))
     inc %file.to.read.lines 2
+    if (%fast) %file.to.read.lines = 1
   }
 
   ; If we're in gauntlet mode and the turn is a multiple of 15 we need to reset certain skills.
@@ -2110,12 +2157,14 @@ alias display.statusmessages {
   if (($lines($txtfile(temp_status.txt)) != $null) && ($lines($txtfile(temp_status.txt)) > 0)) { 
     var %file.to.read $txtfile(temp_status.txt)
 
-    if ($readini(system.dat, system, botType) = IRC) {  /.play %battlechan %file.to.read }
-    if ($readini(system.dat, system, botType) = TWITCH) {  /.play %battlechan %file.to.read }
+    var %delay = 1000
+    if (%fast) %delay = 1
+    if ($readini(system.dat, system, botType) = IRC) {  /.play %battlechan %file.to.read %delay }
+    if ($readini(system.dat, system, botType) = TWITCH) {  /.play %battlechan %file.to.read %delay }
     if ($readini(system.dat, system, botType) = DCCchat) { $dcc.status.messages(%file.to.read) }
 
     /.remove $txtfile(temp_status.txt)
-    /.timerReturnFromStatus $+ $rand(a,z) 1 2 /return 
+    if (!%fast) /.timerReturnFromStatus $+ $rand(a,z) 1 2 /return
   }
 }
 

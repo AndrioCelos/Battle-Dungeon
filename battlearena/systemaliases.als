@@ -178,6 +178,17 @@ system_defaults_check {
   .remove $lstfile(items_songs.lst)
 }
 
+debugshow {
+  if ($1 isnum) var %level = $1, %message = $2-
+  else var %level = 1, %message = $1-
+  
+  if (%debug_output >= %level) {    
+    if      (%level == 1) noop $display.system.message(%message, battle)
+    else if (%level == 2) echo -a %message
+    else if (%level == 3) echo -s %message
+  }
+}
+
 checkscript {
   var %command $1-
   %command = $remove(%command,$set_chr_name)

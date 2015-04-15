@@ -303,7 +303,34 @@ boost_monster_stats {
 ; This function is for boosting
 ; monster's/npcs's total hp
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MOD: Rebalancing monsters.
 monster_boost_hp {
+  if ($readini($char($1), info, BattleStats) = ignoreHP) { return }
+
+  var %hp = $readini($char($1), BaseStats, HP)
+  var %str $readini($char($1), Battle, str)
+  var %def $readini($char($1), Battle, def)
+  var %int $readini($char($1), Battle, int)
+  var %spd $readini($char($1), Battle, spd)
+
+  var %level = $calc((%str + %def + %int + %spd / 2) / 17.5)
+  var %average_HP = $calc(50 + %level * 5)
+  var %ratio = $calc(%hp / %average_HP)
+  ; Cap the health.
+  if ($isfile($boss($1))) {
+    if (%ratio < 1) %ratio = 1
+    else if (%ratio > 2.5) %ratio = 2.5  
+  }
+  else {
+    if (%ratio < 0.5) %ratio = 0.5
+    else if (%ratio > 1.5) %ratio = 1.5  
+  }
+
+  %hp = $calc($round($calc((60 + $3 * 20) * %ratio / 10), 1) * 10)
+  writeini $char($1) BaseStats HP %hp  
+}
+
+monster_boost_hp_old {
   ; $1 = monster
   ; $2 = same as in the boost mon alias
   ; $3 = monster level
@@ -532,69 +559,56 @@ monster_spend_points {
   writeini $char($1) BaseStats Def %def
   writeini $char($1) BaseStats Int %int
   if ($3 != doppelganger) { writeini $char($1) BaseStats Spd %spd }
-
-  var %level.difference $calc($2 - $get.level.basestats($1))
-  if ((%level.difference > 0) && ($readini($char($1), info, flag) = monster)) {
-    inc %spd $round($calc(%level.difference * 36),0)
-    if ($3 != doppelganger) { writeini $char($1) BaseStats Spd %spd }
-  }
 }
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; This function lets players
 ; sync their level to another
 ; level.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 levelsync {
-  ; $1 = player
+  ; $1 = player/monster/target
   ; $2 = level to sync to
 
-  var %str $readini($char($1), battle, str)
-  var %def $readini($char($1), battle, def)
-  var %int $readini($char($1), battle, int)
-  var %spd $readini($char($1), battle, spd)
+  var %str = $readini($char($1), battle, str)
+  var %def = $readini($char($1), battle, def)
+  var %int = $readini($char($1), battle, int)
+  var %spd = $readini($char($1), battle, spd)
 
-  var %unspent.player.points $calc(20 * $2)
-  var %total.percent 100
+  if (%str < 5) { var %str 5 | writeini $char($1) battle str 5 }
+  if (%def < 5) { var %def 5 | writeini $char($1) battle def 5 }
+  if (%int < 5) { var %int 5 | writeini $char($1) battle int 5 }
+  if (%spd < 5) { var %spd 5 | writeini $char($1) battle spd 5 }
 
-  var %str.percent $rand(30,35)
-  dec %total.percent %str.percent
+  var %level.difference $round($calc($2 - $get.level($1)),0)
 
-  var %def.percent $rand(30,35)
-  dec %total.percent %def.percent
+  var %current.loop 0 
 
-  var %int.percent $rand(30,35)
-  dec %total.percent %int.percent
+  while (%level.difference != 0) {
+    if (%current.loop > 5) { break }
 
-  var %spd.percent %total.percent
-  if (%spd.percent <= 0) { var %spd.percent 1 }
+    var %difference.ratio $calc($2 / $get.level($1))
 
-  var %str.points $round($calc((%str.percent * .01) * %unspent.player.points),0)
-  dec %unspent.player.points %str.points
+    %str = $round($calc(%str * %difference.ratio),0) 
+    %def = $round($calc(%def * %difference.ratio),0) 
+    %int = $round($calc(%int * %difference.ratio),0) 
+    %spd = $round($calc(%spd * %difference.ratio),0) 
 
-  var %def.points $round($calc((%def.percent * .01) * %unspent.player.points),0)
-  dec %unspent.player.points %def.points
-
-  var %int.points $round($calc((%int.percent * .01) * %unspent.player.points),0)
-  dec %unspent.player.points %int.points
-
-  var %spd.points %unspent.player.points
-  dec %unspent.player.points %spd.points
-
-  %str = $round($calc(%str + %str.points),0) 
-  %def = $round($calc(%def + %def.points),0) 
-  %int = $round($calc(%int + %int.points),0) 
-  %spd = $round($calc(%spd + %spd.points),0) 
-
-  writeini $char($1) battle Str %str
-  writeini $char($1) battle Def %def
-  writeini $char($1) battle Int %int
-  writeini $char($1) battle Spd %spd
-
-  if ($get.level($1) != $2) {
-    var %level.difference $round($calc($2 - $get.level($1)),0)
-    var %str.points $calc(18 * %level.difference)
-    inc %str %str.points
     writeini $char($1) battle Str %str
+    writeini $char($1) battle Def %def
+    writeini $char($1) battle Int %int
+    writeini $char($1) battle Spd %spd
+
+    var %level.difference $round($calc($2 - $get.level($1)),0)
+    inc %current.loop 1
+  }
+
+  ; Monsters and Bosses need their stats copied from the synced level to the basestats portion
+  if (($readini($char($1), info, flag) = monster) || ($readini($char($1), info, flag) = boss)) { 
+    writeini $char($1) basestats str $readini($char($1), battle, str)
+    writeini $char($1) basestats def $readini($char($1), battle, def)
+    writeini $char($1) basestats int $readini($char($1), battle, int)
+    writeini $char($1) basestats spd $readini($char($1), battle, spd)
   }
 
 }
@@ -895,7 +909,7 @@ display_damage {
   if (((((((%double.attack = $null) && (%triple.attack = $null) && (%fourhit.attack = $null) && (%fivehit.attack = $null) && (%sixhit.attack = $null) && (%sevenhit.attack = $null) && (%eighthit.attack = $null))))))) { 
 
     if ($3 != aoeheal) {
-      if (%guard.message = $null) {  $display.system.message(The attack did $+ %damage_colour $bytes(%attack.damage,b) damage to %enemy %style.rating, battle) 
+      if (%guard.message = $null) {  $display.system.message(The attack did $+ %damage_colour $bytes(%attack.damage,b) damage to %enemy %style.rating, battle) 
       }
       if (%guard.message != $null) { $display.system.message(%guard.message,battle) 
       }
@@ -904,7 +918,7 @@ display_damage {
       }
     }
     if ($3 = aoeheal) { 
-      if (%guard.message = $null) {  $display.system.message(The attack did $+ %damage_colour $bytes(%attack.damage,b) damage to %enemy %style.rating, battle)    }
+      if (%guard.message = $null) {  $display.system.message(The attack did $+ %damage_colour $bytes(%attack.damage,b) damage to %enemy %style.rating, battle)    }
       if (%guard.message != $null) { $display.system.message(%guard.message,battle)  }
       if (%element.desc != $null) {  $display.system.message(%element.desc,battle) 
         unset %element.desc 
@@ -913,14 +927,14 @@ display_damage {
   }
 
   if (%double.attack = true) { 
-    if (%guard.message = $null) {  var %damage.message The first attack did $+ %damage_colour $bytes(%attack.damage1,b) damage.  The second attack did $+ %damage_colour $bytes(%attack.damage2,b) damage.  Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating 
+    if (%guard.message = $null) {  var %damage.message The first attack %attack_effect1 $+ .  The second attack %attack_effect2 $+ .  Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating 
       $display.system.message(%damage.message,battle)
     }
     if (%guard.message != $null) { $display.system.message(%guard.message,battle)  }
     unset %attack.damage1 | unset %attack.damage2 | unset %attack.damage3 | unset %attack.damage5 | unset %attack.damage6 | unset %attack.damage7 | unset %attack.damage8 | unset %double.attack | unset %triple.attack | unset %fourhit.attack | unset %fivehit.attack | unset %sixhit.attack | unset %sevenhit.attack | unset %eighthit.attack 
   }
   if (%triple.attack = true) {  
-    if (%guard.message = $null) { var %damage.message The first attack did $+ %damage_colour $bytes(%attack.damage1,b) damage.  The second attack did $+ %damage_colour $bytes(%attack.damage2,b) damage.  The third attack did $+ %damage_colour $bytes(%attack.damage3,b) damage.  Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating
+    if (%guard.message = $null) { var %damage.message The first attack %attack_effect1 $+ .  The second attack %attack_effect2 $+ .  The second attack %attack_effect3 $+ .  Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating
       $display.system.message(%damage.message,battle) 
     }
     if (%guard.message != $null) { $display.system.message(%guard.message,battle)  }
@@ -928,7 +942,7 @@ display_damage {
   }
 
   if (%fourhit.attack = true) { 
-    if (%guard.message = $null) { var %damage.message The first attack did $+ %damage_colour $bytes(%attack.damage1,b) damage.  The second attack did $+ %damage_colour $bytes(%attack.damage2,b) damage.  The third attack did $+ %damage_colour $bytes(%attack.damage3,b) damage. The fourth attack did $+ %damage_colour $bytes(%attack.damage4,b) damage. Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating
+    if (%guard.message = $null) { var %damage.message The first attack %attack_effect1 $+ .  The second attack %attack_effect2 $+ .  The third attack %attack_effect3 $+ . The fourth attack %attack_effect4 $+ . Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating
       $display.system.message(%damage.message,battle) 
     }
     if (%guard.message != $null) {  $display.system.message(%guard.message,battle)   }
@@ -936,7 +950,7 @@ display_damage {
   }
 
   if (%fivehit.attack = true) { 
-    if (%guard.message = $null) { var %damage.message The first attack did $+ %damage_colour $bytes(%attack.damage1,b) damage.  The second attack did $+ %damage_colour $bytes(%attack.damage2,b) damage.  The third attack did $+ %damage_colour $bytes(%attack.damage3,b) damage. The fourth attack did $+ %damage_colour $bytes(%attack.damage4,b) damage. The fifth attack did $+ %damage_colour $bytes(%attack.damage5,b) damage. Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating 
+    if (%guard.message = $null) { var %damage.message The first attack %attack_effect1 $+ .  The second attack %attack_effect2 $+ .  The third attack %attack_effect3 $+ . The fourth attack %attack_effect4 $+ . The fifth attack %attack_effect5 $+ . Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating 
       $display.system.message(%damage.message,battle) 
     }
     if (%guard.message != $null) { $display.system.message(%guard.message,battle)  }
@@ -944,7 +958,7 @@ display_damage {
   }
 
   if (%sixhit.attack = true) { 
-    if (%guard.message = $null) { var %damage.message The first attack did $+ %damage_colour $bytes(%attack.damage1,b) damage.  The second attack did $+ %damage_colour $bytes(%attack.damage2,b) damage.  The third attack did $+ %damage_colour $bytes(%attack.damage3,b) damage. The fourth attack did $+ %damage_colour $bytes(%attack.damage4,b) damage. The fifth attack did $+ %damage_colour $bytes(%attack.damage5,b) damage. The sixth attack did $+ %damage_colour $bytes(%attack.damage6,b) damage.  Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating
+    if (%guard.message = $null) { var %damage.message The first attack %attack_effect1 $+ .  The second attack %attack_effect2 $+ .  The third attack %attack_effect3 $+ . The fourth attack %attack_effect4 $+ . The fifth attack %attack_effect5 $+ . The sixth attack %attack_effect6 $+ .  Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating
       $display.system.message(%damage.message,battle) 
     }
     if (%guard.message != $null) { $display.system.message(%guard.message,battle)   }
@@ -952,7 +966,7 @@ display_damage {
   }
 
   if (%sevenhit.attack = true) { 
-    if (%guard.message = $null) { var %damage.message The first attack did $+ %damage_colour $bytes(%attack.damage1,b) damage.  The second attack did $+ %damage_colour $bytes(%attack.damage2,b) damage.  The third attack did $+ %damage_colour $bytes(%attack.damage3,b) damage. The fourth attack did $+ %damage_colour $bytes(%attack.damage4,b) damage. The fifth attack did $+ %damage_colour $bytes(%attack.damage5,b) damage. The sixth attack did $+ %damage_colour $bytes(%attack.damage6,b) damage. The seventh attack did $+ %damage_colour $bytes(%attack.damage7,b) damage.  Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating 
+    if (%guard.message = $null) { var %damage.message The first attack %attack_effect1 $+ .  The second attack %attack_effect2 $+ .  The third attack %attack_effect3 $+ . The fourth attack %attack_effect4 $+ . The fifth attack %attack_effect5 $+ . The sixth attack %attack_effect6 $+ . The seventh attack %attack_effect7 $+ .  Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating 
       $display.system.message(%damage.message,battle) 
     }
     if (%guard.message != $null) { $display.system.message(%guard.message,battle) 
@@ -961,7 +975,7 @@ display_damage {
   }
 
   if (%eighthit.attack = true) { 
-    if (%guard.message = $null) { var %damage.message The first attack did $+ %damage_colour $bytes(%attack.damage1,b) damage.  The second attack did $+ %damage_colour $bytes(%attack.damage2,b) damage.  The third attack did $+ %damage_colour $bytes(%attack.damage3,b) damage. The fourth attack did $+ %damage_colour $bytes(%attack.damage4,b) damage. The fifth attack did $+ %damage_colour $bytes(%attack.damage5,b) damage. The sixth attack did $+ %damage_colour $bytes(%attack.damage6,b) damage. The seventh attack did $+ %damage_colour $bytes(%attack.damage7,b) damage.  The eighth attack did $+ %damage_colour $bytes(%attack.damage8,b) damage. Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating
+    if (%guard.message = $null) { var %damage.message The first attack %attack_effect1 $+ .  The second attack %attack_effect2 $+ .  The third attack %attack_effect3 $+ . The fourth attack %attack_effect4 $+ . The fifth attack %attack_effect5 $+ . The sixth attack %attack_effect6 $+ . The seventh attack %attack_effect7 $+ .  The eighth attack %attack_effect8 $+ . Total physical damage: $+ %damage_colour $bytes(%attack.damage,b)  $+ %style.rating
       $display.system.message(%damage.message,battle) 
     }
     if (%guard.message != $null) { $display.system.message(%guard.message,battle)  }
@@ -1029,7 +1043,7 @@ display_damage {
     $gemconvert_check($1, %target, $3, $4)
     if (%attack.damage > $readini($char(%target), basestats, hp)) { set %overkill 7<<OVERKILL>> }
 
-    $display.system.message($readini(translation.dat, battle, EnemyDefeated),private)
+    $display.system.message($readini(translation.dat, battle, EnemyDefeated), battle)
 
     ; check to see if a clone or summon needs to die with the target
     $check.clone.death(%target)
@@ -2159,6 +2173,28 @@ first_round_dmg_chk {
 ; Check to see if someone
 ; dodges an attack.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MOD: Basic miss
+hit_check {
+  ; $1 = attacker
+  ; $2 = attack type (basic, technique or magic)
+  ; $3 = defender
+
+  if ((%battle.rage.darkness = on) && ($readini($char($3), info, flag) = monster)) { return }
+  if ((%hit == $null) || (%hit >= 100)) return
+
+  var %r = $rand(1, 100)
+  if (%r > %hit) {
+    ; The attack misses.
+    set %attack.damage 0 | $set_chr_name($1)
+
+    ; Missing costs some style points.
+    var %stylepoints = $readini($txtfile(battle2.txt), style, $1)  
+    writeini $txtfile(battle2.txt) style $1 $calc(%stylepoints * 0.8)
+
+    set %guard.message $readini(translation.dat, battle, Miss)
+    set -u0 %attack_effect missed
+  }
+}
 trickster_dodge_check {
   ; $1 = person dodging
   ; $2 = person attacking
@@ -2213,6 +2249,7 @@ trickster_dodge_check {
 
     if (%current.playerstyle = Trickster) {  set %guard.message $readini(translation.dat, battle, TricksterDodged) }
     if (%current.playerstyle != Trickster) { set %guard.message $readini(translation.dat, battle, NormalDodge) }
+    set -u0 %attack_effect was dodged
 
     if (%third.eye.dodge = yes) { set %guard.message $readini(translation.dat, battle, ThirdEyeDodge) }
 
@@ -2286,6 +2323,7 @@ weapon_parry_check {
 
   $calculate.stylepoints($1)
   $set_chr_name($1) | set %guard.message $readini(translation.dat, battle, WeaponParry)
+  set -u0 %attack_effect was parried
 
   var %number.of.parries $readini($char($1), stuff, TimesParried)
   if (%number.of.parries = $null) { var %number.of.parries 0 }
@@ -2535,14 +2573,14 @@ counter_melee_action {
 
   set %weapon.element $readini($dbfile(weapons.db), %weapon.name, element)
   if ((%weapon.element != $null) && (%weapon.element != none)) {
-    $modifer_adjust($1, %weapon.element)
+    modifier_adjust $1 %weapon.element
   }
 
   unset %weapon.element
 
   ; Check for weapon type weaknesses.
   set %weapon.type $readini($dbfile(weapons.db), %weapon.name, type)
-  $modifer_adjust($1, %weapon.type)
+  modifier_adjust $1 %weapon.type
 
   unset %weapon.type
 
@@ -2715,9 +2753,11 @@ spawn_after_death {
 }
 
 metal_defense_check {
-  if ($augment.check($2, IgnoreMetalDefense) = true) { return }
+  ; MOD: Metal defense won't save you from critical hits!
+  if (($augment.check($2, IgnoreMetalDefense) == true) || (%defense <= 0)) { return }
   else { 
-    if ($readini($char($1), info, MetalDefense) = true) {  set %attack.damage 0  }
+    ; MOD: Set damage against metal defense to 1 instead of 0.
+    if ($readini($char($1), info, MetalDefense) = true) {  set %attack.damage 1 }
     return
   }
 }
@@ -3042,6 +3082,7 @@ offensive.style.check {
 melee.ethereal.check {
   if ($readini($char($3), status, ethereal) = yes) {
     if ((($readini($dbfile(weapons.db), $2, HurtEthereal) != true) && ($augment.check($1, HurtEthereal) = false) && ($readini($char($1), skills, FormlessStrike.on) != on))) {
+      set -u0 %attack_effect went right through | set -u0 %nopass $true
       $set_chr_name($1) | set %guard.message $readini(translation.dat, status, EtherealBlocked) | set %attack.damage 0 | return
     }
   }
@@ -3053,6 +3094,7 @@ magic.ethereal.check {
   ; $3 = target
 
   if (($readini($char($3), status, ethereal) = yes) && ($readini($dbfile(techniques.db), $2, magic) != yes)) {
+    set -u0 %attack_effect went right through | set -u0 %nopass $true
     $set_chr_name($1) | set %guard.message $readini(translation.dat, status, EtherealBlocked) | set %attack.damage 0 | return
   }
 }
@@ -3066,6 +3108,7 @@ tech.ethereal.check {
 
   if ($readini($char($3), status, ethereal) = yes) {
     if ((($augment.check($1, HurtEthereal) = false) && (%weapon.hurt.ethereal != true) && ($readini($dbfile(techniques.db), $2, magic) != yes))) {
+      set -u0 %attack_effect went right through | set -u0 %nopass $true
       $set_chr_name($1) | set %guard.message $readini(translation.dat, status, EtherealBlocked) | set %attack.damage 0 | return
     }
   }
@@ -3104,6 +3147,7 @@ utsusemi.check {
     dec %number.of.shadows %shadows.blocked 
     writeini $char($3) skills utsusemi.shadows %number.of.shadows
     if (%number.of.shadows <= 0) { writeini $char($3) skills utsusemi.on off }
+    set -u0 %attack_effect was avoided by Utsusemi
     $set_chr_name($3) | set %guard.message $readini(translation.dat, skill, UtsusemiBlocked) | set %attack.damage 0 | unset %shadows.blocked | return 
   }
 }
@@ -3133,6 +3177,7 @@ royalguard.check {
 
     inc %total.blocked.damage %blocked.damage
     writeini $char($3) skills royalguard.dmgblocked %total.blocked.damage
+    set %attack_effect hit Royal Guard
     set %attack.damage 0 | $set_chr_name($3) | set %guard.message $readini(translation.dat, skill, RoyalGuardBlocked) | return 
   }
 }
@@ -3169,6 +3214,7 @@ perfectdefense.check {
   ; does the target have PerfectDefense on?  If so, reduce the damage to 0.
   if ($readini($char($3), skills, perfectdefense.on) = on) { 
     writeini $char($3) skills perfectdefense.on off 
+    set %attack_effect hit Perfect Defense
     set %attack.damage 0 | $set_chr_name($3) | set %guard.message $readini(translation.dat, skill, PerfectDefenseBlocked) | return 
   }
 }
@@ -3186,6 +3232,7 @@ invincible.check {
 
   ; does the target have Invincible on?  If so, reduce the damage to 0.
   if ($readini($char($3), status, invincible) = yes) { 
+    set -u0 %attack_effect was futile | set -u0 %nopass $true
     set %attack.damage 0 | $set_chr_name($3) | set %guard.message $readini(translation.dat, status, InvincibleDamage) | return 
   }
 }
@@ -3194,26 +3241,25 @@ invincible.check {
 ; see if someone is being
 ; protected by someone else.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; MOD: Have this return a value, and possibly block healing techniques against zombies.
 covercheck {
   ; $3 = AOE for AOE stuff
   unset %covering.someone
 
   var %cover.target $readini($char($1), skills, CoverTarget)
 
-  if ((%cover.target = none) || (%cover.target = $null)) { set %attack.target $1 | return } 
+  if ((%cover.target = none) || (%cover.target = $null)) { set %attack.target $1 | return $false } 
 
   var %cover.status $readini($char(%cover.target), battle, status)
-  if ((%cover.status = dead) || (%cover.status = runaway)) { writeini $char($1) skills CoverTarget none | set %attack.target $1 | return } 
+  if ((%cover.status = dead) || (%cover.status = runaway)) { writeini $char($1) skills CoverTarget none | set %attack.target $1 | return $false } 
 
-  if ($readini($dbfile(techniques.db), $2, Type) = heal) { set %attack.target $1 | return }
-  if ($readini($dbfile(techniques.db), $2, Type) = heal-AOE) { set %attack.target $1 | return }
-
-  if ($3 != AOE) {  set %attack.target %cover.target 
+  if ($3 != AOE) {  set %attack.target %cover.target
     set %covering.someone on
   }
   if ($3 = AOE) { set %who.battle %cover.target }
   writeini $char($1) skills CoverTarget none
   $display.system.message($readini(translation.dat, battle, TargetCovered),battle) 
+  return $true
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -3671,11 +3717,35 @@ eighthit.attack.check {
   unset %original.attackdmg
 }
 
+; MOD: Alternate damage mechanics.
+multi_strike_check {
+  ; $1 = number of strikes
+
+  if ($1 > 1) {
+    set %attack.damage 0
+    var %strike = 1
+    while (%strike <= $1) {
+      inc %attack.damage %attack.damage [ $+ [ %strike ] ]
+      inc %strike
+    }
+
+    if      ($1 == 2) set %double.attack true
+    else if ($1 == 3) set %triple.attack true
+    else if ($1 == 4) set %fourhit.attack true
+    else if ($1 == 5) set %fivehit.attack true
+    else if ($1 == 6) set %sixhit.attack true
+    else if ($1 == 7) set %sevenhit.attack true
+    else if ($1 == 8) set %eighthit.attack true
+
+    unset %guard.message
+  }
+}
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Modifier Checks for
 ; elements and weapon types
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-modifer_adjust {
+modifier_adjust {
   ; $1 = target
   ; $2 = element or weapon type
 
@@ -3723,6 +3793,8 @@ modifer_adjust {
 
   ; Adjust the attack damage.
   set %attack.damage $round($calc(%attack.damage * %modifier.adjust.value),0)
+  ; MOD: Alternate damage mechanics
+  return %modifier.adjust.value
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

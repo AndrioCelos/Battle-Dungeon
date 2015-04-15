@@ -2,7 +2,7 @@
 ;;;; BASIC CONTROL
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-raw 421:*:echo -a 4,1Unknown Command: ( $+ $2 $+ ) | echo -a 4,1Location: %debug.location | halt
+;raw 421:*:echo -a 4,1Unknown Command: ( $+ $2 $+ ) | echo -a 4,1Location: %debug.location | halt
 CTCP *:PING*:?:if ($nick == $me) haltdef
 CTCP *:VERSION*:*:ctcpreply $nick VERSION Battle Dungeon $battle.version
 CTCP *:BOTVERSION*:*:ctcpreply $nick BOTVERSION Battle Dungeon $battle.version
