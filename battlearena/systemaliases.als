@@ -634,7 +634,7 @@ get.unspentpoints {
     if ($3 = warmachine) { var %points.should.have.spent $round($calc(20 * $2),0) }
     if ($3 = rage) { var %points.should.have.spent $round($calc(1000 * $2),0) }
 
-    if (%bloodmoon = on) { inc %points.should.have.spent $calc(20 * $rand(5,10)) }
+    ;if (%bloodmoon = on) { inc %points.should.have.spent $calc(20 * $rand(5,10)) }
 
   }
 
