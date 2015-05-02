@@ -34,7 +34,6 @@ EnhanceDefender
 EnhanceAggressor
 EnhanceZen
 EnhanceWeaponBash
-EnhanceParry
 EnhanceEnfeeble
 EnhanceHandToHand
 EnhanceSword
@@ -50,3 +49,5 @@ EnhanceScythe
 EnhanceDagger
 EnhanceCriticalHits
 EnhanceStylePoints
+EnhanceElementalDefense
+DecreaseMechEnergyCost

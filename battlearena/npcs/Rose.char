@@ -1,21 +1,21 @@
 [BaseStats]
-Hp=2800
+Hp=5000
 Tp=500
-Str=$calc(30 + $current.battlestreak)
-Def=$calc(30 + $current.battlestreak)
-Int=$calc(50 + $current.battlestreak)
-Spd=$calc(50 + $current.battlestreak)
+Str=20
+Def=20
+Int=20
+Spd=20
 IgnitionGauge=60
 Name=Rose
 
 
 [Battle]
-Hp=2800
+Hp=5000
 Tp=500
-Str=$calc(30 + $current.battlestreak)
-Def=$calc(30 + $current.battlestreak)
-Int=$calc(50 + $current.battlestreak)
-Spd=$calc(50 + $current.battlestreak)
+Str=20
+Def=20
+Int=20
+Spd=20
 IgnitionGauge=60
 Status=alive
 
@@ -97,38 +97,40 @@ zombie.timer=1
 
 [Weapons]
 Equipped=Rose's_Rapier
-Rose's_Rapier=$round($calc(500 + (($current.battlestreak / 2) / 5.5)),0)
+Rose's_Rapier=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
 
 [Skills]
+SwordMaster=100
+Wizardry=100
+Zen=5
+ClearMind=3
+ShadowCopy=1
 Resist-Charm=100
+Resist-Poison=100
 Resist-Zombie=100
 Resist-Intimidate=100
 Resist-Amnesia=100
+Resist-Blind=100
+Resist-Slow=100
+Resist-Stop=100
+Resist-Paralysis=100
+Resist-confuse=100
+Resist-stun=100
+Resist-Drunk=100
+Resist-Weaponlock=100
 Resist-Curse=100
-SwordMaster=1000
-Wizardry=1000
-Zen=5
-ClearMind=3
-ElementalSeal=1
-ShadowCopy=1
+Resist-Petrify=100
+Resist-Disarm=100
 
 
 [Techniques]
-WhipSmack=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-MoreAndMore=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-HardBlade=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-DemonsDance=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
+WhipSmack=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+MoreAndMore=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+HardBlade=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+DemonsDance=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
 
 
 [Item_Amount]
-
-[equipment]
-head=
-body=
-hands=
-legs=
-feet=
-accessory=
 
 
 [Styles]
@@ -136,8 +138,13 @@ Equipped=WeaponMaster
 WeaponMaster=10
 WeaponMasterXP=1
 
+
 [Ignitions]
-DarkDragoon=1
+DarkDragoon=$iif($current.battlestreak < 200, 0, 1)
+
+
+[Augments]
+Rose's_Rapier=MeleeBonus.TechBonus.EnhanceSword.HurtEthereal
 
 
 [modifiers]
@@ -149,7 +156,7 @@ Ice=100
 Water=100
 Lightning=100
 Light=100
-Dark=0
+Dark=100
 HandToHand=100
 Whip=100
 Sword=100

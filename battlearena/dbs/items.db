@@ -5,9 +5,6 @@ Gems=Zircon.Topaz.Emerald.Ruby.Zircon.Diamond.Sapphire.Opal.Zircon.Onyx
 ; Keys are used to open chests. They cannot be bought in stores.  This line needs to stay here for the bot to work.
 Keys=BlueKey.BrownKey.RedKey.OrangeKey.GreenKey.GoldKey.BrownKey.BlueKey.RedKey.SilverKey.PurpleKey.BlackKey
 
-; Runes are for augments. This line needs to stay in here for the bot to work.
-Runes=EthRune.MtlRune.HiRune.GeRune.MaRune.TeRune.MeRune.SmnRune.DrnRune.ItmRune.RenRune.NinRune.IgDefRune.TurtleRune.DragonRune
-
 
 =========================
 HEALING ITEMS
@@ -30,7 +27,7 @@ Target=Single
 Amount=60
 Desc=pulls out a bottle of fizzy rootbeer and hands it to %enemy $+ , who drinks it down. Teehee. Bubbly.
 Cost=50
-SellPrice=100
+SellPrice=30
 FullbringLevel=1
 FullbringTarget=AOE
 FullbringAmount=30
@@ -85,7 +82,7 @@ Cost=3500
 SellPrice=2000
 FullbringLevel=5
 FullbringTarget=AOE
-FullbringAmount=800
+FullbringAmount=350
 Fullbringdesc=draws out the soul from the potion.  The potion's soul is drawn towards everyone and gives off a bright light that heals everyone.
 ConquestItem=true
 
@@ -93,13 +90,13 @@ ConquestItem=true
 Type=heal
 ShopNPC=TravelMerchant
 Target=Single
-Amount=5000
+Amount=4000
 Desc=pulls out bottle of liquid made with blood labeled "Mega Potion" and hands it to %enemy $+ , who drinks it down.  Ahh! Refreshing!
 Cost=8000
 SellPrice=4000
 FullbringLevel=5
 FullbringTarget=AOE
-FullbringAmount=3500
+FullbringAmount=400
 Fullbringdesc=draws out the soul from the potion.  The potion's soul is drawn towards everyone and gives off a bright light that heals everyone.
 Currency=none
 
@@ -107,13 +104,13 @@ Currency=none
 Plural=bottles of Bruce's juice
 Type=heal
 Target=Single
-Amount=15000
+Amount=5000
 Desc=pulls out a refreshing bottle of Bruce "Old Man" Willaker's juice and drinks it.  Ahhhhhhh, the most refreshing juice in the world.
 Cost=0
 SellPrice=5000
 FullbringLevel=5
 FullbringTarget=AOE
-FullbringAmount=5000
+FullbringAmount=500
 Fullbringdesc=draws out the soul from a bottle of Bruce "Old Man" Willaker's juice.  The juice's soul is drawn towards everyone and gives off a bright light that heals everyone.
 Currency=none
 
@@ -127,7 +124,7 @@ Cost=$iif($readini(shopnpcs.dat, NPCStatus, Santa) = true, 1000, 0)
 SellPrice=200
 FullbringLevel=5
 FullbringTarget=AOE
-FullbringAmount=2500
+FullbringAmount=400
 Fullbringdesc=draws out the soul from the candy cane.  The soul is drawn over to everyone and gives off a bright red and green colored light that heals everyone
 Currency=none
 
@@ -185,8 +182,8 @@ ShopNPC=Santa
 Type=IgnitionGauge
 Target=single
 Amount=10
-Cost=10000
-SellPrice=2000
+Cost=5000
+SellPrice=1000
 Desc=pulls out a strange purple star and tosses it at %enemy $+ .  The star is absorbed and a sense of power overcomes $gender2($4) $+ .
 ShopNPC=HealingMerchant
 
@@ -237,7 +234,7 @@ Amount=20
 Desc=takes out a small glowing blue fang and slashes %enemy with it.  The fang snaps and explodes with ice energy.
 Cost=100
 SellPrice=40
-Element=fire
+Element=ice
 FullbringLevel=2
 FullbringTarget=AOE
 FullbringAmount=10
@@ -253,7 +250,7 @@ SellPrice=40
 Element=lightning
 FullbringLevel=2
 FullbringTarget=AOE
-FullbringAmount=40
+FullbringAmount=10
 Fullbringdesc=draws out the soul from the thunder orb.  The sky goes black and a lightning storm erupts on the battlefield, shocking all enemies!
 
 [Stop_Watch]
@@ -389,12 +386,11 @@ Cost=0
 SellPrice=5000
 Desc=takes out a smelly bottle of thick white liquid and hands it over to %enemy who drinks it. Hey, why not? %enemy begins to feel a bit tipsy from the substance!
 
-
 [BombFlower]
 Type=Damage
 ShopNPC=TravelMerchant
 Target=Single
-Amount=100
+Amount=200
 Cost=6000
 SellPrice=50
 Desc=takes out a small bomb that came from a weird flower and tosses it at %enemy causing a small explosion.
@@ -405,6 +401,7 @@ FullbringAmount=80
 Fullbringdesc=draws out the soul from the bomb flower.  The soul floats over the battlefield and then glows a bright red before violently exploding, causing damage to all targets.
 ConquestItem=false
 IgnoreMetalDefense=true
+Bomb=true
 
 [Dynamite]
 Plural=sticks of dynamite
@@ -421,6 +418,7 @@ FullbringAmount=250
 Fullbringdesc=draws out the soul from the stick of dynamite.  The soul floats over the battlefield and then glows a bright red before violently exploding, causing damage to all targets.
 ConquestItem=true
 IgnoreMetalDefense=true
+Bomb=true
 
 [BombFragment]
 Type=Damage
@@ -436,6 +434,7 @@ FullbringAmount=1800
 Fullbringdesc=draws out the soul from the bomb fragment.  The soul floats over the battlefield and then glows a bright red before violently exploding, causing damage to all targets.
 ConquestItem=true
 IgnoreMetalDefense=true
+Bomb=true
 
 [HolyHandGrenade]
 Type=Damage
@@ -446,6 +445,7 @@ Desc=takes out a holy hand grenade.  An angelic voice is heard from above. First
 Cost=0
 Element=light
 IgnoreMetalDefense=true
+Bomb=true
 
 [XmasGrenade]
 Type=Damage
@@ -456,6 +456,7 @@ Desc=takes out a Candy-Cane colored grande and lobs it at %enemy which causes an
 Cost=$iif($readini(shopnpcs.dat, events, SavedElves) >= 50, 1500, 0)
 Element=ice
 IgnoreMetalDefense=true
+Bomb=true
 
 [Grappling_Hook]
 Type=Snatch
@@ -466,6 +467,34 @@ SellPrice=200
 Desc=takes out a grappling hook and swings it around %enemy $+ . After %enemy is hooked, %real.name begins to pull in an attempt to drag %enemy over to $gender2($1) to use as a protective shield.
 ShopNPC=BattleMerchant
 
+[C4]
+Type=Damage
+Target=Single
+Amount=300
+Cost=0
+SellPrice=0
+Desc=places some C4 on a random area of the battlefield and waits. Once %enemy is close enough, %user activates the C4 from a distance, causing an explosion!
+Element=fire
+IgnoreMetalDefense=true
+Bomb=true
+
+[Flash_Grenade]
+Type=Status
+Target=AOE
+StatusType=Blind
+Amount=0
+Cost=0
+SellPrice=0
+Desc=pulls out a grenade, pulls the pin and hurls it at the battlefield. A few second later, it explodes with a bright flash, blinding all enemies!
+
+[Coffee]
+Type=Status
+Target=Single
+StatusType=speedup
+Amount=0
+Cost=0
+SellPrice=5000
+Desc=takes out a cup of thick black liquid and hands it over to %enemy who drinks it. Hey, why not? %enemy begins to feel a bit hyper from the substance!
 
 =========================
 FOOD ITEMS (+stats)
@@ -475,8 +504,9 @@ Type=food
 Target=str
 Amount=10
 Desc=pulls out a large pot roast and hands it to %enemy $+ , who munches down.  Mmmm, yummy!
-Cost=5000000
+Cost=0
 SellPrice=1000
+Exclusive=yes
 
 [Ramen]
 Plural=bowls of ramen
@@ -484,32 +514,36 @@ Type=food
 Target=def
 Amount=10
 Desc=pulls out a bowl of ramen and hands it to %enemy $+ , who munches down. Slurrrp!
-Cost=5000000
+Cost=0
 SellPrice=1000
+Exclusive=yes
 
 [Cavier]
 Type=food
 Target=int
 Amount=10
 Desc=pulls out a small amount of cavier and hands it to %enemy $+ , who eats it slowly.  I say!
-Cost=5000000
+Cost=0
 SellPrice=1000
+Exclusive=yes
 
 [Pizza]
 Type=food
 Target=hp
 Amount=20
 Desc=pulls out a slice of pizza and hands it to %enemy $+ , who munches it down.  Cowabunga!
-Cost=5000000
+Cost=0
 SellPrice=1000
+Exclusive=yes
 
 [BisonDollar]
 Type=food
 Target=tp
 Amount=10
 Desc=pulls out a Bison Dollar and hands it to %enemy who exchanges it for a small TP enhancement.
-Cost=5000000
+Cost=0
 SellPrice=1000
+Exclusive=yes
 
 [DragonMeat]
 Plural=pieces of dragon meat
@@ -517,8 +551,9 @@ Type=food
 Target=str
 Amount=10
 Desc=pulls out a piece of dragon meat and hands it to %enemy $+ , who cooks it and then munches down.  Mmmm, yummy!
-Cost=5000000
+Cost=0
 SellPrice=1000
+Exclusive=yes
 
 [CerberusMeat]
 Plural=pieces of Cerberus meat
@@ -526,8 +561,9 @@ Type=food
 Target=str
 Amount=10
 Desc=pulls out a piece of Cerberus meat and hands it to %enemy $+ , who cooks it and eats it.  Dude, you just ate some of a three-headed dog!
-Cost=5000000
+Cost=0
 SellPrice=1000
+Exclusive=yes
 
 [WereMeat]
 Plural=pieces of werewolf meat
@@ -535,8 +571,9 @@ Type=food
 Target=str
 Amount=15
 Desc=pulls out a piece of meat from a werewolf and hands it to %enemy $+ , who cooks it and eats it. Mmm! It's howling good!
-Cost=5000000
+Cost=0
 SellPrice=2000
+Exclusive=yes
 
 [AlphaWereMeat]
 Plural=pieces of alpha werewolf meat
@@ -544,24 +581,27 @@ Type=food
 Target=str
 Amount=25
 Desc=pulls out a piece of meat from an alpha werewolf and hands it to %enemy $+ , who cooks it and eats it. Mmm! This meat is so good it makes you want to transform into a howling maniac! 
-Cost=5000000
+Cost=0
 SellPrice=5000
+Exclusive=yes
 
 [TurkeyLeg]
 Type=food
 Target=str
 Amount=10
 Desc=pulls out a turkey leg meat and hands it to %enemy $+ , who cooks it and eats it. Mmm! Gobble gobble indeed!
-Cost=5000000
+Cost=0
 SellPrice=4000
+Exclusive=yes
 
 [SuperMushroom]
 Type=food
 Target=hp
 Amount=20
 Desc=pulls out a Super Mushroom from the Mushroom Kingdom and hands it to %enemy $+ , who munches it down.  $2 does not grow bigger, but instead gains more endurance.
-Cost=5000000
+Cost=0
 SellPrice=1000
+Exclusive=yes
 
 [FireDragonWine]
 Plural=bottles of Fire Dragon Wine
@@ -569,8 +609,9 @@ Type=food
 Target=def
 Amount=10
 Desc= pulls out a bottle of alcohol labeled "Fire Dragon Wine" and hands it to %enemy $+ , who drinks the entire bottle. After a moment of intense pain and nausea, $2 feels that $gender($2) defense has increased! 
-Cost=5000000
+Cost=0
 SellPrice=1000
+Exclusive=yes
 
 [Ambrosia]
 Plural=bottles of ambrosia
@@ -578,7 +619,7 @@ Type=food
 Target=style
 Amount=30
 Desc=takes out a potion bottle with a golden liquid inside and hands it to %enemy who drinks it. After a moment of warmth feeling, $2 feels more stylish!
-Cost=10000000
+Cost=0
 SellPrice=5000
 
 [FoieGras]
@@ -587,24 +628,27 @@ Type=Food
 Target=spd
 Amount=10
 Desc=pulls out a a plate of foie gras and hands it to %enemy $+ , who then eats it. Uh... let's say it's an aquired taste...
-Cost=5000000
+Cost=0
 SellPrice=1000
+Exclusive=yes
 
 [KnowledgeSource]
 Type=Food
 Target=int
 Amount=10
-Desc=pulls out a source of knowledge and hands it to %enemy $+ , who then reads it and feels a little smarter!
-Cost=5000000
+Desc=pulls out a book of knowledge and hands it to %enemy $+ , who then reads it and feels a little smarter!
+Cost=0
 SellPrice=1000
+Exclusive=yes
 
 [SoulPainting]
 Type=food
 Target=int
 Amount=10
 Desc=pulls out a painting drawn by Brauner and hands it to %enemy $+ , who studies it. Indeed. Quite.
-Cost=5000000
+Cost=0
 SellPrice=1000
+Exclusive=yes
 
 [FishAndChips]
 Plural=baskets of fish and chips
@@ -612,8 +656,9 @@ Type=food
 Target=int
 Amount=10
 Desc=pulls out a basket of fish and chips and hands it to %enemy $+ , who eats it slowly.  Quite! Indeed!
-Cost=5000000
+Cost=0
 SellPrice=1000
+Exclusive=yes
 
 [BloodyHeart]
 type=food
@@ -621,7 +666,8 @@ Target=hp
 Amount=100
 Desc=pulls out a bleeding heart and looks at it. People really eat this? Well..uhh..maybe. $set_chr_name($2) %real.name ends up eating it and feels sick for doing so.... but..at least %real.name gains some max HP for it.
 SellPrice=5000
-
+Exclusive=yes
+Cost=0
 
 [RottingMeat]
 Plural=slabs of rotting meat
@@ -630,6 +676,7 @@ Target=str
 Amount=-10
 Desc=pulls out a slab of brown, smelly, rotting meat. Ugh, who would ever eat this?  Well, $set_chr_name($2) %real.name is forced to eat it and feels sick to $gender($2) stomach.  This isn't helpful at all! %real.name feels weaker than before after eating it.
 SellPrice=2000
+Cost=0
 
 [Slurm]
 Plural=cans of Slurm
@@ -637,7 +684,7 @@ Type=food
 Target=style
 Amount=15
 Desc=takes out a small can of Slurm and opens it before handing it to %enemy who drinks it. After a moment, $set_chr_name($2) %real.name feels like going out and partying like Slurms McKenzie! Whimmy wham wham wozzle!
-Cost=10000000
+Cost=0
 SellPrice=2000
 
 [SilverApple]
@@ -645,7 +692,7 @@ Type=food
 Target=style
 Amount=10
 Desc=pulls out a small silver apple and hands it to %enemy who eats it. Woah, a silver apple? That's pretty cool, right? Stylish!
-Cost=10000000
+Cost=0
 SellPrice=2000
 
 [Rum]
@@ -654,82 +701,62 @@ Type=food
 Target=style
 Amount=10
 Desc=pulls out a bottle of rum and hands it to %enemy who chugs it down. Arrr! Pirates be stylish, matey!
-Cost=10000000
+Cost=0
 SellPrice=2000
 
-
 [DefenseSource]
-
 Type=Food
-
 Target=def
 Amount=10
-Desc=pulls out a source of defense and hands it to %enemy $+ , who then reads it and feels a little stronger!
-
-Cost=5000000
-
+Desc=pulls out a book of defense and hands it to %enemy $+ , who then reads it and feels a little stronger!
+Cost=0
 SellPrice=1000
-
-
+Exclusive=yes
 
 [PowerSource]
-
 Type=Food
-
 Target=str
 Amount=10
-Desc=pulls out a source of power and hands it to %enemy $+ , who then reads it and feels a little more powerful!
-
-Cost=5000000
-
+Desc=pulls out a book of power and hands it to %enemy $+ , who then reads it and feels a little more powerful!
+Cost=0
 SellPrice=1000
-
+Exclusive=yes
 
 [Herring]
-
 Type=food
-
 Target=spd
-
 Amount=10
 Desc=takes out a herring and hands it to %enemy $+ , who then stares at it. $set_chr_name($2) $+ %real.name then cooks and eats it, though $gender3($2) then feels an urge to chop down the mightiest tree in the forest...
-
-Cost=10000000
-
+Cost=0
 SellPrice=1000
+Exclusive=yes
 
 [BloodScroll]
-
 Type=food
-
 Target=redorbs
 Amount=$rand(500,1000)
 Desc=takes out an ancient blood-colored scroll and hands it to %enemy who then reads it. The scroll begins to dissolve into red orbs that swirl around %enemy before being absorbed.
-Cost=10000000
-
-SellPrice=1000
+Cost=0
+SellPrice=50
+Exclusive=yes
 
 [BurntScroll]
-
 Type=food
-
 Target=blackorbs
 Amount=$rand(1,2)
 Desc=takes out an ancient burnt scroll and hands it to %enemy who then reads it. The scroll begins to dissolve into a black mist that swirls around %enemy before being absorbed.
-Cost=10000000
-
+Cost=0
 SellPrice=1000
+Exclusive=yes
 
 [TreasureMap]
-
 Type=food
-
 Target=redorbs
 Amount=$rand(1000,2000)
 Desc=takes out old pirate map and hands it to %enemy who then uses it to discover a chest full of red orbs. Yarr!
-Cost=10000000
-
-SellPrice=2000
+Cost=0
+SellPrice=50
+Exclusive=yes
 
 [BookOfSkulls]
 Plural=books of skulls
@@ -737,7 +764,7 @@ Type=Food
 Target=int
 Amount=10
 Desc=takes out a black book covered in skulls and reads it.
-Cost=5000000
+Cost=0
 SellPrice=1000
 Exclusive=yes
 
@@ -830,6 +857,13 @@ Summon=Courier_Carrie
 SummonName=Courier Carrie
 
 [ElvishMedallian]
+Type=summon
+Cost=0
+SellPrice=2000
+Summon=Lirarian
+SummonName=Lirarian
+
+[ElvishCrystal]
 Type=summon
 Cost=0
 SellPrice=2000
@@ -938,6 +972,13 @@ Summon=Titan
 SummonName=Titan
 ShopNPC=BattleMerchant
 
+[GuardContract]
+Type=summon
+Cost=500
+SellPrice=1
+Summon=Yojimbo
+SummonName=Yojimbo
+
 [Pokeball]
 Plural=Poké Balls
 Type=summon
@@ -1017,63 +1058,63 @@ KEYS
 [BlueKey]
 Type=key
 Unlocks=blue
-Cost=30
+Cost=0
 SellPrice=50
 Desc=A small blue key. It will unlock blue-colored chests.
 
 [RedKey]
 Type=key
 Unlocks=red
-Cost=30
+Cost=0
 SellPrice=50
 Desc=A small red key. It will unlock red-colored chests.
 
 [OrangeKey]
 Type=key
 Unlocks=orange
-Cost=500
+Cost=0
 SellPrice=50
 Desc=A small orange key. It will unlock orange-colored chests.
 
 [GreenKey]
 Type=key
 Unlocks=green
-Cost=30
+Cost=0
 SellPrice=50
 Desc=A small green key. It will unlock green-colored chests.
 
 [GoldKey]
 Type=key
 Unlocks=gold
-Cost=60
+Cost=0
 SellPrice=200
 Desc=A small gold key. It will unlock gold-colored chests.
 
 [BrownKey]
 Type=key
 Unlocks=brown
-Cost=30
+Cost=0
 SellPrice=80
 Desc=A small brown key. It will unlock brown-colored chests.
 
 [SilverKey]
 Type=key
 Unlocks=silver
-Cost=60
+Cost=0
 SellPrice=100
 Desc=A small silver key. It will unlock silver-colored chests.
 
 [PurpleKey]
 Type=key
 Unlocks=purple
-Cost=60
+Cost=0
 SellPrice=150
 Desc=A small purple key. It will unlock purple-colored chests.
 
 [BlackKey]
 Type=key
 Unlocks=black
-Cost=60
+Cost=0
 SellPrice=100
 Desc=A small black key. It will unlock black-colored chests.
 
@@ -1087,7 +1128,7 @@ Target=Single
 Amount=5.0
 Desc=pulls out a special Christmas Discount Card and gives it to %enemy who shows it to the shop clerk.  "Oh wow! You've met Santa! That's awesome! Of course you can have a discount!"  Score!
 Cost=$iif($readini(shopnpcs.dat, events, SavedElves) >= 20, 45000, 0)
-SellPrice=$iif($shopnpc.present.check(DiscountCardMerchant) = true, 50000, 0)
+SellPrice=$iif($shopnpc.present.check(DiscountCardMerchant) = true, 4500, 0)
 ShopNPC=Santa
 Exclusive=yes
 
@@ -1107,7 +1148,7 @@ Target=Single
 Amount=10.0
 Desc=pulls out a Discount Card and gives it to %enemy who shows it to the shop clerk.  "Ah yes, indeed, part of of our..secret club."  Score!
 Cost=100000
-SellPrice=10000
+SellPrice=1000
 Exclusive=yes
 ShopNPC=DiscountCardMerchant
 
@@ -1117,7 +1158,7 @@ Target=Single
 Amount=15.0
 Desc=pulls out a special membership card obtained from the traveling merchant and gives it to %enemy who shows it to the shop clerk.  "No way! You have a membership card from HIM? Of course you get a discount!"
 Cost=140000
-SellPrice=10000
+SellPrice=1000
 Exclusive=yes
 ShopNPC=TravelMerchant
 
@@ -1128,7 +1169,7 @@ Amount=15.0
 Desc=pulls out a bronze Discount Card and gives it to %enemy who shows it to the shop clerk.  "Oh, a bronze member? Not too bad.  Here's your discount!"
 Cost=160000
 ConquestItem=true
-SellPrice=20000
+SellPrice=2000
 Exclusive=yes
 ShopNPC=DiscountCardMerchant
 
@@ -1139,7 +1180,7 @@ Amount=20.0
 Desc=pulls out a shiny silver Discount Card and gives it to %enemy who shows it to the shop clerk.  "Woah! A silver member? Well of course you get a discount!"
 Cost=200000
 ConquestItem=true
-SellPrice=30000
+SellPrice=3000
 Exclusive=yes
 ShopNPC=DiscountCardMerchant
 
@@ -1150,9 +1191,102 @@ Amount=30.0
 Desc=pulls out a shiny gold Ultra Discount Card and gives it to %enemy who shows it to the shop clerk.  "Woah! No way! You know the president of the shop? Why yes, of course, please!  Here's a hefty discount for you!" 
 Cost=300000
 ConquestItem=true
-SellPrice=40000
+SellPrice=4000
 Exclusive=yes
 ShopNPC=DiscountCardMerchant
+
+
+=========================
+NPC TRUST ITEMS
+=========================
+[BigWhoop]
+Type=trust
+NPC=Guybrush
+Exclusive=yes
+SellPrice=100
+Cost=0
+
+[StarCoin]
+type=trust
+NPC=Mario
+Exclusive=yes
+SellPrice=10
+Cost=10
+SummonDesc=$get_chr_name(%trust.npc) pops out of a large green warp pipe and goes "IT'S-A-ME! MARIO!"  before collecting the Star Coin and preparing for battle!
+
+[BelmontMedallian]
+type=Trust
+NPC=Simon_Belmont
+Exclusive=yes
+Sellprice=10
+Cost=10
+
+[GlazedDonut]
+type=Trust
+NPC=Vash
+Exclusive=yes
+SellPrice=10
+Cost=20
+
+[PowerPellet]
+Type=trust
+NPC=Pac-Man
+Exclusive=yes
+SellPrice=10
+Cost=20
+
+[S-MartNameTag]
+type=trust
+NPC=AshWilliams
+Exclusive=yes
+SellPrice=10
+Cost=20
+
+[ShinigamiBadge]
+Type=trust
+NPC=Ichigo
+Exclusive=yes
+SellPrice=10
+Cost=50
+
+[ProudSoulNecklace]
+type=trust
+NPC=Dante
+Exclusive=yes
+SellPrice=10
+Cost=50
+
+[GoddessCrystal]
+type=trust
+NPC=Fi
+Exclusive=yes
+SellPrice=10
+Cost=$iif($readini($char($1), weapons, MasterSword) >= 1, 10, 0)
+SummonDesc=$get_chr_name(%trust.npc) pops out of $get_chr_name($1) $+ 's Master Sword and floats in the air.  "Master, I calculate an $rand(80,89) $+ $chr(37) chance of success"
+
+[Strawberry_Lollipop]
+Type=trust
+NPC=Bayonetta
+SummonDesc=$get_chr_name($1) takes out a strawberry-flavored lollipop. Before $get_chr_name($1) can do anything else, the lollipop gets taken out of $get_chr_name($1) $+ 's hand. $get_chr_name($1) looks over and sees a tall woman holding the lollipop. Bayonetta: "Oh, very well. I have nothing better to do, so I'll help you out."
+Exclusive=yes
+SellPrice=0
+Cost=500
+
+[Codec]
+Type=Trust
+NPC=Solid_Snake
+SummonDesc=$get_chr_name($1) kneels down and places $gender($1) first two fingers onto the right ear. $get_chr_name($1) contacts the number 141.12. A moment later, $get_chr_name($1) sees a cardbox suddenly lifted from the ground and thrown to the side.
+Exclusive=yes
+Sellprice=0
+Cost=100
+
+[BlackRock]
+Type=Trust
+NPC=Magus
+SummonDesc=$get_chr_name($1) takes out a strange black rock and studies it. $get_chr_name($1) suddenly looks up and sees a tall man with long purple hair, long ears, and weas a red cape over his armor and clothing. The man also carries a large scythe in hand as well. Magus: "Very well, I will fight with you. Just stay out of my way."
+Exclusive=yes
+Sellprice=0
+Cost=100
 
 =========================
 ACCESSORIES
@@ -1161,7 +1295,7 @@ ACCESSORIES
 [Jungle-Medallion]
 Type=accessory
 AccessoryType=IncreaseCriticalHits.IncreaseMeleeDamage.BlockAllStatus
-Cost=9999999999
+Cost=0
 Desc=A Medallian infused with the power of the Jungle Demons. This Medallion will increase critical hits by 15%, increase melee damage based on the number of on-hand red orbs you have and reduce the chance of status effects from happening by 50%. 
 SellPrice=2000
 IncreaseCriticalHits.Amount=15
@@ -1171,7 +1305,7 @@ BlockAllStatus.Amount=50
 [Hourglass-Necklace]
 Type=accessory
 AccessoryType=IgnoreQuickSilver
-Cost=9999999999
+Cost=0
 Desc=A necklace with the power to ignore Quicksilver.
 SellPrice=2000
 
@@ -1208,7 +1342,7 @@ ShopNPC=TravelMerchant
 [Wizard's-Ankh]
 Type=accessory
 AccessoryType=IncreaseHealing.IncreaseSpellDamage
-Cost=9999999999
+Cost=0
 Desc=The combination of a Wizard's Amulet and a Blessed Ankh, this is a necklace that will increase the potentcy of healing and the power of your spells.
 IncreaseHealing.Amount=.20
 IncreaseSpellDamage.Amount=.07
@@ -1227,7 +1361,7 @@ ShopNPC=TravelMerchant
 [Blood-Pendant]
 Type=accessory
 AccessoryType=IncreaseRedOrbs
-Cost=9999999999
+Cost=0
 Desc=A small ring with a small blood-red stone in it.  This accessory will increase the amount of orbs you gain at the end of battles.
 ; .15 = 15% more orbs.  if the reward is 1000 you'll get +150.
 IncreaseRedOrbs.Amount=.15
@@ -1236,7 +1370,7 @@ SellPrice=2000
 [Blood-Crown]
 Type=accessory
 AccessoryType=IncreaseRedOrbs
-Cost=9999999999
+Cost=0
 Desc=A golden crown with a bright red gem sitting in the middle.  This accessory will increase the amount of orbs you gain at the end of battles.
 ; .20 = 20% more orbs.  if the reward is 1000 you'll get +200.
 IncreaseRedOrbs.Amount=.20
@@ -1253,7 +1387,7 @@ ShopNPC=TravelMerchant
 
 [Brown-Belt]
 Type=accessory
-Cost=9999999999
+Cost=0
 AccessoryType=IncreaseH2HDamage
 Desc=A cloth belt that proves you're almost finished with your training as a martial arts master master!  This accessory will increase the power of hand to hand attacks.
 IncreaseH2HDamage.Amount=.20
@@ -1261,7 +1395,7 @@ SellPrice=1000
 
 [Black-Belt]
 Type=accessory
-Cost=9999999999
+Cost=0
 AccessoryType=IncreaseH2HDamage
 Desc=A cloth belt that proves you're a real hand to hand master!  This accessory will increase the power of hand to hand attacks.
 IncreaseH2HDamage.Amount=.30
@@ -1269,7 +1403,7 @@ SellPrice=2000
 
 [Red-Belt]
 Type=accessory
-Cost=9999999999
+Cost=0
 AccessoryType=IncreaseH2HDamage
 Desc=A cloth belt that proves you've gone way beyond the level of a black belt! This accessory will increase the power of hand to hand attacks.
 IncreaseH2HDamage.Amount=.50
@@ -1287,7 +1421,7 @@ ShopNPC=TravelMerchant
 
 [Thief-Ring]
 Type=accessory
-Cost=9999999999
+Cost=0
 AccessoryType=IncreaseSteal
 Desc=A tiny ring that increases the chance of successfully stealing from a target.
 IncreaseSteal.Amount=5
@@ -1296,7 +1430,7 @@ SellPrice=2000
 
 [Mugger's-Belt]
 Type=accessory
-Cost=9999999999
+Cost=0
 AccessoryType=Mug
 Desc=A belt that changes the standard Steal command into Mug. If you wear this accessory you will deal melee damage to the target in addition to stealing from it.
 SellPrice=2000
@@ -1320,10 +1454,9 @@ BlockAllStatus.Amount=50
 SellPrice=1000
 ShopNPC=TravelMerchant
 
-
 [Ribbon]
 Type=accessory
-Cost=9999999999
+Cost=0
 AccessoryType=BlockAllStatus
 Desc=A pretty pink ribbon said to have been worn by a goddess. While wearing this accessory you will become immune to all status effects EXCEPT for curse under a Curse Night.
 ; The amount is added to the target's current resistance amount.  It's a direct amount so 100 = +100%
@@ -1332,14 +1465,14 @@ SellPrice=5000
 
 [Aztec-Goldcoin]
 Type=accessory
-Cost=9999999999
+Cost=0
 AccessoryType=CurseAddDrain
 Desc=A shiny piece of cursed Aztec Gold. While equipped, this coin will inflict the curse status but will add a +HP Absorb to every melee attack.  The person equipped with this accessory will remain at 0 tp each turn even if items or skills are used.
 SellPrice=1000
 
 [AztecGoldcoin]
 Type=accessory
-Cost=9999999999
+Cost=0
 AccessoryType=CurseAddDrain
 Desc=A shiny piece of cursed Aztec Gold. While equipped, this coin will inflict the curse status but will add a +HP Absorb to every melee attack.  The person equipped with this accessory will remain at 0 tp each turn even if items or skills are used.
 SellPrice=1000
@@ -1347,7 +1480,7 @@ SellPrice=1000
 [Mayan-Charm]
 Type=accessory
 AccessoryType=IncreaseCriticalHits.BlockAllStatus
-Cost=9999999999
+Cost=0
 Desc=A small ancient Mayan charm infused with the power of the ancient ones. This charm will increase critical hits by 5% and reduce the chance of status effects from happening by 10%. 
 SellPrice=2000
 IncreaseCriticalHits.Amount=5
@@ -1356,7 +1489,7 @@ BlockAllStatus.Amount=10
 [Lucky-Rabbit'sFoot]
 Plural=lucky rabbit's feet
 Type=accessory
-Cost=9999999999
+Cost=0
 AccessoryType=IncreaseCriticalHits
 Desc=A lucky rabbit's foot that enhances the chance for critical hits.
 IncreaseCriticalHits.Amount=10
@@ -1364,7 +1497,7 @@ SellPrice=2000
 
 [4leaf-clover]
 Type=accessory
-Cost=9999999999
+Cost=0
 AccessoryType=IncreaseCriticalHits
 Desc=A lucky 4 leaf clover that enhances the chance for critical hits.
 IncreaseCriticalHits.Amount=15
@@ -1372,7 +1505,7 @@ SellPrice=3000
 
 [VIP-MemberCard]
 Type=accessory
-Cost=9999999999
+Cost=0
 AccessoryType=ReduceShopLevel
 Desc=A special VIP membership card to the shop. While wearing this accessory all purchases will be -1 shop level.  Note, your shop level cannot drop below 1 even while wearing this accessory and your shop level will continue to rise as it would normally.
 ReduceShopLevel.Amount=1
@@ -1390,7 +1523,7 @@ ShopNPC=TravelMerchant
 [Prism-Specs]
 Plural=pairs of prism specs
 Type=accessory
-Cost=9999999999
+Cost=0
 AccessoryType=ElementalDefense
 Desc=A special pair of sunglasses that enhances the elemental defense of anyone who wears it. This accessory will cut elemental damage done by half, but will also do the same to healing.
 ElementalDefense.Amount=.50
@@ -1407,7 +1540,7 @@ ShopNPC=TravelMerchant
 
 [Mimic-Ring]
 Type=accessory
-Cost=9999999999
+Cost=0
 AccessoryType=IncreaseMimicOdds
 Desc=A ring that has the shape of an angry chest on it. Wearing this accessory will increase the odds of a mimic showing up when opening chests by 3%
 IncreaseMimicOdds.Amount=3
@@ -1415,7 +1548,7 @@ SellPrice=3000
 
 [Engine-Ring]
 Type=accessory
-Cost=9999999999
+Cost=0
 AccessoryType=IncreaseMechEngineLevel
 Desc=A ring that will help increase mech engine efficiency by 0.5% when worn.
 IncreaseMechEngineLevel.Amount=0.5
@@ -1439,6 +1572,14 @@ IncreaseSwordDamage.Amount=.30
 SellPrice=3000
 ShopNPC=TravelMerchant
 
+[Hero'sMedal]
+Type=accessory
+Cost=0
+AccessoryType=IncreaseCriticalHits
+Desc=An accessory for a true hero.
+IncreaseCriticalHits.Amount=$iif($readini($char($1), weapons, MasamuneII) >= 1, 90, 0)
+SellPrice=10
+
 [Axe-Pin]
 Type=accessory
 Cost=$iif($left($adate,2) = 11, 30000, 0)
@@ -1451,7 +1592,7 @@ ShopNPC=TravelMerchant
 [PendantOfPower]
 Plural=pendants of power
 Type=accessory
-Cost=9999999
+Cost=0
 AccessoryType=IncreaseSwordDamage
 Desc=A bright red pendant that is said to enhance a wearer's ability to fight with a sword. This accessory will increase melee damage done with a sword weapon.
 IncreaseSwordDamage.Amount=.45
@@ -1460,7 +1601,7 @@ SellPrice=3000
 [PendantOfWisdom]
 Plural=pendants of wisdom
 Type=accessory
-Cost=9999999
+Cost=0
 AccessoryType=IncreaseMagic
 Desc=A bright blue pendant that is said to enhance a wearer's spell power. This accessory will increase damage done with magic.
 IncreaseMagic.Amount=.45
@@ -1469,9 +1610,9 @@ SellPrice=3000
 [PendantOfCourage]
 Plural=pendants of courage
 Type=accessory
-Cost=9999999
+Cost=0
 AccessoryType=EnhanceBlocking
-Desc=A bright green pendant that is said to enhance a wearer's ability to stand up to an enemy and block more often with a shiel. This accessory will increase the odds of blocking an attack while using a shield.
+Desc=A bright green pendant that is said to enhance a wearer's ability to stand up to an enemy and block more often with a shield. This accessory will increase the odds of blocking an attack while using a shield.
 EnhanceBlocking.Amount=2
 SellPrice=3000
 
@@ -1544,6 +1685,36 @@ Cost=0
 SellPrice=100
 Desc=A bottle of milk.
 
+[GibdoBandage]
+Type=misc
+Cost=0
+SellPrice=100
+Desc=A rotting piece of mummy bandage from a gibdo.
+
+[RedeadAsh]
+Type=misc
+Cost=0
+SellPrice=100
+Desc=The ash taken from a Redead Knight.
+
+[GremlinSkin]
+Type=misc
+Cost=0
+SellPrice=100
+Desc=The skin taken from a gremlin.
+
+[GreenKinstone]
+Type=misc
+Cost=0
+SellPrice=100
+Desc=A green Kinstone piece. Collecting these is said to bring a lot of luck.
+
+[BlueKinstone]
+Type=misc
+Cost=0
+SellPrice=100
+Desc=A blue Kinstone piece. Collecting these is said to bring a lot of luck.
+
 [SmallEgg]
 Type=misc
 Desc=A small white egg.
@@ -1579,6 +1750,7 @@ Desc=a small tank of energy for use by mechs.
 Currency=AlliedNotes
 Amount=200
 MechType=RestoreEnergy
+Exclusive=yes
 
 [MetalScrap]
 Type=misc
@@ -1588,6 +1760,7 @@ Desc=A piece of metal scrap, used to repair mechs.
 Currency=AlliedNotes
 Amount=200
 MechType=RestoreHP
+Exclusive=yes
 
 [E-TankA]
 Type=misc
@@ -1598,6 +1771,7 @@ Currency=AlliedNotes
 Amount=400
 MechType=RestoreEnergy
 ConquestItem=true
+Exclusive=yes
 
 [E-TankB]
 Type=misc
@@ -1608,6 +1782,7 @@ Currency=AlliedNotes
 Amount=600
 MechType=RestoreEnergy
 ConquestItem=true
+Exclusive=yes
 
 [E-TankT]
 Type=misc
@@ -1618,6 +1793,7 @@ Currency=AlliedNotes
 Amount=800
 MechType=RestoreEnergy
 ConquestItem=true
+Exclusive=yes
 
 [E-TankZ]
 Type=misc
@@ -1628,6 +1804,7 @@ Currency=AlliedNotes
 Amount=1000
 MechType=RestoreEnergy
 ConquestItem=true
+Exclusive=yes
 
 [FrameRepairA]
 type=misc
@@ -1638,6 +1815,7 @@ Currency=AlliedNotes
 Amount=400
 MechType=RestoreHP
 ConquestItem=true
+Exclusive=yes
 
 [FrameRepairB]
 type=misc
@@ -1648,6 +1826,7 @@ Currency=AlliedNotes
 Amount=600
 MechType=RestoreHP
 ConquestItem=true
+Exclusive=yes
 
 [FrameRepairE]
 type=misc
@@ -1658,6 +1837,7 @@ Currency=AlliedNotes
 Amount=800
 MechType=RestoreHP
 ConquestItem=true
+Exclusive=yes
 
 [FrameRepairZ]
 type=misc
@@ -1668,7 +1848,7 @@ Currency=AlliedNotes
 Amount=1000
 MechType=RestoreHP
 ConquestItem=true
-
+Exclusive=yes
 
 [JungleThorn]
 Type=misc
@@ -1686,7 +1866,6 @@ Desc=A beautiful rose won from an evil Jungle monster
 Currency=AlliedNotes
 GardenXP=100
 GardenType=Plant
-
 
 [Ink]
 Plural=tubes of ink
@@ -1973,7 +2152,6 @@ Desc=Taking this stone into hand, you can feel your arm move more freely.
 Currency=AlliedNotes
 ConquestItem=true
 
-
 [UtopianGoldThread]
 Plural=spools of Utopian gold thread
 type=misc
@@ -2143,121 +2321,158 @@ SellPrice=100
 Exclusive=yes
 Currency=AlliedNotes
 
+[AdvancedFusionEngine]
+Type=misc
+Desc=An advanced fusion engine for use by mechs, though requires just a few more materials before proper installation.
+Cost=10000
+SellPrice=100
+Exclusive=yes
+Currency=AlliedNotes
+
+[AlphaWeltallCore]
+Type=misc
+Desc=The mech core retrieved from the Alpha Weltall gear. Requires repairs before it can be used.
+Cost=0
+SellPrice=100
+Exclusive=yes
+Currency=AlliedNotes
+
+[SilverPointsCard]
+type=misc
+cost=0
+Desc=A card that contains 15 Silver Points.
+Currency=none
+Exclusive=yes
+
+[SilverSeal]
+type=misc
+cost=0
+Desc=A silver seal made from silver points.
+Currency=none
+Exclusive=yes
+
 =========================
 RUNES
 =========================
 
 [EthRune]
 Type=rune
-Cost=500
+Cost=0
 SellPrice=200
 Augment=HurtEthereal
 Desc=This rune will infuse a weapon with the ability to hurt Ethereal monsters.
 
 [MtlRune]
 Type=rune
-Cost=500
+Cost=0
 SellPrice=200
 Augment=IgnoreMetalDefense
 Desc=This rune will infuse a weapon with the ability to cut through the defense of strong "Metal Defense" type monsters (such as Metal Slimes).
 
 [RenRune]
 Type=rune
-Cost=500
+Cost=0
 SellPrice=200
 Augment=RenkeiBonus
 Desc=This rune will infuse a weapon with Enhanced Renkei points when a tech is done with that weapon.
 
 [MeRune]
 Type=rune
-Cost=500
+Cost=0
 SellPrice=200
 Augment=MeleeBonus
 Desc=This rune will infuse a weapon with a melee bonus when melee attacks are done with that weapon.
 
 [TeRune]
 Type=rune
-Cost=500
+Cost=0
 SellPrice=200
 Augment=TechBonus
 Desc=This rune will infuse a weapon with a tech damage bonus when techs are done with that weapon.
 
 [MaRune]
 Type=rune
-Cost=500
+Cost=0
 SellPrice=200
 Augment=MagicBonus
 Desc=This rune will infuse a weapon with a magic damage bonus when magic techs are done with that weapon.
 
 [HiRune]
 Type=rune
-Cost=500
+Cost=0
 SellPrice=200
 Augment=AdditionalHit
 Desc=This rune will infuse a weapon with the ability to do one extra hit per melee attack.
 
 [GeRune]
 Type=rune
-Cost=500
+Cost=0
 SellPrice=200
 Augment=GemConvert
 Desc=This rune will infuse a weapon with the ability to convert monsters into gems upon their deaths.
 
 [SmnRune]
 Type=rune
-Cost=500
+Cost=0
 SellPrice=200
 Augment=EnhanceSummons
 Desc=This rune will infuse a weapon with the ability to enhance summons while the augmented weapon is equipped when using a summon.
 
 [DrnRune]
 Type=rune
-Cost=500
+Cost=0
 SellPrice=200
 Augment=Drain
 Desc=This rune will infuse a weapon with the Drain status. Attacks done with the Drain status on will allow you to absorb some HP back.
 
 [ItmRune]
 Type=rune
-Cost=500
+Cost=0
 SellPrice=150
 Augment=EnhanceItems
 Desc=This rune will infuse a weapon with the ability to enhance items when the augmented weapon is equipped while using items.
 
 [NinRune]
 Type=rune
-Cost=500
+Cost=0
 SellPrice=300
 Augment=UtsusemiBonus
 Desc=This rune will infuse a weapon with the ability to enhance the Utsusemi skill when the augmented weapon is equipped while using the skill.
 
 [IgDef]
 type=rune
-Cost=500
+Cost=0
 SellPrice=300
 Augment=IgnoreDefense
 Desc=This rune will infuse a weapon with the ability to ignore some of a target's defense. 
 
 [IgDefRune]
 type=rune
-Cost=500
+Cost=0
 SellPrice=300
 Augment=IgnoreDefense
 Desc=This rune will infuse a weapon with the ability to ignore some of a target's defense. 
 
 [TurtleRune]
 Type=rune
-Cost=500
+Cost=0
 SellPrice=200
 Augment=EnhanceDefender
 Desc=This rune will infuse a weapon with the ability to enhance the skill "Defender" while the augmented weapon is equipped when using the skill. 
 
 [DragonRune]
 Type=rune
-Cost=500
+Cost=0
 SellPrice=200
 Augment=EnhanceAggressor
 Desc=This rune will infuse a weapon with the ability to enhance the skill "Aggressor" while the augmented weapon is equipped when using the skill. 
+
+[EleRune]
+type=rune
+Cost=0
+SellPrice=200
+Augment=EnhanceElementalDefense
+Desc=This rune will infuse a weapon with the ability to help enhance the user's elemental defense while the augmented weapon is equipped when hit by an elemental attack.
 
 
 ========================
@@ -2276,6 +2491,19 @@ Monster=Allied_Scrub
 Desc=visits the Allied Forces and hands the guard the training paper. "You must be here to train the new guy," he says to them before leading them to the training field.
 AlliedNotes=50
 Exclusive=yes
+PortalLevel=10
+
+[MillennialFairPass]
+Type=portal
+Cost=10
+Currency=BeastmenSeal
+Battlefield=Leene Square
+Weather=calm
+Monster=Gato
+Desc=takes out the fair pass, which allows everyone to enter. The heroes take a look around, enjoying the sights. Eventually they come up to an area with a strange robot. The robot sees the heroes and goes to speak into the microphone in its hand.
+AlliedNotes=50
+Exclusive=yes
+PortalLevel=10
 
 [WormFood]
 Plural=cans of worm food
@@ -2286,8 +2514,9 @@ battlefield=Korroloka Tunnel
 Weather=gloomy
 Monster=Morion_Worm
 Desc=travels to the Korroloka Tunnel and takes out the worm food.  After opening it, %real.name sprinkles the food out on the cavern floor.  A large worm pops out of the side of the cavern wall and looks at the heroes..
-AlliedNotes=150
+AlliedNotes=50
 Exclusive=yes
+PortalLevel=25
 
 [DemonBell]
 type=portal
@@ -2297,8 +2526,9 @@ Battlefield=Jester's Lair
 Weather=gloomy
 Monster=Crazy_Jester
 Desc=rings a demonic bell that opens a portal. Upon entering they are greeted with Jester, the insane clown.
-AlliedNotes=300
+AlliedNotes=100
 Exclusive=yes
+PortalLevel=30
 
 [BombShard]
 type=portal
@@ -2310,6 +2540,8 @@ Monster=Time_Bomb
 Desc=travels to Waughroon Shrine and takes out the bomb shard.  After placing it down into the center of the shrine a large and powerful bomb is lured out and floats onto the battlefield
 AlliedNotes=200
 Exclusive=yes
+PortalLevel=30
+DarknessTurns=7
 
 [ArmosMedallian]
 type=portal
@@ -2319,8 +2551,9 @@ Battlefield=Eastern Palace
 Weather=gloomy
 Monster=Armos_Knight.Small_Armos
 Desc=pulls out a an ancient Armos Medallian that leads the heroes to an old palace on the eastern border.  Inside they overcome many puzzles and dangers to finally reach a boss room.
-AlliedNotes=500
+AlliedNotes=200
 Exclusive=yes
+PortalLevel=30
 
 [BookOfMudora]
 Plural=books of Mudora
@@ -2331,8 +2564,9 @@ Battlefield=Desert Palace
 weather=dry
 Monster=Red_Lanmola.Green_Lanmola.Blue_Lanmola
 Desc=pulls out an ancient book that leads the heroes to an old palace in the desert.  Inside they overcome many puzzles and dangers before finally reaching a large room full of sand.  The sand seems to be moving.. prepare yourselves!
-AlliedNotes=550
+AlliedNotes=200
 Exclusive=yes
+PortalLevel=30
 
 [HeraKey]
 type=portal
@@ -2342,8 +2576,9 @@ Battlefield=Tower of Hera
 weather=dry
 Monster=Moldorm.MoldormTail
 Desc=takes a special key made to enter the Tower of Hera.  After a climb up a mountain, the heroes enter and climb the tower to the top floor where they're greeted by a massive yellow centipede-snake creature.
-AlliedNotes=550
+AlliedNotes=200
 Exclusive=yes
+PortalLevel=30
 
 [SuspiciousLookingEye]
 type=portal
@@ -2353,8 +2588,9 @@ Battlefield=Overworld - Night
 Weather=calm
 Monster=Eye_of_Cthulhu
 Desc=takes out a small item that resembles an eye and tosses it into the air. A loud roar is heard as the item suddenly vanishes. [Eye of Cthulhu has awoken!]
-AlliedNotes=500
+AlliedNotes=200
 Exclusive=yes
+PortalLevel=50
 
 [CorruptWormFood]
 Plural=pieces of corrupt worm food
@@ -2365,8 +2601,9 @@ Battlefield=Overworld - The Corruption
 Weather=gloomy
 Monster=Eater_of_Worlds
 Desc=travels to the Corruption. %real.name takes out some rotten meat attached to a bone and tosses it into a deep pit. A loud roar is heard a moment later as a massive worm rises out of the pit. [Eater of Worlds has awoken!]
-AlliedNotes=550
+AlliedNotes=200
 Exclusive=yes
+PortalLevel=75
 
 [BloodySpine]
 type=portal
@@ -2376,8 +2613,9 @@ Battlefield=Overworld - The Crimson
 Weather=gloomy
 Monster=Brain_of_Cthulhu
 Desc=travels to the Crimson. %real.name takes out a small item that resembles a spine, which somehow drips blood and tosses it into the air. A loud roar is heard as the item suddenly vanishes. [Brain of Cthulhu has awoken!]
-AlliedNotes=550
+AlliedNotes=200
 Exclusive=yes
+PortalLevel=75
 
 [DungeonMap]
 type=portal
@@ -2387,8 +2625,9 @@ Battlefield=Overworld - The Dungeon
 Weather=calm
 Monster=Skeletron.Skeletron_LeftArm.Skeletron_RightArm
 Desc=takes out a map which leads to a dungeon. After descending into the dungeon, a loud roar is heard. [Skeletron has awoken!]
-AlliedNotes=600
+AlliedNotes=200
 Exclusive=yes
+PorltalLevel=100
 
 [MayanMap]
 type=portal
@@ -2398,8 +2637,9 @@ Battlefield=Ancient Mayan Ruins
 weather=hot
 Monster=Mazaal.MazaalRHand.MazaalLHand
 Desc=takes the ancient Mayan Map and uses it to locate the remains of ancient Mayan ruins. After much effort, the heroes enter and climb through the ruins to a special chamber where they're greeted by a large Mayan-looking head statue and two large Mayan-looking hand statues.
-AlliedNotes=550
+AlliedNotes=350
 Exclusive=yes
+PortalLevel=30
 
 [VirilityCan]
 type=portal
@@ -2409,11 +2649,24 @@ Battlefield=Slurm Factory
 Weather=glomy
 Monster=Poison
 Desc=pulls out a special can of Virility. It sure does look an awful lot like a can of Slurm.  After drinking it, the heroes are pulled into Limbo where they can venture deep into the Virility factory.  After a little bit of exploring, they discover the horror: the secret ingrident comes from the behind of one awfully large demon slug named Poison. Yuck!
-AlliedNotes=500
+AlliedNotes=250
 Exclusive=yes
+PortalLevel=50
 
 
 ; Kindred Seal Portal Items
+
+[EnergyElements]
+type=portal
+Cost=15
+Currency=KindredSeal
+Battlefield=Dr. Wily's Castle
+Weather=Gloomy
+Monster=Gamma.GammaLeftArm.GammaRightArm
+Desc=manages to gather the eight energy elements only to be stolen by the nefarious Dr. Wily! The heroes travel to Dr. Wily's castle in an attempt to defeat him.
+AlliedNotes=1200
+Exclusive=yes
+PortalLevel=150
 
 [IgnisFatuus]
 Plural=Ignis Fatuus
@@ -2426,6 +2679,7 @@ Monster=LeviathanLeftHeart.LeviathanCenterHeart.LeviathanRightHeart
 Desc=is swallowed whole by the great and powerful flying demon known as Leviathan.  Once inside, the heroes take the Ignis Fatuus (a small object composed of souls of the fallen) to the demon's heartcore chamber.  The three hearts are protected by a membrane. Suddenly the Ignis Fatuus releases the souls it has collected and the membrane disappears, exposing the three hearts and the only way the beast can be defeated.
 AlliedNotes=1000
 Exclusive=yes
+PortalLevel=55
 
 [NewsOrb]
 type=portal
@@ -2437,6 +2691,7 @@ Monster=Bob_Barbas
 Desc=takes out a small glowing orb that has the initials R.N.N. on it. %real.name then tosses the orb onto the ground. It shatters and the players are teleported into the Raptor News Network.
 AlliedNotes=1000
 Exclusive=yes
+PortalLevel=60
 
 [BanishingCharm]
 type=portal
@@ -2448,6 +2703,7 @@ Monster=Gaki.Onki.Rasetsu
 Desc=takes out the banishing charm; a powerful charm used to banish demons. It begins to glow and creates a portal that teleports the heroes into a demonic shrine where three demons await.
 AlliedNotes=1000
 Exclusive=yes
+PortalLevel=50
 
 [RottingOrb]
 type=portal
@@ -2455,10 +2711,11 @@ cost=25
 currency=KindredSeal
 battlefield=Smelly Dungeon
 Weather=gloomy
-Monster=Legion.Zombie
+Monster=Legion
 Desc=takes out the rotting orb and shatters it.  Suddenly the heroes find themselves in a smelly dungeon where there's hundreds of rotting bodies laying everywhere. Floating in the air is Legion.
 AlliedNotes=2500
 Exclusive=yes
+PortalLevel=100
 
 [GemOfTheWest]
 Plural=Gems of the West
@@ -2471,6 +2728,7 @@ Monster=Byakko
 Desc=takes out the Gem of the West, a pulsing green gem. It glows brightly before shattering.  A green light shoots out of the sky and down onto the heroes, who are teleported up into Byakko's Chamber.
 AlliedNotes=1200
 Exclusive=yes
+PortalLevel=110
 
 [GemOfTheNorth]
 Plural=Gems of the North
@@ -2483,6 +2741,7 @@ Monster=Genbu
 Desc=takes out the Gem of the North, a pulsing brown gem. It glows brightly before shattering.  A brown light shoots out of the sky and down onto the heroes, who are teleported up into Genbu's Chamber.
 AlliedNotes=1200
 Exclusive=yes
+PortalLevel=110
 
 [GemOfTheEast]
 Plural=Gems of the East
@@ -2495,6 +2754,7 @@ Monster=Seiryu
 Desc=takes out the Gem of the East, a pulsing red gem. It glows brightly before shattering.  A red light shoots out of the sky and down onto the heroes, who are teleported up into Seiryu's Chamber.
 AlliedNotes=1200
 Exclusive=yes
+PortalLevel=110
 
 [GemOfTheSouth]
 Plural=Gems of the South
@@ -2507,6 +2767,7 @@ Monster=Suzaku
 Desc=takes out the Gem of the South, a pulsing white gem. It glows brightly before shattering.  A white light shoots out of the sky and down onto the heroes, who are teleported up into Suzaku's Chamber.
 AlliedNotes=1200
 Exclusive=yes
+PortalLevel=110
 
 [GodSeal]
 type=portal
@@ -2518,6 +2779,7 @@ Monster=Kirin
 Desc=takes out the small glowing orb, which shatters and creates a large portal that leads up into the sky.  After entering, the heroes find themselves inside an ancient shrine of the sky gods, The Shrine of Ru'Avitau.  
 AlliedNotes=2500
 Exclusive=yes
+PortalLevel=120
 
 [MechanicalEye]
 type=portal
@@ -2529,6 +2791,7 @@ Monster=Retinazer.Spazmatism
 Desc=takes out a small item that resembles a mechanical eye and tosses it into the air. A loud roar is heard as the item suddenly vanishes. [The Twins have awoken!]
 AlliedNotes=1000
 Exclusive=yes
+PortalLevel=200
 
 [MechanicalWorm]
 type=portal
@@ -2540,6 +2803,7 @@ Monster=The_Destroyer
 Desc=takes out a small item that resembles a mechanical worm and tosses it into the air. A loud roar is heard as the item suddenly vanishes. [The Destroyer has awoken!]
 AlliedNotes=1050
 Exclusive=yes
+PortalLevel=200
 
 [MechanicalSkull]
 type=portal
@@ -2547,10 +2811,11 @@ Cost=15
 Currency=KindredSeal
 Battlefield=Overworld - Night
 Weather=calm
-Monster=Skeletron_Prime.Prime_Cannon.Prime_Laser.Prime_Saw.Prime_Vise
+Monster=Skeletron_Prime.Prime_Cannon.Prime_Laser.Prime_Saw.Prime_Vice
 Desc=takes out a small item that resembles a mechanical skull and tosses it into the air. A loud roar is heard as the item suddenly vanishes. [Skeletron Prime has awoken!]
 AlliedNotes=1100
 Exclusive=yes
+PortalLevel=225
 
 [Plantera'sBulb]
 type=portal
@@ -2562,6 +2827,7 @@ Monster=Plantera
 Desc=comes across a cave while exploring the jungle. %real.name stumbles over a small, pink bulb while exploring the cave. %real.name decides to destroy it, and upon doing so, a loud roar is heard. [Plantera has awoken!]
 AlliedNotes=1150
 Exclusive=yes
+PortalLevel=250
 
 [HyruleOrb]
 type=portal
@@ -2573,6 +2839,7 @@ Monster=HeroOfTime
 Desc=takes out the small glowing orb that has a Triforce symbol on it and watches as the battlefield is enveloped in a bright light.  When the light clears, the heroes find themselves standing in ancient Hyrule, facing an ancient hero.  
 AlliedNotes=2500
 Exclusive=yes
+PortalLevel=100
 
 [LachesisOrb]
 type=portal
@@ -2584,6 +2851,7 @@ Monster=Rainemard
 Desc=takes out a blue gem that has white light swirling inside. The blue gem shatters a moment later, transporting the players to Horlais Peak.
 AlliedNotes=1000
 Exclusive=yes
+PortalLevel=150
 
 [TavnaziaPass]
 type=portal
@@ -2595,6 +2863,7 @@ Monster=Marchelute
 Desc=takes out the Tavnazia Pass. The paper crumbles and transports everyone to the Valkurm Dunes.
 AlliedNotes=1500
 Exclusive=yes
+PortalLevel=150
 
 [YagudoDrink]
 type=portal
@@ -2606,6 +2875,7 @@ Monster=HuuXalmo
 Desc=takes out a bottle of Yagudo Drink and sets it on the ground. A random Yagudo quickly takes it and teleports everyone to Castle Oztroja.
 AlliedNotes=1500
 Exclusive=yes
+PortalLevel=150
 
 [SpheroidPlate]
 type=portal
@@ -2617,6 +2887,7 @@ Monster=IroncladSeverer
 Desc=takes out a spheroid plate and sets it on the ground. Everyone is then teleported to Abyssea - Misareaux Coast, appearing before the Iron Giant who begins to awaken.
 AlliedNotes=1500
 Exclusive=yes
+PortalLevel=150
 
 [AvatarBlood]
 Plural=bottles of avatar blood
@@ -2629,6 +2900,7 @@ Monster=Awahondo
 Desc=takes out a bottle of avatar blood and tosses it to the ground. It shatters and teleports everyone to Abyssea - Uleguerand Range.
 AlliedNotes=1500
 Exclusive=yes
+PortalLevel=150
 
 [OldOrcBow]
 type=portal
@@ -2640,6 +2912,7 @@ Monster=Prozpuz
 Desc=takes out an old bow and set it down. A random Orc takes the bow and teleports everyone to Davoi.
 AlliedNotes=1500
 Exclusive=yes
+PortalLevel=150
 
 
 ; Kindred Crest Portal Items
@@ -2654,6 +2927,7 @@ Monster=Golem_Controller.Lihzahrd_Golem
 Desc=ventures into a mysterious temple found in the Underground Jungle. After navigating through various traps, %real.name finds a strange altar. %real.name takes out a small power cell and places it onto the altar, which causes a loud roar to be heard. [The Golem has awoken!]
 AlliedNotes=1200
 Exclusive=yes
+PortalLevel=250
 
 [TruffleWorm]
 type=portal
@@ -2665,6 +2939,7 @@ Monster=Duke_Fishron
 Desc=travels to the ocean. %real.name takes out a fishing rod and attaches the truffle worm onto the hook, casting the line into the ocean. After a bit of time, %real.name feels a bite on the line and quickly reels in.. [Duke Fishron has awoken!]
 AlliedNotes=1250
 Exclusive=yes
+PortalLevel=275
 
 [OldOrcSword]
 type=portal
@@ -2676,6 +2951,7 @@ Monster=Gwajboj
 Desc=takes out an old sword and places it into the ground. A random Orc takes the sword and teleports everyone to Davoi.
 AlliedNotes=1750
 Exclusive=yes
+PortalLevel=150
 
 [TimeOrb]
 type=portal
@@ -2687,6 +2963,7 @@ Monster=Geryon
 Desc=takes out a small glowing orb that has an engraving of an hourglass on it. %real.name then tosses the orb onto the ground. It shatters and the players feel time slowing down as they are teleported into an underground arena.
 AlliedNotes=1000
 Exclusive=yes
+PortalLevel=150
 
 [JungleOrb]
 type=portal
@@ -2698,6 +2975,7 @@ Monster=$iif($rand(1,2) = 1, Echidna, EccentricEve)
 Desc=takes out a small glowing green orb. %real.name then tosses the orb onto the ground. It shatters and the players find themselves in a deep jungle ready to face one of the masters of the jungle.
 AlliedNotes=1000
 Exclusive=yes
+PortalLevel=150
 
 [CrimsonTraverserStone]
 type=portal
@@ -2709,6 +2987,7 @@ Monster=ShinryuVerus
 Desc=takes out a stone that is a deep crimson in color. %real.name then tosses the stone onto the ground. It shatters and the players are teleported to the Empyreal Paradox.
 AlliedNotes=2750
 Exclusive=yes
+PortalLevel=275
 
 [EvilGuitar]
 type=portal
@@ -2720,7 +2999,17 @@ Monster=I-No
 Desc=pulls out a curious guitar and plays a few strings. Suddenly %real.name and everyone else is teleported to the sky with dark red clouds everywhere.
 AlliedNotes=2750
 Exclusive=yes
+PortalLevel=200
 
+[UnknownPowerSource]
+type=portal
+Battlefield=Zohar Cave
+Weather=gloomy
+Monster=Grahf
+Desc=pulls out an unknown source of power, which suddenly covers the heroes in darkness. Once the darkness fades, they appear to be in a cave with a strange golden monolith with a large eye on it. In front of the monolith is a large black and grey mech with black wings. You can also see a person stand on the shoulder of the mech.
+AlliedNotes=2500
+Exclusive=yes
+PortalLevel=300
 
 ; High Kindred Crest Portal Items
 
@@ -2729,12 +3018,13 @@ Exclusive=yes
 Type=portal
 Cost=30
 Currency=HighKindredCrest
-Battlefield=Unknown Realm
+Battlefield=Asgard
 Weather=Light
-Monster=EldoraAdlanna.NauthimaTiranadel
-Desc=takes out an orb that has a bright white glow. %real.name then tosses the orb to the ground. The orb shatters and transports all players to a realm that few have seen.
+Monster=Freya.Sif
+Desc=takes out an orb that has a bright white glow. %real.name then tosses the orb to the ground. The orb shatters and transports all players to a realm that few mortals have seen.
 AlliedNotes=3000
 Exclusive=yes
+PortalLevel=300
 
 [AtlantianCrystal]
 Type=portal
@@ -2744,7 +3034,9 @@ Battlefield=Atlantis
 Weather=Dark
 Monster=AshiAtora
 Desc=takes out an ancient crystal from Atlantis. It begins to pulse then glows bright, covering everyone and the battlefield.  When the glow fades they find themselves in Atlantis.. 
-AlliedNotes=7000
+AlliedNotes=5000
+PortalLevel=300
+DarknessTurns=35
 
 
 =========================
@@ -2777,6 +3069,59 @@ EnergyCost=150
 Currency-AlliedNotes
 Exclusive=yes
 
+[VesselofAnima]
+Type=MechCore
+Cost=-1
+SellPrice=0
+Augment=
+EnergyCost=1000
+Currency=AlliedNotes
+Exclusive=yes
+
+[UmbranMechCore]
+Type=MechCore
+Cost=-1
+SellPrice=0
+Augment=
+EnergyCost=1000
+Currency=AlliedNotes
+Exclusive=yes
+
+[Vlar]
+Type=MechCore
+Cost=0
+SellPrice=0
+Augment=EnhanceDodge.HurtEthereal.MeleeBonus.MagicBonus.TechBonus.IgnoreDefense
+EnergyCost=500
+Currency=AlliedNotes
+Exclusive=yes
+
+[Magna]
+Type=MechCore
+Cost=0
+SellPrice=0
+Augment=EnhanceDodge.HurtEthereal.MeleeBonus.MagicBonus.IgnoreDefense.IgnoreMetalDefense
+EnergyCost=500
+Currency=AlliedNotes
+Exclusive=yes
+
+[Omni]
+Type=MechCore
+Cost=0
+SellPrice=0
+Augment=DecreaseMechEnergyCost.EnhanceDodge.HurtEthereal.EnhanceDoubleTurnChance.MeleeBonus.MagicBonus.TechBonus.IgnoreDefense.IgnoreMetalDefense.IgnoreGuardian.AdditionalHit.EnhanceCriticalHits
+EnergyCost=500
+Currency=AlliedNotes
+Exclusive=yes
+
+[Leenex]
+Type=MechCore
+Cost=0
+SellPrice=500
+Augment=GemConvert.HurtEthereal
+EnergyCost=500
+Currency=AlliedNotes
+Exclusive=yes
 
 =========================
 SPECIAL ITEMS
@@ -2786,7 +3131,6 @@ Plural=X-Buster blueprints
 Type=special
 Cost=0
 SellPrice=5000
-Exclusive=yes
 SpecialType=GainWeapon
 Weapon=X-Buster
 Desc=pulls out a set of blueprints for an X-Buster $iif($2 != $1, and hands it to $set_chr_name($2) %real.name $+ .) %real.name then gets to work and builds a beautiful and functional X-Buster ready for use.
@@ -2796,7 +3140,6 @@ Plural=Silver Sword blueprints
 Type=special
 Cost=0
 SellPrice=5000
-Exclusive=yes
 SpecialType=GainWeapon
 Weapon=SilverSword
 Desc=pulls out a set of blueprints for the Silver Sword $iif($2 != $1, and hands it to $set_chr_name($2) %real.name $+ .) %real.name then gets to work and builds the beautiful and powerful Silver Sword, ready for use.
@@ -2816,7 +3159,6 @@ Plural=Master Sword maps
 Type=special
 Cost=0
 SellPrice=5000
-Exclusive=yes
 SpecialType=GainWeapon
 Weapon=MasterSword
 Desc=$iif($2 != $1,pulls out an ancient map from Hyrule and hands it to $set_chr_name($2) %real.name $+ ., pulls out an ancient map from Hyrule.) %real.name then uses it to find the long lost hidden resting place for the ancient Master Sword.  With effort, %real.name pulls it out of its stone and readies it for use.

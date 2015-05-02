@@ -1,20 +1,20 @@
 [BaseStats]
-Hp=2000
-Tp=250
-Str=$calc(20 + $current.battlestreak)
-Def=$calc(20 + $current.battlestreak)
-Int=$calc(20 + $current.battlestreak)
-Spd=$calc(20 + $current.battlestreak)
+Hp=5000
+Tp=500
+Str=20
+Def=20
+Int=20
+Spd=20
 Name=Indiana Jones
 
 
 [Battle]
-Hp=2000
-Tp=250
-Str=$calc(20 + $current.battlestreak)
-Def=$calc(20 + $current.battlestreak)
-Int=$calc(20 + $current.battlestreak)
-Spd=$calc(20 + $current.battlestreak)
+Hp=5000
+Tp=500
+Str=20
+Def=20
+Int=20
+Spd=20
 Status=alive
 
 
@@ -34,12 +34,14 @@ Dused=1
 Char=is the well-known archaeologist. He wears a brown shirt, dark brown pants and boots. He also has a black leather jacket, a leather whip and his iconic dark brown fedora.
 Rage=gets angry and yells "It belongs in a museum!"
 
+
 [Stuff]
 RedOrbs=0
 BlackOrbs=1
 ShopLevel=1
 RedOrbsSpent=0
 BlackOrbsSpent=0
+
 
 [Info]
 Gender=his
@@ -51,6 +53,7 @@ LastIP=N/a
 Created=Fri Jun 22 19:56:53 2012
 Flag=NPC
 CanTaunt=true
+
 
 [Status]
 Poison=no
@@ -95,26 +98,68 @@ zombie.timer=1
 
 [Weapons]
 Equipped=LeatherWhip
-LeatherWhip=$round($calc(500 + (($current.battlestreak / 2) / 5.5)),0)
+LeatherWhip=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
 
 
 [Skills]
-MartialArts=1000
-Gunslinger=1000
-Whipster=1000
+Whipster=100
+Zen=5
 Resist-Charm=100
+Resist-Poison=100
 Resist-Zombie=100
 Resist-Intimidate=100
-Zen=5
-MightyStrike=1
+Resist-Amnesia=100
+Resist-Blind=100
+Resist-Slow=100
+Resist-Stop=100
+Resist-Paralysis=100
+Resist-confuse=100
+Resist-stun=100
+Resist-Drunk=100
+Resist-Weaponlock=100
+Resist-Curse=100
+Resist-Petrify=100
+Resist-Disarm=100
+
 
 [Techniques]
-Whiplash=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
+Whiplash=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
 
 
 [Item_Amount]
+
 
 [Styles]
 Equipped=WeaponMaster
 WeaponMaster=10
 WeaponMasterXP=1
+
+
+[Augments]
+LeatherWhip=MeleeBonus.TechBonus.EnhanceWhip.HurtEthereal
+
+
+[modifiers]
+; This section controls how much resistance/weakness this monster has the elements and weapon types.
+; 100 = it does 100% normal damage. Over 100 = weakness, under 100 = resistance. 0 = immune.
+Heal=none
+Earth=100
+Fire=100
+Wind=100
+Water=100
+Ice=100
+Lightning=100
+Light=100
+Dark=100
+HandToHand=100
+Whip=100
+Sword=100
+Gun=100
+Rifle=100
+Katana=100
+Wand=100
+Spear=100
+Scythe=100
+Glyph=100
+GreatSword=100
+Bow=100

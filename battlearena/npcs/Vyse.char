@@ -1,20 +1,20 @@
 [BaseStats]
-Hp=2500
-Tp=250
-Str=$calc(25 + $current.battlestreak)
-Def=$calc(20 + $current.battlestreak)
-Int=$calc(30 + $current.battlestreak)
-Spd=$calc(25 + $current.battlestreak)
+Hp=5000
+Tp=500
+Str=20
+Def=20
+Int=20
+Spd=20
 Name=Vyse
 
 
 [Battle]
-Hp=2500
-Tp=250
-Str=$calc(25 + $current.battlestreak)
-Def=$calc(20 + $current.battlestreak)
-Int=$calc(30 + $current.battlestreak)
-Spd=$calc(25 + $current.battlestreak)
+Hp=5000
+Tp=500
+Str=20
+Def=20
+Int=20
+Spd=20
 Status=alive
 
 
@@ -96,24 +96,33 @@ zombie.timer=1
 
 [Weapons]
 Equipped=VorlikBlade
-VorlikBlade=$round($calc(500 + (($current.battlestreak / 2) / 5.5)),0)
+VorlikBlade=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
 
 [Skills]
-Swordmaster=1000
+Swordmaster=100
 Zen=5
-MightyStrike=1
-Impetus=20
-WeaponBash=1
 Resist-Charm=100
-Resist-Amnesia=100
-Resist-Curse=100
+Resist-Poison=100
+Resist-Zombie=100
 Resist-Intimidate=100
+Resist-Amnesia=100
+Resist-Blind=100
+Resist-Slow=100
+Resist-Stop=100
+Resist-Paralysis=100
+Resist-confuse=100
+Resist-stun=100
+Resist-Drunk=100
+Resist-Weaponlock=100
+Resist-Curse=100
+Resist-Petrify=100
+Resist-Disarm=100
 
 
 [Techniques]
-CutlassFury=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-RainOfSwords=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-PiratesWrath=$round($calc(300 + (($current.battlestreak / 2) / 5.5)),0)
+CutlassFury=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+RainOfSwords=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+PiratesWrath=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
 
 
 [Item_Amount]
@@ -127,11 +136,41 @@ WeaponMasterXP=1
 [mech]
 name=Delphinus
 inUse=false
-EngineLevel=1.2
-HpMax=10000
-HpCurrent=10000
-EnergyMax=5000
-EnergyCurrent=5000
+EngineLevel=$iif($current.battlestreak < 1000, 0, 1.2)
+HpMax=20000
+HpCurrent=20000
+EnergyMax=10000
+EnergyCurrent=10000
 EquippedCore=EtherealCore
 EquippedWeapon=DelphinusWeaponSystems
 Augments=TechBonus.HurtEthereal
+
+
+[Augments]
+VorlikBlade=MeleeBonus.TechBonus.EnhanceSword.HurtEthereal
+
+
+[modifiers]
+; This section controls how much resistance/weakness this monster has the elements and weapon types.
+; 100 = it does 100% normal damage. Over 100 = weakness, under 100 = resistance. 0 = immune.
+Heal=none
+Earth=100
+Fire=100
+Wind=100
+Water=100
+Ice=100
+Lightning=100
+Light=100
+Dark=100
+HandToHand=100
+Whip=100
+Sword=100
+Gun=100
+Rifle=100
+Katana=100
+Wand=100
+Spear=100
+Scythe=100
+Glyph=100
+GreatSword=100
+Bow=100

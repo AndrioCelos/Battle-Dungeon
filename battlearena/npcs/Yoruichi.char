@@ -1,22 +1,22 @@
 [BaseStats]
-Hp=2500
-Tp=270
-Str=$calc(70 + $current.battlestreak)
-Def=$calc(40 + $current.battlestreak)
-Int=$calc(40 + $current.battlestreak)
-Spd=$calc(70 + $current.battlestreak)
-IgnitionGauge=100
+Hp=5000
+Tp=500
+Str=20
+Def=20
+Int=20
+Spd=20
+IgnitionGauge=60
 Name=Yoruichi Shihouin
 
 
 [Battle]
-Hp=2500
-Tp=270
-Str=$calc(70 + $current.battlestreak)
-Def=$calc(40 + $current.battlestreak)
-Int=$calc(40 + $current.battlestreak)
-Spd=$calc(70 + $current.battlestreak)
-IgnitionGauge=100
+Hp=5000
+Tp=500
+Str=20
+Def=20
+Int=20
+Spd=20
+IgnitionGauge=60
 Status=alive
 
 
@@ -39,6 +39,7 @@ Utsusemi=laughs as she activates the ability. "What's the matter? Can't find the
 ShadowCopy=laughs once more as she creates a clone of herself. "Can you handle two of me?"
 Speed=laughs as she increases her speed. "What's wrong? You can't keep up with me?"
 MightyStrike=surrounds her arms with reiatsu, increasing her strength for a short time.
+TrueStrike=focuses her reiatsu as she observes the battlefield.
 
 
 [Stuff]
@@ -106,7 +107,7 @@ conservetp.on=off
 
 [Weapons]
 Equipped=ShihouinFists
-ShihouinFists=$round($calc(500 + (($current.battlestreak / 2) / 5.5)),0)
+ShihouinFists=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
 
 [Skills]
 mightystrike=1
@@ -114,17 +115,10 @@ desperateblows=1
 speed.on=off
 doubleturn.on=off
 soulvoice.on=off
-manawall.on=off
 mightystrike.on=off
-royalguard.on=on
-MartialArts=1000
-Wizardry=1000
-SwordMaster=1000
-Resist-Charm=100
-Resist-Zombie=100
-Resist-Intimidate=100
-RoyalGuard=1
-ManaWall=1
+MartialArts=100
+Wizardry=100
+SwordMaster=100
 Zen=5
 Utsusemi=1
 ShadowCopy=1
@@ -132,15 +126,31 @@ Speed=100
 Sugitekai=1
 WeaponBash=1
 Impetus=20
+Resist-Charm=100
+Resist-Poison=100
+Resist-Zombie=100
+Resist-Intimidate=100
+Resist-Amnesia=100
+Resist-Blind=100
+Resist-Slow=100
+Resist-Stop=100
+Resist-Paralysis=100
+Resist-confuse=100
+Resist-stun=100
+Resist-Drunk=100
+Resist-Weaponlock=100
+Resist-Curse=100
+Resist-Petrify=100
+Resist-Disarm=100
 
 
 [Techniques]
-DoublePunch=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-ShoulderTackle=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-AsuranFists=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-TornadoKick=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-ShinjinSpiral=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-ShitotsuSansen=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
+DoublePunch=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+ShoulderTackle=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+AsuranFists=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+TornadoKick=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+ShinjinSpiral=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+ShitotsuSansen=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
 
 
 [Item_Amount]
@@ -153,8 +163,34 @@ WeaponMasterXP=1
 
 
 [Ignitions]
-Shunkou-Lightning=1
+Shunkou-Lightning=$iif($current.battlestreak < 200, 0, 1)
 
 
 [Augments]
-ShihouinFists=EnhanceMelee.TechBonus
+ShihouinFists=MeleeBonus.TechBonus.HurtEthereal.EnhanceHandToHand.MagicBonus.EnhanceDodge.EnhanceParry
+
+
+[modifiers]
+; This section controls how much resistance/weakness this monster has the elements and weapon types.
+; 100 = it does 100% normal damage. Over 100 = weakness, under 100 = resistance. 0 = immune.
+Heal=none
+Earth=100
+Fire=100
+Wind=100
+Water=100
+Ice=100
+Lightning=100
+Light=100
+Dark=100
+HandToHand=100
+Whip=100
+Sword=100
+Gun=100
+Rifle=100
+Katana=100
+Wand=100
+Spear=100
+Scythe=100
+Glyph=100
+GreatSword=100
+Bow=100

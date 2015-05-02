@@ -1,22 +1,20 @@
 [BaseStats]
-Hp=3500
-Tp=250
-Str=$calc(50 + $current.battlestreak)
-Def=$calc(100 + $current.battlestreak)
-Int=$calc(50 + $current.battlestreak)
-Spd=$calc(50 + $current.battlestreak)
-IgnitionGauge=50
+Hp=5000
+Tp=500
+Str=20
+Def=20
+Int=20
+Spd=20
 Name=Samus Aran
 
 
 [Battle]
-Hp=3500
-Tp=250
-Str=$calc(50 + $current.battlestreak)
-Def=$calc(100 + $current.battlestreak)
-Int=$calc(50 + $current.battlestreak)
-Spd=$calc(50 + $current.battlestreak)
-IgnitionGauge=50
+Hp=5000
+Tp=500
+Str=20
+Def=20
+Int=20
+Spd=20
 Status=alive
 
 
@@ -97,49 +95,54 @@ zombie.timer=1
 
 [Weapons]
 Equipped=ChozoArmCannon
-ChozoArmCannon=$round($calc(500 + (($current.battlestreak / 2) / 5.5)),0)
+ChozoArmCannon=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
 
 [Skills]
 Zen=5
-Impetus=20
-Gunslinger=1000
-MartialArts=1000
+Gunslinger=100
+MartialArts=100
 Resist-Charm=100
+Resist-Poison=100
 Resist-Zombie=100
 Resist-Intimidate=100
-Resist-Petrify=100
 Resist-Amnesia=100
+Resist-Blind=100
+Resist-Slow=100
+Resist-Stop=100
+Resist-Paralysis=100
+Resist-confuse=100
+Resist-stun=100
+Resist-Drunk=100
+Resist-Weaponlock=100
+Resist-Curse=100
+Resist-Petrify=100
+Resist-Disarm=100
 
 
 [Techniques]
-PoweredShot=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-Missile=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-SuperMissile=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-Bomb=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-PowerBomb=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-ScrewAttack=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-IceBeam=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-PlasmaBeam=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-DarkBeam=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-DarkBurst=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-LightBeam=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-SunBurst=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
+PoweredShot=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+Missile=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+SuperMissile=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+Bomb=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+PowerBomb=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+ScrewAttack=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+IceBeam=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+PlasmaBeam=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+DarkBeam=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+DarkBurst=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+LightBeam=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+SunBurst=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
 
 [Item_Amount]
-
-
-[equipment]
-head=
-body=
-hands=
-legs=
-feet=
-accessory=
 
 [Styles]
 Equipped=Guardian
 Guardian=10
 GuardianXP=1
+
+
+[Augments]
+ChozoArmCannon=MeleeBonus.TechBonus.EnhanceRanged.HurtEthereal
 
 
 [modifiers]

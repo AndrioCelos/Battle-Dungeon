@@ -1,12 +1,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; AUCTION HOUSE COMMANDS
+;;;; Last updated: 02/15/15
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; See info on the auction
 on 3:TEXT:!auction info*:*: {  $auction.status($nick) }
 on 3:TEXT:!auction winner*:*: { $auctionhouse.winners($nick, $3) }
 on 3:TEXT:!auction bid*:*: { $auctionhouse.bid($nick, $3) }
-
 
 alias auction.status {
   if ($readini(system.dat, auctionInfo, current.item) = $null) { $display.private.message2($1, $readini(translation.dat, errors, NoAuction)) | halt }
@@ -70,7 +70,6 @@ alias auctionhouse.winners {
 
 }
 
-
 ; Bid on an item
 alias auctionhouse.bid {
   ; Is the AH system enabled?  Is there an auction to bid on?
@@ -84,6 +83,7 @@ alias auctionhouse.bid {
 
   ; Does the person have that many notes?
   var %current.alliednotes $readini($char($1), stuff, alliednotes)
+  if (%current.alliednotes = $null) { writeini $char($1) stuff alliednotes 0 | var %current.alliednotes 0 }
   if (%current.alliednotes < $2) { $display.private.message2($1, $readini(translation.dat, errors, NotEnoughNotesToBid)) | halt }
 
   ; Is the person betting the minimum?

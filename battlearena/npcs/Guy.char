@@ -1,20 +1,20 @@
 [BaseStats]
-Hp=4000
-Tp=300
-Str=$calc(40 + $current.battlestreak)
-Def=$calc(40 + $current.battlestreak)
-Int=$calc(20 + $current.battlestreak)
-Spd=$calc(20 + $current.battlestreak)
+Hp=5000
+Tp=500
+Str=20
+Def=20
+Int=20
+Spd=20
 Name=Guy
 
 
 [Battle]
-Hp=4000
-Tp=300
-Str=$calc(40 + $current.battlestreak)
-Def=$calc(40 + $current.battlestreak)
-Int=$calc(20 + $current.battlestreak)
-Spd=$calc(20 + $current.battlestreak)
+Hp=5000
+Tp=500
+Str=20
+Def=20
+Int=20
+Spd=20
 Status=alive
 
 
@@ -93,31 +93,78 @@ curse.timer=1
 slow.timer=1
 zombie.timer=1
 
+
 [Weapons]
 Equipped=AdamantAxe
-AdamantAxe=$round($calc(500 + (($current.battlestreak / 2) / 5.5)),0)
+AdamantAxe=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+
 
 [Skills]
 Zen=5
-PoleMaster=100
-MartialArts=100
+HatchetMan=100
 Resist-Charm=100
-Resist-Amnesia=100
-Resist-Curse=100
+Resist-Poison=100
+Resist-Zombie=100
 Resist-Intimidate=100
-RoyalGuard=1
-WeaponBash=1
-Impetus=20
+Resist-Amnesia=100
+Resist-Blind=100
+Resist-Slow=100
+Resist-Stop=100
+Resist-Paralysis=100
+Resist-confuse=100
+Resist-stun=100
+Resist-Drunk=100
+Resist-Weaponlock=100
+Resist-Curse=100
+Resist-Petrify=100
+Resist-Disarm=100
+
 
 [Techniques]
-Thundershriek=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-BombAttack=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-FellCleave=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-UkkosFury=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
-KingsJustice=$round($calc(125 + (($current.battlestreak / 2) / 5.5)),0)
+Thundershriek=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+BombAttack=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+FellCleave=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+UkkosFury=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+KingsJustice=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+
 
 [Item_Amount]
-Lucky-Rabbit'sFoot=1
+
 
 [equipment]
 accessory=Lucky-Rabbit'sFoot
+
+[Styles]
+Equipped=WeaponMaster
+WeaponMaster=10
+WeaponMasterExp=1
+
+
+[Augments]
+AdamantAxe=MeleeBonus.TechBonus.EnhanceAxe.HurtEthereal
+
+
+[modifiers]
+; This section controls how much resistance/weakness this monster has the elements and weapon types.
+; 100 = it does 100% normal damage. Over 100 = weakness, under 100 = resistance. 0 = immune.
+Heal=none
+Earth=100
+Fire=100
+Wind=100
+Water=100
+Ice=100
+Lightning=100
+Light=100
+Dark=100
+HandToHand=100
+Whip=100
+Sword=100
+Gun=100
+Rifle=100
+Katana=100
+Wand=100
+Spear=100
+Scythe=100
+Glyph=100
+GreatSword=100
+Bow=100

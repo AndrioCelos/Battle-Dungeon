@@ -1,23 +1,23 @@
 [BaseStats]
-Hp=2000
-Tp=1000
-Str=2000
-Def=2000
-Int=2000
-Spd=2000
-Name=Exenmille
+Hp=300
+Tp=50
+Str=$calc(40 + $current.battlestreak)
+Def=$calc(40 + $current.battlestreak)
+Int=$calc(40 + $current.battlestreak)
+Spd=$calc(40 + $current.battlestreak)
+Name=Shopkeeper
 IgnitionGauge=2
 
 
 [Battle]
-Hp=2000
-Tp=1000
-Str=2000
-Def=2000
-Int=2000
-Spd=2000
+Hp=300
+Tp=50
+Str=$calc(40 + $current.battlestreak)
+Def=$calc(40 + $current.battlestreak)
+Int=$calc(40 + $current.battlestreak)
+Spd=$calc(40 + $current.battlestreak)
+Status=inactive
 IgnitionGauge=2
-Status=alive
 
 
 [Rage]
@@ -26,8 +26,9 @@ RageCountDown=0
 
 
 [Descriptions]
-Char=is a renowned San d'Orian hero who wears black and red armor.
-Rage=screams in rage 
+Char=is a simple shopkeeper who carries a shotgun in hand, to ward off thieves. He will only attack when provoked. $iif($readini($char(Shopkeeper), battle, status) = inactive,  He slowly wanders around the battlefield, He is running around waiting for a moment to attack)
+Rage=shouts out, "You'll pay for your crimes!"
+Awaken=shouts out "Terrorist!" and bounces around the battlefield at a high speed.
 
 [Stuff]
 RedOrbs=0
@@ -43,11 +44,9 @@ passhurt=0
 LastSeen=N/a
 LastIP=N/a
 Created=N/a
-Streak=-1000
-cantaunt=false
-justreleasedefense=90
-ignorepresident=true
-canflee=false
+CanTaunt=false
+IgnorePresident=true
+Streak=100
 ;=======================================
 ; These are optional flags you can set:
 ;========================================
@@ -81,16 +80,49 @@ canflee=false
 ; Valid list is: Full Moon or Crescent Moon or Gibbous Moon or New Moon or Quarter Moon or Blood Moon  (with the spaces)
 ; Moonphase=
 ;
+; TIMEOFDAY is for if you want the monster to only appear during certain times of days (game time, not real life)
+; Valid list is: Morning, Noon, Evening and Night.
+; TimeOfDay=
+;
 ; Can the monster taunt?   Assumed to be true if blank.
 ; CANTAUNT=true/false
+;
+; TAUNTFILE is an optional taunt file if you want your boss to have unique taunts.  If blank it will use the default taunts.txt
+; TAUNTFILE=
+;
+; GUARDIAN is a monster that covers the monster. While the guardian mon is alive, this mon will take no damage
+; Guardian=
+;
+; JUSTRELEASEDEFENSE is to block "Just Release" the # is a percent of the damage blocked. 0 = no block, 100 = 100% blocked
+; JustReleaseDefense=
+;
+; HURTBYTAUNT is a special flag. If set to true, taunts done against this monster will deal damage.
+; HurtByTaunt=true/false
+;
+; HEALBYTAUNT is a special flag. If set to true, taunts done against this monster will heal damage. 
+; HealByTaunt=true/false
+;
+; Does the monster appear in President battles? True=yes/False=no
+; IgnorePresident=
+;
+; DEATHCONDITIONS= if you want the monster to only only if a certain action is performed, you can set it here. Not set by default.
+; Valid conditions are: melee, magic, tech, item, renkei, status, magiceffect
+; You can list multiple by putting a period inbetween such as: melee.magic.status 
+; If the monster is killed by something that isn't the death condition, it'll be revived until killed with the condition.
+; DeathConditions=
+
 
 [monster]
 ; Type is the type of monster it is. 
-type=elf
+type=
+
 ; TechLearn is a special flag where if it's hit by a tech, it will become immune to that tech for the rest of the battle.
 ; Change it to "true" to turn it on.
 TechLearn=false
-size=medium
+
+; Size is the size of the monster. Small/Medium/Large
+size=Medium
+
 
 [Status]
 Poison=no
@@ -125,16 +157,15 @@ sleep=no
 stun=no
 MPRegenerating=no
 
+
 [Weapons]
-Equipped=Rhongomiant
-Rhongomiant=$calc(100 + $current.battlestreak)
+Equipped=Boomstick
+Boomstick=$calc(20 + $current.battlestreak)
+Fists=$calc(5 + $current.battlestreak)
 
 
 [Skills]
 Zen=5
-Polemaster=$rand(200,400)
-RoyalGuard=1
-MightyStrike=1
 Resist-Charm=100
 Resist-Poison=100
 Resist-Zombie=100
@@ -145,16 +176,14 @@ Resist-Slow=100
 Resist-Stop=100
 Resist-Paralysis=100
 Resist-confuse=100
+Resist-stun=100
 Resist-Drunk=100
 Resist-Weaponlock=100
-Resist-Stun=100
+Resist-Curse=100
+Resist-Petrify=100
 
 
 [Techniques]
-HighJump=$calc(200 + $current.battlestreak)
-CamlannsTorment=$calc(200 + $current.battlestreak)
-LegSweep=$calc(200 + $current.battlestreak)
-SonicThrust=$calc(200 + $current.battlestreak)
 
 
 [Item_Amount]
@@ -185,96 +214,12 @@ Scythe=100
 Glyph=100
 GreatSword=100
 Bow=100
-BasicMechGun=20
-ImprovedMechGun=20
-FlawlessMechGun=20
-DarksteelOreCannon=20
-BasicMechSword=20
-ImprovedMechSword=20
-FlawlessMechSword=20
-DarksteelOreSword=20
-BasicMechFists=20
-ImprovedMechFists=20
-FlawlessMechFists=20
-DarksteelOreFists=20
-BasicMechStaff=20
-ImprovedMechStaff=20
-FlawlessMechStaff=20
-DarksteelOreStaff=20
-GoukiGloves=0
-Hadouken=0
-AsherGuns=20
-ReubenKatanas=20
-DinahWeapons=20
-DelphinusWeaponSystems=20
-ShotBuster=20
-FlareBuster=20
-Cerberus=20
-IronBlade=20
-GarudasWrath=20
-LotusBlades=20
-R-Fang=20
-X-BusterII=20
-X-Cannon=20
-MoonStoneCannon=20
-Rainstorm=30
-SpinningAttack=30
-TornadoKick=30
-CircularChain=30
-CircleBlade=30
-SonicThrust=30
-ApexArrow=30
-UrielBlade=30
-FellCleave=30
-AeolianEdge=30
-BladeBeam=0
-TwinSlice=0
-BiteOfLightning=0
-HyperTwinSlice=0
-Chivalry=30
-JakuhouRaikouben=30
-BladeBeamII=30
-DoubleShot=20
-GunBlaze=20
-DoubleShotII=20
-GunBlazeII=20
-DoubleShotIII=20
-GunBlazeIII=20
-TripleShot=20
-GunBlazeIII=20
-DoubleSwing=20
-SwordBlaze=20
-DoubleSwingII=20
-SwordBlazeII=20
-DoubleSwingIII=20
-SwordBlazeIII=20
-TripleSwing=20
-SwordBlazeIII=20
-DoubleStrike=20
-MartialBlaze=20
-DoubleStrikeII=20
-MartialBlazeII=20
-DoubleStrikeIII=20
-MartialBlazeIII=20
-TripleStrike=20
-MartialBlazeIII=20
-WereFists=0
-Roar=0
-RazorFang=0
-ClawCyclone=0
-DeathStare=30
-TrillionStabs=60
-DoubleBackstab=60
-Chou_Kamehameha=60
-BloodBath=60
-
-
-[Equipment]
-Accessory=Spear-Pin
 
 [Styles]
-Equipped=Weaponmaster
+Equipped=WeaponMaster
 WeaponMaster=10
+WeaponMasterXP=0
 
-[Augments]
-Rhongomiant=IgnoreGuardian.IgnoreMetalDefense
+
+[augments]
+Boomstick=EnhanceDoubleTurnChance

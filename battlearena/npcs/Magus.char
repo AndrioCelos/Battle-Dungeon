@@ -1,23 +1,23 @@
 [BaseStats]
-Hp=$iif($return_playerlevelstotal >= 700, $round($calc(5000 + (4 * $return_differenceof($return_playerlevelstotal,700))),0), $round($calc(4500 + $return_playerlevelstotal),0))
+Hp=5000
 Tp=500
-Str=450
-Def=450
-Int=450
-Spd=450
-Name=Prime Vise
-IgnitionGauge=2
+Str=15
+Def=15
+Int=15
+Spd=15
+IgnitionGauge=0
+Name=Magus
 
 
 [Battle]
-Hp=4500
-Tp=450
-Str=450
-Def=450
-Int=450
-Spd=450
+Hp=5000
+Tp=500
+Str=15
+Def=15
+Int=15
+Spd=15
+IgnitionGauge=0
 Status=alive
-IgnitionGauge=2
 
 
 [Rage]
@@ -26,7 +26,7 @@ RageCountDown=0
 
 
 [Descriptions]
-Char=is one of Skeletron Prime's arms. It has a vise in place of its hand.
+Char=is a tall man with long purple hair, long ears, and weas a red cape over his armor and clothing. The man also carries a large scythe in hand as well.
 Rage=screams in rage 
 
 
@@ -34,22 +34,20 @@ Rage=screams in rage
 RedOrbs=0
 BlackOrbs=1
 ShopLevel=1.0
+Drops=
 
 [Info]
-Flag=monster
-Gender=its
-Gender2=it
+Flag=npc
+Gender=his
+Gender2=him
 password=battlearena
 passhurt=0
 LastSeen=N/a
 LastIP=N/a
 Created=N/a
-ai_type=techonly
-Streak=-1000
-BossLevel=350
-CanTaunt=False
-IgnoreQuicksilver=true
-JustReleaseDefense=90
+Streak=20
+CanTaunt=false
+RageMode=ignore
 ;=======================================
 ; These are optional flags you can set:
 ;========================================
@@ -58,12 +56,13 @@ JustReleaseDefense=90
 ; StaggerAmount=$rand(#,#)   
 ; 
 ; IGNORE RAGEMODE
-; RageMode=ignore   
+; RageMode=ignore 
 ;
 ; IGNORE QUICKSILVER
-; IgnoreQuicksilver=true
+; IgnoreQuicksilver=true/false 
 ;
-; AI TYPE: berserkers will attack their own allies, defenders won't get a turn. Leave blank for normal.
+; AI TYPE: berserkers will attack their own allies, defenders won't get a turn. healers only heal, 
+; counteronly will counter melee/take 0 damage from everything else, and techonly only uses techs. Leave blank for normal.
 ; ai_type=
 ;
 ; STREAK MIN/MAX: Streak= for the minimum streak it takes for the monster to show up. StreakMax= for max.
@@ -76,7 +75,13 @@ JustReleaseDefense=90
 ; SPAWNING ANOTHER MONSTER UPON DEATH: If set, when this monster is killed, it'll summon another one that's set.
 ; SpawnAfterDeath=nameofmonster
 ;
-; BIOME is for if you want the monster to only appear under certain battlefields. You can list multiple with periods inbetween.
+; BOSS LEVELS are used for bosses that are summoned via portal items. You can make them harder or easier by setting a level.
+; BossLevel=
+; 
+; IGNORE DRAIN is true or false. If set to true, stuff like drainsamba won't work.
+; IgnoreDrain=true/false
+;
+; BIOME is for if you want the boss to only appear under certain battlefields. You can list multiple with periods inbetween.
 ; Biome=
 ;
 ; MOONPHASE is for if you want the monster to only appear during a certain moon phase. You can only list one.
@@ -93,34 +98,40 @@ JustReleaseDefense=90
 ; TAUNTFILE is an optional taunt file if you want your boss to have unique taunts.  If blank it will use the default taunts.txt
 ; TAUNTFILE=
 ;
-; GUARDIAN is a monster that covers the monster. While the guardian mon is alive, this mon will take no damage
+; GUARDIAN is a monster that covers the boss. While the monster is alive the boss will take no damage from items/techs/attacks
 ; Guardian=
 ;
 ; JUSTRELEASEDEFENSE is to block "Just Release" the # is a percent of the damage blocked. 0 = no block, 100 = 100% blocked
 ; JustReleaseDefense=
 ;
-; HURTBYTAUNT is a special flag. If set to true, taunts done against this monster will deal damage.
+; HURTBYTAUNT is a special flag. If set to true, taunts done against this boss will deal damage.
 ; HurtByTaunt=true/false
 ;
-; HEALBYTAUNT is a special flag. If set to true, taunts done against this monster will heal damage. 
+; HEALBYTAUNT is a special flag. If set to true, taunts done against this boss will heal damage. 
 ; HealByTaunt=true/false
 ;
 ; Does the monster appear in President battles? True=yes/False=no
 ; IgnorePresident=
-
-
+;
+; IMMUNETOMAGIC= is to determine if a boss is completely immune to magic or not. True/false.
+; ImmuneToMagic=true/false
+;
+; DEATHCONDITIONS= if you want the boss to only only if a certain action is performed, you can set it here. Not set by default.
+; Valid conditions are: melee, magic, tech, item, renkei, status, magiceffect
+; You can list multiple by putting a period inbetween such as: melee.magic.status 
+; If the boss is killed by something that isn't the death condition, it'll be revived until killed with the condition.
+; DeathConditions=
 
 [monster]
 ; Type is the type of monster it is. 
-type=android
+type=
 
 ; TechLearn is a special flag where if it's hit by a tech, it will become immune to that tech for the rest of the battle.
 ; Change it to "true" to turn it on.
 TechLearn=false
 
 ; Size is the size of the monster. Small/Medium/Large
-size=large
-
+size=Medium
 
 [Status]
 Poison=no
@@ -155,12 +166,14 @@ sleep=no
 stun=no
 MPRegenerating=no
 
+
 [Weapons]
-Equipped=SkeletronArm
-SkeletronArm=$current.battlestreak
+Equipped=DoomSickle
+DoomSickle=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
 
 
 [Skills]
+Zen=5
 Resist-Charm=100
 Resist-Poison=100
 Resist-Zombie=100
@@ -171,23 +184,35 @@ Resist-Slow=100
 Resist-Stop=100
 Resist-Paralysis=100
 Resist-confuse=100
-Resist-Curse=100
 Resist-stun=100
 Resist-Drunk=100
 Resist-Weaponlock=100
+Resist-Curse=100
+Resist-Petrify=100
+Resist-Disarm=100
 
 
 [Techniques]
-PrimeViseAttack=$current.battlestreak
+Thundaja=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+Blizzaja=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+Firaja=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+DarkBomb=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
+DarkMist=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
 
 
-[Item_Amount]
+[Styles]
+Equipped=Spellmaster
+SpellMaster=5
+SpellMasterXP=0
 
+
+[Augments]
+DoomSickle=MeleeBonus.TechBonus.EnhanceScythe.MagicBonus.HurtEthereal
 
 
 [modifiers]
-; Resistances/weaknesses/immunities/heals can be set here.  100 = normal damage, greater than 100 means weakness, 
-; less than 100 means resistances, 0 means immune to it.
+; This section controls how much resistance/weakness this monster has the elements and weapon types.
+; 100 = it does 100% normal damage. Over 100 = weakness, under 100 = resistance. 0 = immune.
 Heal=none
 Earth=100
 Fire=100
@@ -196,7 +221,7 @@ Water=100
 Ice=100
 Lightning=100
 Light=100
-Dark=100
+Dark=0
 HandToHand=100
 Whip=100
 Sword=100

@@ -1,23 +1,23 @@
 [BaseStats]
-Hp=2000
-Tp=1000
-Str=2000
-Def=2000
-Int=2000
-Spd=2000
-Name=Wind Up Shantotto
-IgnitionGauge=60
+Hp=$iif($current.battlestreak <= 300, 400, 3000)
+Tp=50
+Str=$calc(75 + $current.battlestreak)
+Def=$calc(75 + $current.battlestreak)
+Int=$calc(75 + $current.battlestreak)
+Spd=$calc(75 + $current.battlestreak)
+Name=Mad Cow
+IgnitionGauge=2
 
 
 [Battle]
-Hp=2000
-Tp=1000
-Str=2000
-Def=2000
-Int=2000
-Spd=2000
+Hp=400
+Tp=50
+Str=75
+Def=75
+Int=75
+Spd=75
 Status=alive
-IgnitionGauge=60
+IgnitionGauge=2
 
 
 [Rage]
@@ -26,8 +26,8 @@ RageCountDown=0
 
 
 [Descriptions]
-Char=is a doll version of a Tarutaru that wears the Black Mage AF armor, excluding the hat. This version is just as arrogant as the original! "O~hohohohohohoho!"
-Rage=screams in rage as her eyes glow bright red!
+Char=is a large cow that isn't very happy to be on the battlefield.
+Rage=screams in rage 
 
 [Stuff]
 RedOrbs=0
@@ -36,18 +36,17 @@ ShopLevel=1.0
 
 [Info]
 Flag=monster
-Gender=her
-Gender2=her
+Gender=its
+Gender2=its
 password=battlearena
 passhurt=0
 LastSeen=N/a
 LastIP=N/a
 Created=N/a
-Streak=-1000
-cantaunt=true
-justreleasedefense=90
-ignorepresident=true
-canflee=false
+CanFlee=False
+CanTaunt=False
+Biome=Farm
+JustReleaseDefense=100
 ;=======================================
 ; These are optional flags you can set:
 ;========================================
@@ -81,6 +80,10 @@ canflee=false
 ; Valid list is: Full Moon or Crescent Moon or Gibbous Moon or New Moon or Quarter Moon or Blood Moon  (with the spaces)
 ; Moonphase=
 ;
+; TIMEOFDAY is for if you want the monster to only appear during certain times of days (game time, not real life)
+; Valid list is: Morning, Noon, Evening and Night.
+; TimeOfDay=
+;
 ; Can the monster taunt?   Assumed to be true if blank.
 ; CANTAUNT=true/false
 ;
@@ -101,19 +104,24 @@ canflee=false
 ;
 ; Does the monster appear in President battles? True=yes/False=no
 ; IgnorePresident=
-
+;
+; DEATHCONDITIONS= if you want the monster to only only if a certain action is performed, you can set it here. Not set by default.
+; Valid conditions are: melee, magic, tech, item, renkei, status, magiceffect
+; You can list multiple by putting a period inbetween such as: melee.magic.status 
+; If the monster is killed by something that isn't the death condition, it'll be revived until killed with the condition.
+; DeathConditions=
 
 
 [monster]
 ; Type is the type of monster it is. 
-type=
+type=cow
 
 ; TechLearn is a special flag where if it's hit by a tech, it will become immune to that tech for the rest of the battle.
 ; Change it to "true" to turn it on.
 TechLearn=false
 
 ; Size is the size of the monster. Small/Medium/Large
-size=small
+size=large
 
 
 [Status]
@@ -149,56 +157,18 @@ sleep=no
 stun=no
 MPRegenerating=no
 
-
 [Weapons]
-Equipped=Laevatein
-Laevatein=$calc(200 + $current.battlestreak)
-
+Equipped=CowLegs
+CowLegs=$calc(1 + $current.battlestreak)
 
 
 [Skills]
-Zen=5
-ClearMind=3
-BloodSpirit=20
-ManaWall=1
-MagicMirror=1
-Wizardry=$rand(200,400)
-Resist-Charm=100
-Resist-Poison=100
-Resist-Zombie=100
-Resist-Intimidate=100
-Resist-Amnesia=100
-Resist-Blind=100
-Resist-Slow=100
-Resist-Stop=100
-Resist-Paralysis=100
-Resist-confuse=100
-Resist-Drunk=100
-Resist-Weaponlock=100
-Resist-Stun=100
-
+DesperateBlows=1
 
 [Techniques]
-FlareII=$calc(200 + $current.battlestreak)
-QuakeII=$calc(200 + $current.battlestreak)
-FloodII=$calc(200 + $current.battlestreak)
-TornadoII=$calc(200 + $current.battlestreak)
-FreezeII=$calc(200 + $current.battlestreak)
-BurstII=$calc(200 + $current.battlestreak)
-CureV=$calc(200 + $current.battlestreak)
-DarknessII=$calc(200 + $current.battlestreak)
-LightII=$calc(200 + $current.battlestreak)
-Esuna=1
-Dispel=1
-
-
-[Equipment]
-Head=WizardPetasos+2
-Body=WizardCoat+2
-Hands=WizardGloves+2
-Legs=WizardTonban+2
-Feet=WizardSabots+2
-Accessory=Wizard's-Ankh
+Stomp=$calc(1 + $current.battlestreak)
+Charge=$calc(1 + $current.battlestreak)
+Roar=1
 
 
 [Item_Amount]
@@ -229,98 +199,3 @@ Scythe=100
 Glyph=100
 GreatSword=100
 Bow=100
-BasicMechGun=20
-ImprovedMechGun=20
-FlawlessMechGun=20
-DarksteelOreCannon=20
-BasicMechSword=20
-ImprovedMechSword=20
-FlawlessMechSword=20
-DarksteelOreSword=20
-BasicMechFists=20
-ImprovedMechFists=20
-FlawlessMechFists=20
-DarksteelOreFists=20
-BasicMechStaff=20
-ImprovedMechStaff=20
-FlawlessMechStaff=20
-DarksteelOreStaff=20
-GoukiGloves=0
-Hadouken=0
-AsherGuns=20
-ReubenKatanas=20
-DinahWeapons=20
-DelphinusWeaponSystems=20
-ShotBuster=20
-FlareBuster=20
-Cerberus=20
-IronBlade=20
-GarudasWrath=20
-LotusBlades=20
-R-Fang=20
-X-BusterII=20
-X-Cannon=20
-MoonStoneCannon=20
-Rainstorm=30
-SpinningAttack=30
-TornadoKick=30
-CircularChain=30
-CircleBlade=30
-SonicThrust=30
-ApexArrow=30
-UrielBlade=30
-FellCleave=30
-AeolianEdge=30
-BladeBeam=0
-TwinSlice=0
-BiteOfLightning=0
-HyperTwinSlice=0
-Chivalry=30
-JakuhouRaikouben=30
-BladeBeamII=30
-DoubleShot=20
-GunBlaze=20
-DoubleShotII=20
-GunBlazeII=20
-DoubleShotIII=20
-GunBlazeIII=20
-TripleShot=20
-GunBlazeIII=20
-DoubleSwing=20
-SwordBlaze=20
-DoubleSwingII=20
-SwordBlazeII=20
-DoubleSwingIII=20
-SwordBlazeIII=20
-TripleSwing=20
-SwordBlazeIII=20
-DoubleStrike=20
-MartialBlaze=20
-DoubleStrikeII=20
-MartialBlazeII=20
-DoubleStrikeIII=20
-MartialBlazeIII=20
-TripleStrike=20
-MartialBlazeIII=20
-WereFists=0
-Roar=0
-RazorFang=0
-ClawCyclone=0
-DeathStare=30
-TrillionStabs=60
-DoubleBackstab=60
-Chou_Kamehameha=60
-BloodBath=60
-
-
-[Styles]
-Equipped=SpellMaster
-SpellMaster=10
-
-
-[Ignitions]
-Domina_Shantotto=1
-
-
-[Augments]
-Laevatein=IgnoreGuardian.IgnoreMetalDefense
