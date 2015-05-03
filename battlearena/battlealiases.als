@@ -1449,11 +1449,6 @@ taunt {
   if ($is_confused($1) = true) { var %user.flag monster }
   if (%mode.pvp = on) { var %user.flag monster }
 
-  if ((%user.flag != monster) && (%target.flag != monster)) { $set_chr_name($1) | $display.message($readini(translation.dat, errors, OnlyTauntMonsters), private) | halt }
-  if ($readini($char($1), Battle, Status) = dead) { $set_chr_name($1) | $display.message($readini(translation.dat, errors, Can'tTauntWhiledead), private) | unset %real.name | halt }
-  if ($readini($char($2), Battle, Status) = dead) { $set_chr_name($1) | $display.message($readini(translation.dat, errors, Can'tTauntSomeoneWhoIsDead), private) | unset %real.name | halt }
-  if ($readini($char($2), Battle, Status) = RunAway) { $display.message($readini(translation.dat, errors, Can'tTauntSomeoneWhoFled), private) | unset %real.name | halt } 
-
   ; Add some style to the taunter.
   set %stylepoints.to.add $rand(60,80)
   set %current.playerstyle $readini($char($1), styles, equipped)

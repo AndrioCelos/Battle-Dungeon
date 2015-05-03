@@ -204,10 +204,10 @@ on 2:Chat:!ig: {
 }
 on 2:Chat:!orbs*: { 
   if ($2 != $null) { $checkchar($2) | var %orbs.spent $bytes($readini($char($2), stuff, RedOrbsSpent),b) | var %blackorbs.spent $bytes($readini($char($2), stuff, BlackOrbsSpent),b) | $set_chr_name($2) 
-    $dcc.private.message($nick, $readini(translation.dat, system, ViewOthersOrbs))
+    $dcc.private.message($nick,$readini(translation.dat, system, ViewOthersOrbs))
   }
   else { var %orbs.spent $bytes($readini($char($nick), stuff, RedOrbsSpent),b) | var %blackorbs.spent $bytes($readini($char($nick), stuff, BlackOrbsSpent),b) | $set_chr_name($nick) 
-    $dcc.private.message($nick, $readini(translation.dat, system, ViewMyOrbs))
+    $dcc.private.message($nick,$readini(translation.dat, system, ViewMyOrbs))
   }
 }
 ON 2:Chat:!desc*: { 
@@ -833,7 +833,6 @@ on 2:Chat:!mech upgrade *: {
 on 2:Chat:ACTION attacks *: { 
   if ($is_charmed($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyCharmed)) | halt }
   if ($is_confused($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyConfused)) | halt }
-  $set_chr_name($nick)
   $set_chr_name($nick) 
   set %attack.target $matchtok($return_peopleinbattle, $3, 1, 46)
   if (%attack.target = $null) { set %attack.target $3 }

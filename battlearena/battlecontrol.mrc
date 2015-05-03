@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; BATTLE CONTROL
-;;;; Last updated: 04/27/15
+;;;; Last updated: 05/01/15
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 on 1:TEXT:!battle stats*:*: { $battle.stats }
@@ -436,30 +436,6 @@ alias startnormal {
   if (%time.to.enter = $null) { var %time.to.enter 120 }
 
   /.timerBattleBegin 0 %time.to.enter /battlebegin
-
-  ; DEBUG:
-  if (%auto != $null) {
-    var %r = $rand(0, 7)
-    if      (%r == 0) set %level    5
-    else if (%r == 1) set %level   10
-    else if (%r == 2) set %level   20
-    else if (%r == 3) set %level   50
-    else if (%r == 4) set %level  100
-    else if (%r == 5) set %level  200
-    else if (%r == 6) set %level  500
-    else if (%r == 7) set %level 1000
-    writeini battlestats.dat battle winningstreak %level
-    $display.system.message(3The winning streak has been set to: %level, global)
-
-    var %count = $numtok(%auto, $asc(.)), %i = 1
-    while (%i <= %count) {
-      var %name = $gettok(%auto, %i, $asc(.))
-
-      enter %name
-
-      inc %i
-    }
-  }
 }
 
 
@@ -625,7 +601,7 @@ alias flee {
   if ($is_charmed($1) = true) { $set_chr_name($1) | $display.message($readini(translation.dat, status, CurrentlyCharmed), private) | halt }
   if ($is_confused($1) = true) { $set_chr_name($1) | $display.message($readini(translation.dat, status, CurrentlyConfused), private) | halt }
 
-  if ((no-flee isin %battleconditions) || (no-fleeing isin %battleconditions)) { 
+  if (no-flee isin %battleconditions) { 
     $set_chr_name($1) | $display.message($readini(translation.dat, battle, NotAllowedBattleCondition),private) | halt 
   }
   ;MOD: Better fleeing mechanics
@@ -731,25 +707,6 @@ alias battlebegin {
       $clear_battle | halt 
     }
   }
-
-  ; DEBUG:
-  if (%auto != $null) {
-    set %level $readini(battlestats.dat, Battle, WinningStreak)
-
-    var %count = $numtok(%auto, $asc(.)), %i = 1
-    while (%i <= %count) {
-      var %name = $gettok(%auto, %i, $asc(.))
-
-      if (%level >= 100) writeini $char(%name) BaseStats HP 10000
-      else writeini $char(%name) BaseStats HP $calc(%level * 100)
-      if (%level >= 100) writeini $char(%name) Battle HP 10000
-      else writeini $char(%name) Battle HP $calc(%level * 100)
-      levelsync %name %level
-
-      inc %i
-    }
-  }
-
 
   set %ignore.clearfiles no
 
@@ -1545,7 +1502,9 @@ alias endbattle {
         set %battleis off | clear_battle | halt
         halt
       }
-      if (%mode.gauntlet = $null) { var %defeats $readini(battlestats.dat, battle, totalLoss) | inc %defeats 1 | writeini battlestats.dat battle totalLoss %defeats }
+      if (%mode.gauntlet = $null) {
+        if ((%battle.type != assault) && (%battle.type != defendoutpost)) { var %defeats $readini(battlestats.dat, battle, totalLoss) | inc %defeats 1 | writeini battlestats.dat battle totalLoss %defeats }
+      }    
       if (%mode.gauntlet != $null) {
         var %gauntlet.record $readini(battlestats.dat, battle, GauntletRecord) 
         if (%gauntlet.record = $null) { var %gauntlet.record 0 }
@@ -1887,8 +1846,7 @@ alias turn {
   $display.message.delay(%status.message, battle, 1)
 
   if (($lines($txtfile(temp_status.txt)) != $null) && ($lines($txtfile(temp_status.txt)) > 0)) { 
-    if (%fast) display.statusmessages $1 
-    else /.timerThrottle $+ $rand(a,z) $+ $rand(1,1000) $+ $rand(a,z) 1 1 /display.statusmessages $1 
+    /.timerThrottle $+ $rand(a,z) $+ $rand(1,1000) $+ $rand(a,z) 1 1 /display.statusmessages $1 
   } 
 
   if ($readini($char($1), status, curse) != yes) {
@@ -1912,7 +1870,6 @@ alias turn {
   if ($lines($txtfile(temp_status.txt)) != $null) { 
     set %file.to.read.lines $lines($txtfile(temp_status.txt))
     inc %file.to.read.lines 2
-    if (%fast) %file.to.read.lines = 1
   }
 
   ; If we're in gauntlet mode and the turn is a multiple of 15 we need to reset certain skills.
@@ -2046,6 +2003,7 @@ alias battle.check.for.end {
 ; ==========================
 alias battlelist { 
   if (%battleis = off) { $display.message($readini(translation.dat, errors, NoBattleCurrently), private) | halt }
+  if ($return_peopleinbattle = null) { $display.message($readini(translation.dat, battle, NoOneJoinedBattleYet), private) | halt }
   unset %battle.list | set %lines $lines($txtfile(battle.txt)) | set %l 1
   while (%l <= %lines) { 
     set %who.battle $read -l [ $+ [ %l ] ] $txtfile(battle.txt) | set %status.battle $readini($char(%who.battle), Battle, Status)
@@ -2535,12 +2493,11 @@ alias display.statusmessages {
     var %file.to.read $txtfile(temp_status.txt)
 
     var %delay = 1000
-    if (%fast) %delay = 1
     if ($readini(system.dat, system, botType) = IRC) {  /.play %battlechan %file.to.read %delay }
     if ($readini(system.dat, system, botType) = TWITCH) {  /.play %battlechan %file.to.read %delay }
     if ($readini(system.dat, system, botType) = DCCchat) { $dcc.status.messages(%file.to.read) }
 
     /.remove $txtfile(temp_status.txt)
-    if (!%fast) /.timerReturnFromStatus $+ $rand(a,z) 1 2 /return
+    /.timerReturnFromStatus $+ $rand(a,z) 1 2 /return 
   }
 }

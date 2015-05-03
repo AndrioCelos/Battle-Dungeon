@@ -488,7 +488,7 @@ alias achievement_check {
   if ($2 = ALightInTheDark) {
     var %total.souls $readini($char($1), stuff, LostSoulsKilled)
     if (%total.souls >= 1) {
-      writeini $char($1) achievements $2 true 
+      writeini $char($1) achievements $2 true
       $announce_achievement($1, $2, 1000)
       var %current.redorbs $readini($char($1), stuff, redorbs) | inc %current.redorbs 1000 | writeini $char($1) stuff redorbs %current.redorbs
     }
@@ -506,7 +506,7 @@ alias achievement_check {
     var %current.redorbs $readini($char($1), stuff, redorbs) | inc %current.redorbs 1000 | writeini $char($1) stuff redorbs %current.redorbs
   }
 
-F}
+}
 
 alias achievement_already_unlocked {
   if ($readini($char($1), achievements, $2) = true) { set %achievement.unlocked true }

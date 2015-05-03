@@ -343,6 +343,8 @@ debugshow {
   }
 }
 
+}
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Identifies to nickserv
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -417,11 +419,7 @@ writehost {
 ; Starts a new battle
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 system.start.newbattle {
-  ; MOD: Do event ticks with the automated battle system off.
-  if ($readini(system.dat, system, automatedbattlesystem) = off) { 
-    .timerEventTick 1 900 eventtick
-    return
-  }
+  if ($readini(system.dat, system, automatedbattlesystem) = off) { return }
 
   var %time.between.battles $readini(system.dat, System, TimeBetweenBattles)
   if (%time.between.battles = $null) { var %time.between.battles 120 }
@@ -2476,7 +2474,7 @@ get_mon_list {
     else echo 2 -a Selected no monster list.
   }
 
-  if ($1 = portal) { set %nosouls true }
+  if (((($1 = portal) || (%battle.type = defendoutpost) || (%mode.gauntlet != $null) || (%battle.type = assault)))) { set %nosouls true }
 
   set %current.winning.streak.value $readini(battlestats.dat, battle, WinningStreak) 
   set %difficulty $readini($txtfile(battle2.txt), BattleInfo, Difficulty) | inc %current.winning.streak.value %difficulty
