@@ -1,12 +1,12 @@
 # Character files
-**/characters/**/*.char
-!**/characters/new_chr.char
+characters/**/*.char
+!characters/new_chr.char
 
 # Data files
 auction_winners.txt
-**/lsts/monsterdeaths.lst
-**/lsts/wheelgame.lst
-**/txts/auction_winners.txt
+lsts/monsterdeaths.lst
+lsts/wheelgame.lst
+txts/auction_winners.txt
 battlestats.dat
 garden.dat
 scoreboard.html
@@ -26,7 +26,7 @@ m[iI][rR][cC].chw
 ircintro.chm
 mirc.ini
 perform.ini
-popups.ini
+#popups.ini
 remote.ini
 servers.ini
 urls.ini
