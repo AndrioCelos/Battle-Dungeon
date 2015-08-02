@@ -1,19 +1,19 @@
 [BaseStats]
-Hp=75
+Hp=$calc($readini(battlestats.dat, Battle, WinningStreak) * 20)
 Tp=50
 Str=0
-Def=$calc($readini(battlestats.dat, Battle, WinningStreak) * 2)
+Def=$calc($readini(battlestats.dat, Battle, WinningStreak) * 5)
 Int=0
 Spd=0
 Name=Red Orb Fountain
 
 [Battle]
-Hp=75
+Hp=40
 Tp=50
-Str=5
-Def=6
-Int=7
-Spd=1
+Str=0
+Def=10
+Int=0
+Spd=0
 Status=alive
 
 [Rage]
@@ -47,6 +47,7 @@ LastIP=N/a
 Created=N/a
 ai_type=$iif(%current.turn < %darkness.turns || %current.turn = $null, defender, techonly)
 CanTaunt=false
+BattleStats=Ignore
 
 [Monster]
 Type=
