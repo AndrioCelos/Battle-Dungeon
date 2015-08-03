@@ -1,24 +1,6 @@
 ; A Battle Arena error checking script
-; version 1.4.1 (Sunday 22 February 2015)
+; version 1.4.3 (Monday 3 August 2015)
 ; by Andrio Celos
-;
-; Changelog:
-;   Version 1.4.1:
-;     Updated for Battle Arena 3.0 beta 02/21/15.
-;     Added some error handlers.
-;   Version 1.4:
-;     Most commands in this script can no longer be used as a function by default.
-;     Added checks for weapons.
-;     Added /check everything. This may take about a minute to run.
-;     Updated for Battle Arena 3.0 beta 02/11/15.
-;     Changed a few messages.
-;   Version 1.3:
-;     Updated for Battle Arena 2.6 beta 01/31/15.
-;   Version 1.2:
-;     Updated for Battle Arena 2.6 beta 10/07/14.
-;     Expressions in character files containing references to $char or battle txt files are no longer checked fully.
-;     Removed messages about major issues, as I don't know of any that get that rating.
-;     Other message changes.
 
 check {
   ; The main command for the script. To prevent abuse, this alias cannot be used as a function.
@@ -37,15 +19,15 @@ check {
   if (($2 != ignoreversion) && ($3 != ignoreversion)) {
     ; Do a quick check on the Arena version.
     if ($regex($battle.version(), ^(\d\.\d)$) > 0) {
-      if ($regml(1) > 3.0) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
+      if ($regml(1) > 3.1) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
       else if ($regml(1) < 3.0) set -u0 %old $true
     }
-    else if ($regex($battle.version(), ^(\d\.\d)beta_(\d\d)(\d\d)(\d\d)$) > 0) {
-      if ($regml(1) > 3.0) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
+    else if ($regex($battle.version(), ^(\d\.\d)_?beta_?(\d\d)(\d\d)(\d\d)$) > 0) {
+      if ($regml(1) > 3.1) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
       else if ($regml(1) < 3.0) set -u0 %old $true
       else if ($regml(4) > 15) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
       else if ($regml(4) < 15) set -u0 %old $true
-      else if ($regml(2) > 3) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
+      else if ($regml(2) > 10) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
       else if ($regml(2) < 2) set -u0 %old $true
       else if (($regml(2) == 2) && ($regml(3) < 21)) set -u0 %old $true
     }
@@ -567,6 +549,13 @@ check_item {
     if (!$isfile($npc(%trust.npc))) log_issue Moderate Item $2 $+  references missing Ally %trust.npc $+ ; it cannot be used.
     return
   }
+
+  if (%item_type == Dungeon) {
+    ; Dungeon items must specify an existing dungeon.
+    var %dungeon = $readini($dbfile(items.db), $2, Dungeon)
+    if (!$isfile($dungeonfile(%dungeon))) log_issue Moderate Item $2 $+  references missing dungeon %dungeon $+ ; it cannot be used.
+    return
+  }   
 
   log_issue Moderate Item $2 $+  has an unrecognised type ( $+ %item_type $+ ). If it's a mod, this script will need to be edited. Otherwise, the item will have no effect.
 
@@ -1094,8 +1083,8 @@ check_statuseffects {
         var %current.status.effect = $gettok($1, %i, 46)
         if ((%current.status.effect == sleep) && (%old)) $&
           log_issue Minor $2- uses the sleep status effect, which may not work in this version of Battle Arena.
-        else if (%current.status.effect !isin stop.poison.silence.blind.drunk.virus.amnesia.paralysis.zombie.slow.stun.curse.charm.intimidate.defensedown.strengthdown.intdown.petrify.bored.confuse.sleep.random) $&
-          log_issue Minor $2- uses an invalid status effect ( $+ %current.status.effect $+ )! Use one of: stop, poison, silence, blind, drunk, virus, amnesia, paralysis, zombie, slow, stun, curse, charm, intimidate, defensedown, strengthdown, intdown, petrify, bored, confuse, sleep, random.
+        else if (%current.status.effect !isin stop.poison.silence.blind.drunk.virus.amnesia.paralysis.zombie.slow.stun.curse.charm.intimidate.defensedown.strengthdown.intdown.petrify.bored.confuse.defenseup.speedup.sleep.random) $&
+          log_issue Minor $2- uses an invalid status effect ( $+ %current.status.effect $+ )! Use one of: stop, poison, silence, blind, drunk, virus, amnesia, paralysis, zombie, slow, stun, curse, charm, intimidate, defensedown, strengthdown, intdown, petrify, bored, confuse, defenseup, speedup, sleep, random.
         inc %i
       }  
     }
