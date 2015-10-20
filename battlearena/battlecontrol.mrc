@@ -664,7 +664,6 @@ alias flee {
 ; The battle begins
 ; ==========================
 alias battlebegin {
-  unset %monster.list
   set %battleisopen off
 
   /.timerBattleBegin off
@@ -934,9 +933,9 @@ alias generate_monster {
 
   if ($1 = monster) {
     $get_mon_list
-    var %monsters.total $numtok(%monster.list,46)
+    var %monsters.total $hget(monster_list, 0).item
 
-    if ((%monsters.total = 0) || (%monster.list = $null)) { $display.message($readini(translation.dat, Errors, NoMonsAvailable), global) | $endbattle(none) | halt }
+    if (!%monsters.total) { $display.message($readini(translation.dat, Errors, NoMonsAvailable), global) | $endbattle(none) | halt }
 
     if (%mode.gauntlet != $null) { set %number.of.monsters.needed 2  }
 
@@ -944,16 +943,11 @@ alias generate_monster {
 
     set %value 1 
 
-    if (%battle.type != boss) { var %first.mon.pick false }
-
     while (%value <= %number.of.monsters.needed) {
-      if (%monster.list = $null) { inc %value 1 } 
+      inc %value 1
 
-      set %monsters.total $numtok(%monster.list,46)
-      if ((%first.mon.pick = true) || (%first.mon.pick = $null)) {  set %random.monster $rand(1, %monsters.total) }
-      if (%first.mon.pick = false) { set %random.monster 1 | var %first.mon.pick true }
-      set %monster.name $gettok(%monster.list,%random.monster,46)
-      if (%monsters.total = 0) { inc %value 1 }
+      set %monster.name $random_char(monster)
+      if (!%monster.name) break
 
       if ($readini($mon(%monster.name), battle, hp) != $null) { 
 
@@ -999,8 +993,6 @@ alias generate_monster {
       ; Check for a drop
       $check_drops(%monster.name)
 
-      set %monster.to.remove $findtok(%monster.list, %monster.name, 46)
-      set %monster.list $deltok(%monster.list,%monster.to.remove,46)
       write $txtfile(battle.txt) %monster.name
 
       if (%boss.type = predator) { writeini $char(%monster.name) info SpawnAfterDeath Predator }
@@ -1010,12 +1002,6 @@ alias generate_monster {
 
       $fulls(%monster.name) 
       if (%battlemonsters = 10) { set %number.of.monsters.needed 0 }
-      inc %value 1
-      else {  
-        set %monster.to.remove $findtok(%monster.list, %monster.name, 46)
-        set %monster.list $deltok(%monster.list,%monster.to.remove,46)
-        dec %value 1
-      }
     }
   }
 
@@ -1037,9 +1023,9 @@ alias generate_monster {
       }
 
       $get_boss_list
-      var %monsters.total $numtok(%monster.list,46)
+      var %monsters.total $hget(boss_list, 0).item
 
-      if ((%monsters.total = 0) || (%monster.list = $null)) { $display.message(4Error: There are no bosses in the boss folder.. Have the bot admin check to make sure there are bosses for players to battle!, global) | $endbattle(none) | halt }
+      if (!%monsters.total) { $display.message(4Error: There are no bosses in the boss folder.. Have the bot admin check to make sure there are bosses for players to battle!, global) | $endbattle(none) | halt }
       if (%mode.gauntlet != $null) { set %number.of.monsters.needed 2  }
       if (%battle.type = defendoutpost) { set %number.of.monsters.needed 1 }
       if (%battle.type = assault) { set %number.of.monsters.needed 1 }
@@ -1048,10 +1034,9 @@ alias generate_monster {
 
       set %value 1
       while (%value <= %number.of.monsters.needed) {
-        if (%monster.list = $null) { inc %value 1 } 
-        set %monsters.total $numtok(%monster.list,46)
-        set %random.monster $rand(1, %monsters.total) 
-        set %monster.name $gettok(%monster.list,%random.monster,46)
+        inc %value 1
+        set %monster.name $random_char(boss)
+        if (!%monster.name) break
 
         var %battlemonsters $readini($txtfile(battle2.txt), BattleInfo, Monsters) 
         if ($readini($char(%monster.name), battle, hp) = $null) { inc %battlemonsters 1 | writeini $txtfile(battle2.txt) BattleInfo Monsters %battlemonsters }
@@ -1067,13 +1052,10 @@ alias generate_monster {
         ; Check for a drop
         $check_drops(%monster.name)
 
-        set %monster.to.remove $findtok(%monster.list, %monster.name, 46)
-        set %monster.list $deltok(%monster.list,%monster.to.remove,46)
         write $txtfile(battle.txt) %monster.name
         $boost_monster_stats(%monster.name) 
         $fulls(%monster.name)
         if (%battlemonsters = 10) { set %number.of.monsters.needed 0 }
-        inc %value 1
       }
     }
 

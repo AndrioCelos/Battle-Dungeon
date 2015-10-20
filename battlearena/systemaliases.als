@@ -2519,314 +2519,153 @@ get_minimum_streak {
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Returns the max streak
-; for mons/bosses to show
+; These functions cache monster, boss and NPC data,
+; avoiding the need to go through every single file
+; each battle.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-get_maximum_streak {
-  if ($1 = mon) {
-    set %monster.info.streak.max $readini($mon($2), info, StreakMax)
-  }
+cache_chars {
+  ; Create the hashtable.
+  if (!$hget($1 $+ _cache)) hmake $1 $+ _cache 500
 
-  if ($1 = boss) {
-    set %monster.info.streak.max $readini($boss($2), info, StreakMax)
-  }
+  ; Iterate through the files.
+  ; echo is used instead of noop for compatibility with old versions of mIRC.
+  if      ($1 == monster) .echo -q $findfile($mon_path , *.char, 0, 0, cache_char monster $1-)
+  else if ($1 == boss)    .echo -q $findfile($boss_path, *.char, 0, 0, cache_char boss $1-)
+  else if ($1 == npc)     .echo -q $findfile($npc_path , *.char, 0, 0, cache_char npc $1-)
+}
 
-  if ($1 = npc) {
-    set %monster.info.streak.max $readini($npc($2), info, StreakMax)
-  }
+cache_char {
+  var %name = $left($nopath($2-), -5)
 
-  if (%monster.info.streak.max = $null) { set %monster.info.streak.max 999999999999 }
-  return 
+  ; Skip it if the cache is up to date.
+  if ($gettok($hget($1 $+ _cache, %name), 1, 47) == $file($2-).mtime) return
+  
+  ; Format: timestamp/minlevel/maxlevel/month/biome/moonphase/timeofday/aitype/ignorepresident/metaldefense/ignoreoutpost
+  hadd $1 $+ _cache %name $&
+    $file($2-).mtime $+ / $+ $&
+    $iif($readini($2-, n, info, Streak) == $null, $!null, $v1) $+ / $+ $&
+    $iif($readini($2-, n, info, StreakMax) == $null, $!null, $v1) $+ / $+ $&
+    $iif($readini($2-, n, info, Month) == $null, $!null, $v1) $+ / $+ $&
+    $iif($readini($2-, n, info, Biome) == $null, $!null, $v1) $+ / $+ $&
+    $iif($readini($2-, n, info, MoonPhase) == $null, $!null, $v1) $+ / $+ $&
+    $iif($readini($2-, n, info, TimeOfDay) == $null, $!null, $v1) $+ / $+ $&
+    $iif($readini($2-, n, info, AI_Type) == $null, $!null, $v1) $+ / $+ $&
+    $iif($readini($2-, n, info, IgnorePresident) == $null, $!null, $v1) $+ / $+ $&
+    $iif($readini($2-, n, info, MetalDefense) == $null, $!null, $v1) $+ / $+ $&
+    $iif($readini($2-, n, info, IgnoreOutpost) == $null, $!null, $v1)
+  ; The $iif function will write '$null' in place of nulls. Without this, /tokenize would not work properly.
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Get a list of monsters
-; eligable for the battle
+; Get a list of NPCs
+; eligible for the battle
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-get_mon_list {
-  unset %monster.list
+get_mon_list get_char_list monster
+get_boss_list get_char_list boss
+get_npc_list get_char_list npc
+
+get_char_list {
   if (((($1 = portal) || (%battle.type = defendoutpost) || (%mode.gauntlet != $null) || (%battle.type = assault)))) { set %nosouls true }
 
-  set %current.winning.streak.value $readini(battlestats.dat, battle, WinningStreak) 
-  set %difficulty $readini($txtfile(battle2.txt), BattleInfo, Difficulty) | inc %current.winning.streak.value %difficulty
-  set %current.month $left($adate, 2)
+  ; Clean up in case a previous run failed.
+  if ($hget($1 $+ _list)) hfree $1 $+ _list
 
   if (%battle.type = ai) { set %current.winning.streak.value %ai.battle.level } 
+  else set %current.winning.streak.value $readini(battlestats.dat, battle, WinningStreak)
 
-  if (%mode.gauntlet.wave != $null) { inc %current.winning.streak.value %mode.gauntlet.wave }
-  if (%portal.bonus = true) { var %current.winning.streak.value 100 }
-  if (%battle.type = defendoutpost) { inc %current.winning.streak.value $rand(75,125) }
-
-  .echo -q $findfile( $mon_path , *.char, 0 , 0, mon_list_add $1-)
-
-  $sort_mlist
-
-  set %token.value 1
-  while (%token.value <= 15) {
-    var %monster.name $read -l $+ %token.value $txtfile(temporary_mlist.txt)
-    if (%monster.name != $null) { %monster.list = $addtok(%monster.list,%monster.name,46) | inc %token.value 1 }
-    else { inc %token.value 15 }
+  if ($1 != npc) {
+    set %difficulty $readini($txtfile(battle2.txt), BattleInfo, Difficulty)
+    inc %current.winning.streak.value %difficulty
+    if (%mode.gauntlet.wave != $null) { inc %current.winning.streak.value %mode.gauntlet.wave }
+    if (%portal.bonus = true) { var %current.winning.streak.value 100 }
+    if (%battle.type = defendoutpost) { inc %current.winning.streak.value $rand(75,125) }
   }
-  .remove $txtfile(temporary_mlist.txt)
+
+  set %current.month $left($adate, 2)
+  set %current.time.of.day $readini($dbfile(battlefields.db), TimeOfDay, CurrentTimeOfDay)
+
+  ; Check for changed files.
+  cache_chars $1
+
+  ; Open and populate the list.
+  hmake $1 $+ _list $calc($hget($1 $+ _cache, 0).item * 1.25)
+
+  var %i = 1, %count = $hget($1 $+ _cache, 0).item
+  while (%i <= %count) {
+    char_list_add $1 $hget($1 $+ _cache, %i).item
+    inc %i
+  }
+
   unset %token.value | unset %current.winning.streak.value | unset %difficulty | unset %current.month
   unset %monster.info.streak | unset %monster.info.streak.max | unset %nosouls
   return
 }
 
-mon_list_add {
-  set %file $nopath($1-) 
-  set %name $remove(%file,.char)
+char_list_add {
+  var %type = $1
+  var %name = $2
 
   if (((%name = new_mon) || (%name = $null) || (%name = orb_fountain))) { return } 
   if ((%nosouls = true) && (%name = lost_soul)) { return }
 
-  if ((%mode.gauntlet != $null) && ($readini($mon(%name), info, streak) > -500)) { write $txtfile(temporary_mlist.txt) %name | return }
-  if (%battle.type = ai) { write $txtfile(temporary_mlist.txt) %name | return }
+  tokenize 47 $hget(%type $+ _cache, %name)
 
-  if ((%savethepresident = on) && ($readini($mon(%name), info, IgnorePresident) = true)) { return }
-
-  if ((%battle.type = defendoutpost) || (%battle.type = assault)) { 
-    if ($readini($mon(%name), info, MetalDefense) = true) { return }
-    if ($readini($mon(%name), info, IgnoreOutpost) = true) { return }
-  }
-
-  ; Check the winning streak #..  some monsters won't show up until a certain streak or higher.
-  $get_minimum_streak(mon, %name)
-  $get_maximum_streak(mon, %name)
-
-  var %monster.month $readini($mon(%name), info, month) 
-
-  if (%monster.month = %current.month) { write $txtfile(temporary_mlist.txt) %name  | inc %value 1 | return }
-  if ((%monster.month != $null) && (%monster.month != %current.month)) { return }
-  if (%monster.month = $null) { 
-    if (%monster.info.streak <= -500) { return }
-    if ((%monster.info.streak > -500) || (%monster.info.streak = $null)) {
-
-      var %biome $readini($mon(%name), info, biome)
-      var %monster.moonphase $readini($mon(%name), info, moonphase)
-      var %monster.timeofday $readini($mon(%name), info, TimeOfDay)
-      var %current.time.of.day $readini($dbfile(battlefields.db), TimeOfDay, CurrentTimeOfDay)
-
-      if (%current.winning.streak.value < %monster.info.streak) { return }
-      if (%current.winning.streak.value > %monster.info.streak.max) { return }
-
-      if (((%monster.moonphase = $null) && (%biome = $null) && (%monster.timeofday = $null))) { write $txtfile(temporary_mlist.txt) %name | return  }
-      if ((%monster.moonphase != $null) && (%monster.moonphaes != %moon.phase)) { return }
-      if ((%biome != $null) && ($istok(%biome,%current.battlefield,46) = $false)) { return }
-      if ((%monster.timeofday != $null) && ($istok(%monster.timeofday,%current.time.of.day,46) = $false)) { return }
-
-      write $txtfile(temporary_mlist.txt) %name
-
-    }
-  }
-}
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Get a list of bosses eligable
-; for the battle
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-get_boss_list {
-  unset %monster.list
-  set %current.winning.streak.value $readini(battlestats.dat, battle, WinningStreak) 
-  set %difficulty $readini($txtfile(battle2.txt), BattleInfo, Difficulty) | inc %current.winning.streak.value %difficulty
-  set %current.month $left($adate, 2)
-
-  if (%mode.gauntlet.wave != $null) { inc %current.winning.streak.value %mode.gauntlet.wave }
-  if (%battle.type = defendoutpost) { inc %current.winning.streak.value 100 }
-
-  if (%portal.bonus = true) { var %current.winning.streak 100 }
-
-  if (%battle.type = ai) { set %current.winning.streak.value %ai.battle.level } 
-
-  .echo -q $findfile( $boss_path , *.char, 0 , 0, boss_list_add $1-)
-
-  $sort_mlist
-
-  set %token.value 1
-  while (%token.value <= 15) {
-    var %monster.name $read -l $+ %token.value $txtfile(temporary_mlist.txt)
-    if (%monster.name != $null) { %monster.list = $addtok(%monster.list,%monster.name,46) | inc %token.value 1 }
-    else { inc %token.value 15 }
-  }
-  .remove $txtfile(temporary_mlist.txt)
-  unset %token.value | unset %current.winning.streak.value | unset %difficulty | unset %current.month
-  unset %monster.info.streak | unset %monster.info.streak.max
-  return
-}
-
-boss_list_add {
-  set %file $nopath($1-) 
-  set %name $remove(%file,.char)
-
-  if (((%name = new_boss) || (%name = $null) || (%name = orb_fountain))) { return } 
-  if ((%mode.gauntlet != $null) && ($readini($boss(%name), info, streak) > -500)) { write $txtfile(temporary_mlist.txt) %name | return }
-  if (%battle.type = ai) { write $txtfile(temporary_mlist.txt) %name | return }
-
-  if ((%savethepresident = on) && ($readini($mon(%name), info, IgnorePresident) = true)) { return }
-
-  if ((%battle.type = defendoutpost) || (%battle.type = assault)) { 
-    if ($readini($boss(%name), info, MetalDefense) = true) { return }
-    if ($readini($boss(%name), info, IgnoreOutpost) = true) { return }
-  }
-
-  ; Check the winning streak #..  some monsters won't show up until a certain streak or higher.
-  $get_minimum_streak(boss, %name)
-  $get_maximum_streak(boss, %name)
-
-  if ($readini($boss(%name), info, month) = %current.month) { write $txtfile(temporary_mlist.txt) %name  | inc %value 1 }
-  if ($readini($boss(%name), info, month) != %current.month) { 
-    if (%monster.info.streak <= -500) { return }
-    if ((%monster.info.streak > -500) || (%monster.info.streak = $null)) {
-
-      if (($readini($boss(%name), info, month) != $null) && ($readini($boss(%name), info, month) != %current.month)) { return }
-
-      var %biome $readini($boss(%name), info, biome)
-      var %monster.moonphase $readini($boss(%name), info, moonphase)
-      var %monster.timeofday $readini($boss(%name), info, TimeOfDay)
-      var %current.time.of.day $readini($dbfile(battlefields.db), TimeOfDay, CurrentTimeOfDay)
-
-      if (%current.winning.streak.value < %monster.info.streak) { return }
-      if (%current.winning.streak.value > %monster.info.streak.max) { return }
-
-      if (((%monster.moonphase = $null) && (%biome = $null) && (%monster.timeofday = $null))) { write $txtfile(temporary_mlist.txt) %name | return  }
-      if ((%monster.moonphase != $null) && (%monster.moonphaes != %moon.phase)) { return }
-      if ((%biome != $null) && ($istok(%biome,%current.battlefield,46) = $false)) { return }
-      if ((%monster.timeofday != $null) && ($istok(%monster.timeofday,%current.time.of.day,46) = $false)) { return }
-
-      write $txtfile(temporary_mlist.txt) %name
-
-    }
-  }
-}
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Get a list of NPCs
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-get_npc_list {
-  unset %npc.list
-  .echo -q $findfile( $npc_path , *.char, 0 , 0, npc_list_add $1-)
-  $sort_mlist
-
-  set %token.value 1
-  while (%token.value <= 15) {
-    var %monster.name $read -l $+ %token.value $txtfile(temporary_mlist.txt)
-    if (%monster.name != $null) { %npc.list = $addtok(%npc.list,%monster.name,46) | inc %token.value 1 }
-    else { inc %token.value 15 }
-  }
-  .remove $txtfile(temporary_mlist.txt)
-  unset %token.value
-  return
-}
-npc_list_add {
-  set %file $nopath($1-) 
-  set %name $remove(%file,.char)
-  if ((%name = new_npc) || (%name = $null)) { return } 
-  if (%battle.type = ai) { 
-    if ($readini($char(%name), info, ai_type) = healer) { return }
-  }
-
-  ; Check the winning streak #..  some npcs won't show up until a certain streak or higher.
-  $get_minimum_streak(npc, %name)
-  $get_maximum_streak(npc, %name)
+  var %monster.info.streak $eval($2, 2)
   if (%monster.info.streak <= -500) { return }
-  if ((%monster.info.streak > -500) || (%monster.info.streak = $null)) {
 
-    var %biome $readini($npc(%name), info, biome)
-    var %monster.moonphase $readini($npc(%name), info, moonphase)
-    var %monster.timeofday $readini($npc(%name), info, TimeOfDay)
-    var %current.time.of.day $readini($dbfile(battlefields.db), TimeOfDay, CurrentTimeOfDay)
+  ; Check conditions unless in gauntlet mode.
+  if (%mode.gauntlet == $null) {
+    if (%battle.type = ai) {
+      ; No healers in AI battles.
+      if ($eval($9, 2) = Healer) return
+    }
+    else {
+      var %monster.info.streak.max $eval($3, 2)
+      if (%current.winning.streak.value < %monster.info.streak) { return }
+      if (%current.winning.streak.value > %monster.info.streak.max) { return }
 
-    if ($return_winningstreak < %monster.info.streak) { return }
-    if ($return_winningstreak > %monster.info.streak.max) { return }
-    if ((%monster.moonphase != $null) && (%monster.moonphaes != %moon.phase)) { return }
-    if ((%biome != $null) && ($istok(%biome,%current.battlefield,46) = $false)) { return }
-    if ((%monster.timeofday != $null) && ($istok(%monster.timeofday,%current.time.of.day,46) = $false)) { return }
+      if ((%savethepresident = on) && ($eval($9, 2) = true)) { return }
+
+      if ((%battle.type = defendoutpost) || (%battle.type = assault)) {
+        ; Metal defense and designated monsters should not appear in outposts.
+        if ($eval($10, 2) = true) { return }
+        if ($eval($11, 2) = true) { return }
+      }
+
+      var %monster.month $eval($4, 2)
+      if ((%monster.month != $null) && (%monster.month != %current.month)) { return }
+
+      var %biome $eval($5, 2)
+      if ((%biome != $null) && ($istok(%biome, %current.battlefield, 46) = $false)) { return }
+
+      var %monster.moonphase $eval($6, 2)
+      if ((%monster.moonphase != $null) && (%monster.moonphase != %moon.phase)) { return }
+
+      var %monster.timeofday $eval($7, 2)
+      if ((%monster.timeofday != $null) && ($istok(%monster.timeofday, %current.time.of.day, 46) = $false)) { return }
+    }
   }
 
-
-  write $txtfile(temporary_mlist.txt) %name 
+  ; Add the monster to the list.
+  hadd %type $+ _list %name $true
 }
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; This function sorts the
-; monster list.
+; This function returns a random NPC name from
+; the list, then removes it.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-sort_mlist {
-  ; get rid of the Monster Table and the now un-needed file
-  if ($isfile(MonsterTable.file) = $true) { 
-    .hfree MonsterTable
-    .remove MonsterTable.file
-  }
+random_char {
+  ; Pick the monster.
+  var %count $hget($1 $+ _list, 0).item
+  if (!%count) return $null
+  var %index $rand(1, %count)
+  var %name $hget($1 $+ _list, %index).item
 
-  ; make the monster List table
-  hmake MonsterTable
+  ; Remove the monster from the list.
+  hdel $1 $+ _list %name
 
-  ; load them from the file.  
-  var %monstertxt.lines $lines($txtfile(temporary_mlist.txt)) | var %monstertxt.current.line 1 
-  while (%monstertxt.current.line <= %monstertxt.lines) { 
-    var %who.monster $read -l $+ %monstertxt.current.line $txtfile(temporary_mlist.txt)
-    set %monster.index.num $rand(1,10000)
-    var %tmp.mon.moonphase $readini($mon(%who.monster), info, moonphase)
-    if (%tmp.mon.moonphase = %moon.phase) { inc %monster.index.num $rand(500,2000) }
-
-    hadd MonsterTable %who.monster %monster.index.num
-    inc %monstertxt.current.line
-  }
-
-  ; save the MonsterTable hashtable to a file
-  hsave MonsterTable MonsterTable.file
-
-  ; load the MonsterTable hashtable (as a temporary table)
-  hmake MonsterTable_Temp
-  hload MonsterTable_Temp MonsterTable.file
-
-  ; sort the Monster Table
-  hmake MonsterTable_Sorted
-  var %MonsterTableitem, %MonsterTabledata, %MonsterTableindex, %MonsterTablecount = $hget(MonsterTable_Temp,0).item
-  while (%MonsterTablecount > 0) {
-    ; step 1: get the lowest item
-    %MonsterTableitem = $hget(MonsterTable_Temp,%MonsterTablecount).item
-    %MonsterTabledata = $hget(MonsterTable_Temp,%MonsterTablecount).data
-    %MonsterTableindex = 1
-    while (%MonsterTableindex < %MonsterTablecount) {
-      if ($hget(MonsterTable_Temp,%MonsterTableindex).data < %MonsterTabledata) {
-        %MonsterTableitem = $hget(MonsterTable_Temp,%MonsterTableindex).item
-        %MonsterTabledata = $hget(MonsterTable_Temp,%MonsterTableindex).data
-      }
-      inc %MonsterTableindex
-    }
-
-    ; step 2: remove the item from the temp list
-    hdel MonsterTable_Temp %MonsterTableitem
-
-    ; step 3: add the item to the sorted list
-    %MonsterTableindex = sorted_ $+ $hget(MonsterTable_Sorted,0).item
-    hadd MonsterTable_Sorted %MonsterTableindex %MonsterTableitem
-
-    ; step 4: back to the beginning
-    dec %MonsterTablecount
-  }
-
-  ; get rid of the temp table
-  hfree MonsterTable_Temp
-
-  ; Erase the old monster.txt and replace it with the new one.
-  .remove $txtfile(temporary_mlist.txt)
-
-  var %index = $hget(MonsterTable_Sorted,0).item
-  while (%index > 0) {
-    dec %index
-    var %tmp = $hget(MonsterTable_Sorted,sorted_ $+ %index)
-    if (%tmp != $null) { write $txtfile(temporary_mlist.txt) %tmp }
-  }
-
-  ; get rid of the sorted table
-  hfree MonsterTable_Sorted
-
-  ; get rid of the Monster Table and the now un-needed file
-  hfree MonsterTable
-  .remove MonsterTable.file
-
-  ; unset the monster.index
-  unset %monster.index.num
+  return %name
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -2931,7 +2770,7 @@ clear_variables {
   unset %boss.type | unset %portal.bonus | unset %holy.aura | unset %darkness.fivemin.warn  | unset %battle.rage.darkness |  unset %battleconditions |  unset %red.orb.winners |  unset %bloodmoon 
   unset %line | unset %file | unset %name | unset %curbat | unset %real.name | unset %attack.target
   unset %battle.type | unset %number.of.monsters.needed | unset %who |  unset %next.person | unset %status | unset %hstats | unset %baseredorbs | unset %hp.percent
-  unset %monster.list | unset %monsters.total | unset %random.monster | unset %monster.name |  unset %ai.* | unset %resist.skill | unset %value | unset %mastery.bonus
+  unset %monster.name |  unset %ai.* | unset %resist.skill | unset %value | unset %mastery.bonus
   unset %user | unset %enemy | unset %handtohand.wpn.list | unset %sword.wpn.list | unset %monster.wpn.list | unset %base.redorbs | unset %tech.type | unset %whoturn | unset %replacechar | unset %status.battle 
   unset %number.of.hits | unset %timer.time | unset %help.topics3 | unset %skill.name |  unset %skill_level | unset %action | unset %idwho | unset %currentshoplevel | unset %totalplayers
   unset %life.max | unset %passive.skills.list | unset %active.skills.list | unset %reists.skills.list |  unset %items.list | unset %techs.list | unset %tech.name | unset %tech_level | unset %multiplier
@@ -2945,11 +2784,14 @@ clear_variables {
   unset %drainsamba.turn.max | unset %life.target | unset %drainsamba.on | unset %weapons | unset %techs | unset %number.of.players | unset %keys.items.list
   unset %amount | unset %current.shoplevel | unset %shop.list | unset %battletxt.lines | unset %battletxt.current.lint
   unset %opponent.flag | unset %spell.element | unset %timer.time |   unset %battletxt.currentline | unset %first.round.protection | unset %first.round.protection.turn
-  unset %npc.list | unset %random.npc | unset %npc.to.remove | unset %npc.name | unset %double.attack 
+  unset %npc.name | unset %double.attack
   unset %shaken | unset %info.fullbringmsg | unset %basepower | unset %fullbring.needed | unset %poison | unset %totalwins
   unset %fullbring.type | unset %fullbring.target | unset %fullbring.status | unset %item.base | unset %timer.time | unset %savethepresident
   unset %real.name | unset %weapon.name | unset %weapon.price | unset %steal.item | unset %skip.ai | unset %file.to.read.lines 
   unset %attacker.spd | unset %playerstyle.* | unset %stylepoints.to.add | unset %current.playerstyle.* | unset %styles | unset %wait.your.turn | unset %weapon.list2
+  if ($hget(monster_list)) hfree monster_list
+  if ($hget(boss_list)) hfree boss_list
+  if ($hget(npc_list)) hfree npc_list
 }
 clear_variables2 {
   unset %max.demonwall.turns | unset %demonwall.name | unset %styles.list | unset %style.name | unset %style.level | unset %player.style.level | unset %style.price | unset %styles

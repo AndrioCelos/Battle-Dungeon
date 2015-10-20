@@ -1765,20 +1765,18 @@ dragonhunt.createfile {
 
 predator_fight {
   $get_mon_list
-  var %monsters.total $numtok(%monster.list,46)
+  var %monsters.total $hget(monster_list, 0).item
 
-  if ((%monsters.total = 0) || (%monster.list = $null)) { $display.message($readini(translation.dat, Errors, NoMonsAvailable), global) | $endbattle(none) | halt }
+  if (!%monsters.total) { $display.message($readini(translation.dat, Errors, NoMonsAvailable), global) | $endbattle(none) | halt }
 
   var %number.of.monsters.needed 1
   set %value 1 
 
   while (%value <= %number.of.monsters.needed) {
-    if (%monster.list = $null) { inc %value 1 } 
+    inc %value 1
 
-    var %monsters.total $numtok(%monster.list,46)
-    var %random.monster $rand(1, %monsters.total) 
-    var %monster.name $gettok(%monster.list,%random.monster,46)
-    if (%monsters.total = 0) { inc %value 1 }
+    set %monster.name $random_char(monster)
+    if (!%monster.name) break
 
     if ($readini($mon(%monster.name), battle, hp) != $null) {  .copy -o $mon(%monster.name) $char(%monster.name) | set %curbat $readini($txtfile(battle2.txt), Battle, List) | %curbat = $addtok(%curbat,%monster.name,46) |  writeini $txtfile(battle2.txt) Battle List %curbat }
 
@@ -1795,10 +1793,6 @@ predator_fight {
     var %battlemonsters $readini($txtfile(battle2.txt), BattleInfo, Monsters) 
     inc %battlemonsters 1 | writeini $txtfile(battle2.txt) BattleInfo Monsters %battlemonsters 
 
-    set %monster.to.remove $findtok(%monster.list, %monster.name, 46)
-    set %monster.list $deltok(%monster.list,%monster.to.remove,46)
-    write $txtfile(battle.txt) %monster.name
-
     writeini $char(%monster.name) info SpawnAfterDeath Predator 
     writeini $char(%monster.name) info BossLevel $calc($1 - 5)
 
@@ -1806,12 +1800,6 @@ predator_fight {
 
     $fulls(%monster.name) 
     if (%battlemonsters = 10) { set %number.of.monsters.needed 0 }
-    inc %value 1
-    else {  
-      set %monster.to.remove $findtok(%monster.list, %monster.name, 46)
-      set %monster.list $deltok(%monster.list,%monster.to.remove,46)
-      dec %value 1
-    }
   }
 
   if (%battle.type != ai) {

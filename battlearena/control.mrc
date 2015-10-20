@@ -106,6 +106,16 @@ on 1:START: {
   if ($version < 6.3) {   echo 4*** Your version is older than the recommended version for this bot. Some things may not work right.  It is recommended you update. 12 *** }
   if ($version > 6.3) {   echo 4*** Your version is newer than the recommended version for this bot. While it should work, it is currently untested and may have quirks or bugs.  It is recommended you downgrade if you run into any problems. 12 *** }
 
+  echo 12 -s Loading monsters...
+  cache_chars monster
+
+  echo 12 -s Loading bosses...
+  cache_chars boss
+
+  echo 12 -s Loading NPCs...
+  cache_chars npc
+
+  echo 12 -s Done.
 }
 
 
