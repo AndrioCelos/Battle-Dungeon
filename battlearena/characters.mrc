@@ -144,15 +144,34 @@ ON 1:TEXT:!id*:*:{
     }
   }
 
-  $idcheck($nick , $2) | mode %battlechan +v $nick |  unset %passhurt | $writehost($nick, $site) |  /close -m* 
+  $idcheck($nick , $2) | mode %battlechan +v $nick |  unset %passhurt | $writehost($nick, $site)
   if ($readini($char($nick), info, CustomTitle) != $null) { var %custom.title " $+ $readini($char($nick), info, CustomTitle) $+ " }
   if (($readini(system.dat, system, botType) = IRC) || ($readini(system.dat, system, botType) = TWITCH)) { $set_chr_name($nick) | $display.message(10 $+ %real.name %custom.title  $+  $readini($char($nick), Descriptions, Char), global) }
 }
+
 ON 1:TEXT:!quick id*:*:{ $idcheck($nick , $3, quickid) | mode %battlechan +v $nick |  $writehost($nick, $site)|
   if (($readini(system.dat, system, botType) = IRC) || ($readini(system.dat, system, botType) = TWITCH)) { $set_chr_name($nick) }
   unset %passhurt 
-  /close -m* 
 }
+
+ON ^1:TEXT:!id*:*:censorpass $1-
+ON ^1:TEXT:!quick id*:*:censorpass $1-
+ON ^1:TEXT:!newpass*:*:censorpass $1-
+alias censorpass {
+  ; Open a query window if needed.
+  if ($target == $me) {
+    var %target = $nick
+    query -n $nick
+  }
+  else var %target = $chan
+
+  ; Display the message.
+  if ($1 == !quick) echo -tmr %target < $+ $nick $+ > $1-2 *****
+  else echo -tmr %target < $+ $nick $+ > $1 *****
+
+  haltdef
+}
+
 on 3:TEXT:!logout*:*:{ .auser 1 $nick | mode %battlechan -v $nick | .flush 1 }
 on 3:TEXT:!log out*:*:{ .auser 1 $nick | mode %battlechan -v $nick | .flush 1 }
 
