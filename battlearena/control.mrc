@@ -144,7 +144,7 @@ alias control.battlecheck {
   }
   if (%battleis = off) { $clear_battle
     ; MOD: Do event ticks with the automated battle system off.
-    if ($readini(system.dat, system, automatedbattlesystem) == off) .timerEventTick 1 900 eventtick
+    if ($readini(system.dat, system, automatedbattlesystem) == off) .timerEventTick 0 900 eventtick
   } 
 }
 ; MOD: Do event ticks with the automated battle system off.
@@ -341,6 +341,7 @@ on 50:TEXT:!toggle automated battle system*:*:{
   if ($readini(system.dat, system, automatedbattlesystem) = off) { 
     writeini system.dat system automatedbattlesystem on
     $display.message($readini(translation.dat, system, AutomatedBattleOn), global)
+    .timerEventTick off
     if (%battleis = off) { $clear_battle }
   }
   else {

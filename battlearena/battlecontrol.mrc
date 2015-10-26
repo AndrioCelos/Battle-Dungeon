@@ -276,6 +276,9 @@ alias clear_battle {
   ; Check for auction stuff.
   $auctionhouse.check 
 
+  ; MOD: Do event ticks with the automated battle system off.
+  if ($readini(system.dat, system, automatedbattlesystem) == off) .timerEventTick 0 900 eventtick
+
   halt
 }
 
@@ -327,6 +330,8 @@ alias startnormal {
   if (%battleis = on) { $clear_battle | halt }
   if ($lines($txtfile(battle.txt)) != $null) { .remove $txtfile(battle.txt) }
   if ($lines($txtfile(battle2.txt)) != $null) { .remove $txtfile(battle2.txt) }
+
+  .timerEventTick off
 
   ; Determine if we have a battle type yet
   var %start.battle.type $1
