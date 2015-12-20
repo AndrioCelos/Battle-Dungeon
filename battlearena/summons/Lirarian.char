@@ -61,6 +61,7 @@ LastIP=N/a
 Created=N/a
 IgnoreQuickSilver=true
 CanTaunt=false
+IgnoreElementalMessage=true
 
 
 [Status]
@@ -98,7 +99,7 @@ MPRegenerating=no
 
 
 [Weapons]
-Equipped=Silver_Goddess_Sword
+Equipped=SilverSwords
 SilverSwords=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
 
 [Skills]

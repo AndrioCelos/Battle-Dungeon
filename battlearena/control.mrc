@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; BASIC CONTROL
-;;;; Last updated: 04/30/15
+;;;; Last updated: 10/14/15
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 CTCP *:PING*:?:if ($nick == $me) haltdef
@@ -135,7 +135,6 @@ on 1:DISCONNECT:{
 }
 
 on me:*:JOIN:%battlechan:control.battlecheck
-
 alias control.battlecheck { 
   ; If a battle was on when the bot turned off, let's check it and do something with it.
   if (%battleis = on) { 
@@ -155,7 +154,7 @@ alias eventtick {
     inc %current.emptyrounds 5
     writeini battlestats.dat battle emptyRounds %current.emptyrounds
     if (%current.emptyrounds >= %max.emptyrounds) { 
-      if ($readini(battlestats.dat, battle, winningStreak) > 0) { $display.system.message($readini(translation.dat, system, StreakResetTo0),global) }
+      if ($readini(battlestats.dat, battle, winningStreak) > 0) { $display.message($readini(translation.dat, system, StreakResetTo0),global) }
       writeini battlestats.dat battle emptyRounds 0
       writeini battlestats.dat battle winningStreak 0
       writeini battlestats.dat battle losingStreak 0
@@ -186,6 +185,14 @@ on 50:TEXT:!unzap *:*: {
 ; Force the bot to quit
 on 50:TEXT:!quit*:*:{ if ($0 == 1) quit | else quit $2- }
 on 50:TEXT:!exit*:*:{ if ($0 == 1) quit | else quit $2- | exit -n }
+on 50:TEXT:!restart*:*:{ if ($0 == 1) quit | else quit $2- | exit -nr }
+
+; Force the bot to do a system.dat default check
+on 50:TEXT:!force system default check*:*: { 
+  writeini version.ver versions systemdat $replace($adate, /, ) $+ _ $+ $ctime
+  $system_defaults_check
+  .msg $nick 3The bot has finished with the system.dat default check.
+}
 
 ; Add or remove a bot admin (note: cannot remove the person in position 1 with this command)
 on 50:TEXT:!bot admin*:*: {  
@@ -236,6 +243,17 @@ on 50:TEXT:!toggle mode playersmustdie*:*:{
   }
 }
 
+; Bot admins can toggle Player Access commands on and off
+on 50:TEXT:!toggle playerAccessCmds*:*:{   
+  if ($readini(system.dat, system,AllowPlayerAccessCmds) = false) { 
+    writeini system.dat system AllowPlayerAccessCmds true
+    $display.message($readini(translation.dat, system, AllowPlayerAccessCmdsOn), global)
+  }
+  else {
+    writeini system.dat system AllowPlayerAccessCmds false
+    $display.message($readini(translation.dat, system, AllowPlayerAccessCmdsOff), global)
+  }
+}
 ; Bot admins can toggle Personal Difficulty
 on 50:TEXT:!toggle personalDifficulty*:*:{   
   if ($readini(system.dat, system,AllowPersonalDifficulty) = false) { 
@@ -364,6 +382,27 @@ on 50:TEXT:!toggle automated ai battle*:*:{
   }
 }
 
+; Bot admins can toggle if the auction house changes the channel's topic or not
+on 50:TEXT:!toggle auction house topic change*:*:{   
+  var %allow.topic.change $return.systemsetting(AllowAuctionHouseTopicChange)
+  if (%allow.topic.change = null) { var %allow.topic.change true | writeini system.dat system AllowAuctionHouseTopicChange true }
+
+  if (%allow.topic.change = false) { 
+    writeini system.dat system AllowAuctionHouseTopicChange true
+    $display.message($readini(translation.dat, system, AllowAuctionHouseTopicChangeOn), global)
+    $auctionhouse.topic
+  }
+  else {
+    writeini system.dat system AllowAuctionHouseTopicChange false
+    $display.message($readini(translation.dat, system, AllowAuctionHouseTopicChangeOff), global)
+    var %current.topic $chan(%battlechan).topic
+    var %previous.auction.topic $chr(124) [Current Auction: $readini(system.dat, auctionInfo, current.item) $+ ]
+    var %current.topic $remove(%current.topic, %previous.auction.topic)
+    var %new.topic %current.topic
+    /topic %battlechan %new.topic
+  }
+}
+
 ; Bot admins can set a chance of mimics appearing
 ; !mimic chance #  (where # is 1-100)
 ON 50:TEXT:!mimic chance*:*: {
@@ -457,6 +496,58 @@ on 50:TEXT:!time to enter *:*:{
   }
   else { $display.message(4You must enter a number for the time,global) | halt }
 }
+
+; Bot Admins can toggle which battle formulas are used.
+on 50:TEXT:!toggle damage formula*:*:{   
+  if (($return.systemsetting(BattleDamageFormula) = 1) || ($return.systemsetting(BattleDamageFormula) = null)) { 
+    writeini system.dat system BattleDamageFormula 2
+    $display.message($readini(translation.dat, system, BattleFormula2), global)
+    halt
+  }
+  if ($readini(system.dat, system, BattleDamageFormula) = 2) { 
+    writeini system.dat system BattleDamageFormula 3
+    $display.message($readini(translation.dat, system, BattleFormula3), global)
+    halt
+  }
+  if ($readini(system.dat, system, BattleDamageFormula) = 3) { 
+    writeini system.dat system BattleDamageFormula 4
+    $display.message($readini(translation.dat, system, BattleFormula4), global)
+    halt
+  }
+
+  if ($readini(system.dat, system, BattleDamageFormula) = 4) { 
+    writeini system.dat system BattleDamageFormula 1
+    $display.message($readini(translation.dat, system, BattleFormula1), global)
+    halt
+  }
+}
+
+; Bot admins can set the MOTD, everyone else can just see it
+on 3:TEXT:!motd*:*:{   
+  $checkscript($2-) 
+
+  if (($2 = $null) || ($2 = list)) { 
+    if ($isfile($txtfile(motd.txt)) = $true) { $display.private.message(4Current Admin Message2: $read($txtfile(motd.txt))) }
+    else { $display.private.message(4No admin message has been set) }
+    halt
+  }
+
+  if (($2 = remove) && ($istok($readini(system.dat, botinfo, bot.owner), $nick, 46) = $true)) {
+    if ($isfile($txtfile(motd.txt)) = $true) {  .remove $txtfile(motd.txt) }
+    $display.private.message(4The admin message has been removed) 
+    halt
+  }
+
+  if (($2 = set) || ($2 = add)) {
+    if ($istok($readini(system.dat, botinfo, bot.owner), $nick, 46) = $true) {
+      if ($3 = $null) { $display.private.message(4You need to supply a message to set) | halt }
+      if ($isfile($txtfile(motd.txt)) = $true) {  .remove $txtfile(motd.txt) }
+      write $txtfile(motd.txt) $3-
+      $display.private.message(4Admin message has been set)
+    }
+  }
+}
+
 
 ; Bot admin command for displaying active and zapped player lists.
 on 50:TEXT:!display *:*:{  

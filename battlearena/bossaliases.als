@@ -1,3 +1,8 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; bossaliases.als
+;;;; Last updated: 12/11/15
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; This function will pick a 
 ; random boss type
@@ -6,6 +11,7 @@ get_boss_type {
 
   if (%savethepresident = on) { set %boss.type normal | return } 
   if (%battle.type = defendoutpost) { set %boss.type normal | return }
+  if (%battle.type = torment) { set %boss.type normal | return }
   if ($return_winningstreak <= 10) { set %boss.type normal | return }
 
   set %boss.choices normal
@@ -16,10 +22,13 @@ get_boss_type {
   var %enable.goblins $readini(system.dat, system, EnableGoblins)
   var %enable.gremlins $readini(system.dat, system, EnableGremlins)
   var %enable.crystalshadow $readini(system.dat, system, EnableCrystalShadow)
+  var %enable.dinosaur $readini(system.dat, system, EnableDinosaurs)
 
   var %winning.streak.check $readini(battlestats.dat, battle, winningstreak)
   if (%mode.gauntlet.wave != $null) { inc %winning.streak.check %mode.gauntlet.wave }
 
+
+  if ((%winning.streak.check < 50) || (%winning.streak.check > 500)) { var %enable.dinosaur false }
   if ((%winning.streak.check < 50) || (%winning.streak.check > 200)) { var %enable.bandits false }
   if ((%winning.streak.check < 50) || (%winning.streak.check > 100)) { var %enable.doppelganger false }
   if ((%winning.streak.check < 50) || (%winning.streak.check > 200)) { var %enable.gremlins false }
@@ -30,7 +39,10 @@ get_boss_type {
   if ((%winning.streak.check > 75) && (%winning.streak.check < 200)) { 
     if ($readini(system.dat, system, AllowDemonwall) = yes) { var %enable.demonwall true }
   }
-  if ((%winning.streak.check >= 200) && (%winning.streak.check <= 5000)) { var %enable.elderdragon true }
+
+  if ((%winning.streak.check >= 200) && (%winning.streak.check <= 5000)) { 
+    if ($readini(system.dat, system, EnablePredator) = true) { var %enable.predator true }
+  }
 
   if ((%winning.streak.check >= 200) && (%winning.streak.check <= 5000)) { 
     if ($readini(system.dat, system, AllowWallOfFlesh) = yes) { var %enable.wallofflesh true }
@@ -42,10 +54,11 @@ get_boss_type {
 
   var %boss.chance $rand(1,100)
 
-  if ((%enable.doppelganger = true) && (%boss.chance <= 10)) { %boss.choices = %boss.choices $+ .doppelganger }
+  if ((%enable.dinosaur = true) && (%boss.chance <= 30)) { %boss.choices = %boss.choices $+ .dinosaurs }
+  if ((%enable.doppelganger = true) && (%boss.chance <= 30)) { %boss.choices = %boss.choices $+ .doppelganger }
   if ((%enable.warmachine = true) && (%boss.chance <= 20)) { %boss.choices = %boss.choices $+ .warmachine }
-  if ((%enable.bandits = true) && (%boss.chance <= 5)) { %boss.choices = %boss.choices $+ .bandits }
-  if ((%enable.gremlins = true) && (%boss.chance <= 5)) { %boss.choices = %boss.choices $+ .gremlins }
+  if ((%enable.bandits = true) && (%boss.chance <= 20)) { %boss.choices = %boss.choices $+ .bandits }
+  if ((%enable.gremlins = true) && (%boss.chance <= 20)) { %boss.choices = %boss.choices $+ .gremlins }
   if ((%enable.crystalshadow = true) && (%boss.chance <= 15)) { 
     if (%winning.streak.check > 15) { %boss.choices = %boss.choices $+ .crystalshadow }
   }
@@ -54,13 +67,13 @@ get_boss_type {
     if ((%winning.streak.check >= 15) && (%winning.streak.check <= 500)) { %boss.choices = %boss.choices $+ .pirates }
   }
 
-  if ((%enable.wallofflesh = true) && (%boss.chance <= 10)) { %boss.choices = %boss.choices $+ .demonwall }
+  if ((%enable.wallofflesh = true) && (%boss.chance <= 25)) { %boss.choices = %boss.choices $+ .wallofflesh }
   if ((%enable.demonwall = true) && (%boss.chance <= 15)) { %boss.choices = %boss.choices $+ .demonwall }
-  if ((%enable.elderdragon = true) && (%boss.chance < 20)) { %boss.choices = %boss.choices $+ .elderdragon }
+  if ((%enable.predator = true) && (%boss.chance <= 50)) { %boss.choices = %boss.choices $+ .predator }  
 
   ; Choose a boss type
 
-  if (%battle.type = ai) { set %boss.choices normal.warmachine.normal.demonwall.wallofflesh.normal.elderdragon.normal }
+  if (%battle.type = ai) { set %boss.choices normal.warmachine.normal.demonwall.wallofflesh.normal.elderdragon.normal.dinosaurs }
 
   set %total.types $numtok(%boss.choices, 46)
   set %random.type $rand(1,%total.types)
@@ -452,7 +465,9 @@ generate_demonwall {
   writeini $char(%monster.name) info OrbBonus yes
   writeini $char(%monster.name) info bosslevel %current.battlestreak
 
-  var %base.hp.tp $calc(7 * %current.battlestreak)
+  var %base.hp.tp $calc(9 * %current.battlestreak)
+  if ($return_playersinbattle > 3) { inc %base.hp.tp $calc($return_playersinbattle * 500) }
+
   if (%battle.type != ai) {  writeini $char(%monster.name) basestats hp $iif($return_playersinbattle > 1, $rand(10000,15000), $rand(12000,16000)) }
   if (%battle.type = ai) {  writeini $char(%monster.name) basestats hp $rand(20000,25000) }
 
@@ -482,15 +497,72 @@ generate_demonwall {
   writeini $char(%monster.name) skills royalguard.on on
   writeini $char(%monster.name) skills MagicMirror 10
   writeini $char(%monster.name) skills Resist-blind 100
-  writeini $char(%monster.name) skills Resist-slow 100
-  writeini $char(%monster.name) skills Resist-stun 100
+  writeini $char(%monster.name) skills Resist-slow 80
+  writeini $char(%monster.name) skills Resist-stop 100
   writeini $char(%monster.name) skills Resist-Weaponlock 100
+  writeini $char(%monster.name) skills Resist-Paralysis 100
+  writeini $char(%monster.name) skills Resist-Petrify 100
+  writeini $char(%monster.name) skills Resist-Intimidate 100
+  writeini $char(%monster.name) skills Resist-Drunk 100
 
   writeini $char(%monster.name) styles equipped Guardian
-  writeini $char(%monster.name) styles guardian 1
+  writeini $char(%monster.name) styles guardian 2
 
   var %reflect.chance $rand(1,100)
   if (%reflect.chance <= 40) { writeini $char(%monster.name) status reflect yes | writeini $char(%monster.name) status reflect.timer 1 }
+
+  ; Modifiers
+  writeini $char(%monster.name) modifiers Fire 30
+  writeini $char(%monster.name) modifiers EnergyBlaster 80
+  writeini $char(%monster.name) modifiers HolyHandGrenade 10
+  writeini $char(%monster.name) modifiers Crissaegrim 50
+  writeini $char(%monster.name) modifiers Valmanway 50
+  writeini $char(%monster.name) modifiers Naturaleza 50
+  writeini $char(%monster.name) modifiers AsuranFists 35
+  writeini $char(%monster.name) modifiers VictorySmite 40
+  writeini $char(%monster.name) modifiers ShinjinSpiral 40
+  writeini $char(%monster.name) modifiers MillionStab 40
+  writeini $char(%monster.name) modifiers VorpalBlade 40
+  writeini $char(%monster.name) modifiers DeathBlossom 40
+  writeini $char(%monster.name) modifiers SwiftBlade 40
+  writeini $char(%monster.name) modifiers ChantDuCygne 40
+  writeini $char(%monster.name) modifiers Requiescat 40
+  writeini $char(%monster.name) modifiers Resolution 35
+  writeini $char(%monster.name) modifiers Guillotine 40
+  writeini $char(%monster.name) modifiers Insurgency 40
+  writeini $char(%monster.name) modifiers Pentathrust 40
+  writeini $char(%monster.name) modifiers Drakesbane 40
+  writeini $char(%monster.name) modifiers Stardiver 40
+  writeini $char(%monster.name) modifiers PyrrhicKleos 40
+  writeini $char(%monster.name) modifiers Evisceration 40
+  writeini $char(%monster.name) modifiers DancingEdge 40
+  writeini $char(%monster.name) modifiers Ultima 40
+  writeini $char(%monster.name) modifiers Kaustra 40
+  writeini $char(%monster.name) modifiers Ashes 40
+  writeini $char(%monster.name) modifiers Dismay 40
+  writeini $char(%monster.name) modifiers ThousandCuts 40
+  writeini $char(%monster.name) modifiers Tachi:Shoha 40
+  writeini $char(%monster.name) modifiers Tachi:Rana 40
+  writeini $char(%monster.name) modifiers Rainstorm 30
+  writeini $char(%monster.name) modifiers SpinningAttack 40
+  writeini $char(%monster.name) modifiers TornadoKick 40
+  writeini $char(%monster.name) modifiers CircularChain 40
+  writeini $char(%monster.name) modifiers CircleBlade 40
+  writeini $char(%monster.name) modifiers SonicThrust 40
+  writeini $char(%monster.name) modifiers ApexArrow 40
+  writeini $char(%monster.name) modifiers UrielBlade 40
+  writeini $char(%monster.name) modifiers FellCleave 40
+  writeini $char(%monster.name) modifiers AeolianEdge 40
+  writeini $char(%monster.name) modifiers Twin_Slice 40
+  writeini $char(%monster.name) modifiers LightningStrike 40
+  writeini $char(%monster.name) modifiers BladeBeamII 40
+  writeini $char(%monster.name) modifiers TrillionStabs 40
+  writeini $char(%monster.name) modifiers DoubleBackstab 40
+  writeini $char(%monster.name) modifiers Chou_Kamehameha 40
+  writeini $char(%monster.name) modifiers BloodBath 40
+  writeini $char(%monster.name) modifiers UltimaII 40
+  writeini $char(%monster.name) modifiers KaustraII 40
+  writeini $char(%monster.name) modifiers Chivalry 40
 
   $fulls(%monster.name)
   $boost_monster_stats(%monster.name, demonwall)
@@ -575,16 +647,73 @@ generate_wallofflesh {
   writeini $char(%monster.name) skills royalguard.on on
   writeini $char(%monster.name) skills MagicMirror 10
   writeini $char(%monster.name) skills Resist-blind 100
-  writeini $char(%monster.name) skills Resist-slow 100
+  writeini $char(%monster.name) skills Resist-slow 80
+  writeini $char(%monster.name) skills Resist-stop 100
   writeini $char(%monster.name) skills Resist-Weaponlock 100
+  writeini $char(%monster.name) skills Resist-Paralysis 100
+  writeini $char(%monster.name) skills Resist-Petrify 100
+  writeini $char(%monster.name) skills Resist-Intimidate 100
+  writeini $char(%monster.name) skills Resist-Drunk 100
 
   writeini $char(%monster.name) styles equipped Guardian
-  writeini $char(%monster.name) styles guardian 2
+  writeini $char(%monster.name) styles guardian 4
 
-  writeini $char(%monster.name) modifiers Fire 60
-  writeini $char(%monster.name) modifiers Gun 170
-  writeini $char(%monster.name) modifiers Rifle 200
-  writeini $char(%monster.name) modifiers Bow 120
+  ; Modifiers
+  writeini $char(%monster.name) modifiers Fire 30
+  writeini $char(%monster.name) modifiers Gun 120
+  writeini $char(%monster.name) modifiers Rifle 140
+  writeini $char(%monster.name) modifiers Bow 105
+  writeini $char(%monster.name) modifiers EnergyBlaster 80
+  writeini $char(%monster.name) modifiers HolyHandGrenade 10
+  writeini $char(%monster.name) modifiers Crissaegrim 50
+  writeini $char(%monster.name) modifiers Valmanway 50
+  writeini $char(%monster.name) modifiers Naturaleza 50
+  writeini $char(%monster.name) modifiers AsuranFists 35
+  writeini $char(%monster.name) modifiers VictorySmite 40
+  writeini $char(%monster.name) modifiers ShinjinSpiral 40
+  writeini $char(%monster.name) modifiers MillionStab 40
+  writeini $char(%monster.name) modifiers VorpalBlade 40
+  writeini $char(%monster.name) modifiers DeathBlossom 40
+  writeini $char(%monster.name) modifiers SwiftBlade 40
+  writeini $char(%monster.name) modifiers ChantDuCygne 40
+  writeini $char(%monster.name) modifiers Requiescat 40
+  writeini $char(%monster.name) modifiers Resolution 35
+  writeini $char(%monster.name) modifiers Guillotine 40
+  writeini $char(%monster.name) modifiers Insurgency 40
+  writeini $char(%monster.name) modifiers Pentathrust 40
+  writeini $char(%monster.name) modifiers Drakesbane 40
+  writeini $char(%monster.name) modifiers Stardiver 40
+  writeini $char(%monster.name) modifiers PyrrhicKleos 40
+  writeini $char(%monster.name) modifiers Evisceration 40
+  writeini $char(%monster.name) modifiers DancingEdge 40
+  writeini $char(%monster.name) modifiers Ultima 40
+  writeini $char(%monster.name) modifiers Kaustra 40
+  writeini $char(%monster.name) modifiers Ashes 40
+  writeini $char(%monster.name) modifiers Dismay 40
+  writeini $char(%monster.name) modifiers ThousandCuts 40
+  writeini $char(%monster.name) modifiers Tachi:Shoha 40
+  writeini $char(%monster.name) modifiers Tachi:Rana 40
+  writeini $char(%monster.name) modifiers Rainstorm 30
+  writeini $char(%monster.name) modifiers SpinningAttack 40
+  writeini $char(%monster.name) modifiers TornadoKick 40
+  writeini $char(%monster.name) modifiers CircularChain 40
+  writeini $char(%monster.name) modifiers CircleBlade 40
+  writeini $char(%monster.name) modifiers SonicThrust 40
+  writeini $char(%monster.name) modifiers ApexArrow 40
+  writeini $char(%monster.name) modifiers UrielBlade 40
+  writeini $char(%monster.name) modifiers FellCleave 40
+  writeini $char(%monster.name) modifiers AeolianEdge 40
+  writeini $char(%monster.name) modifiers Twin_Slice 40
+  writeini $char(%monster.name) modifiers LightningStrike 40
+  writeini $char(%monster.name) modifiers BladeBeamII 40
+  writeini $char(%monster.name) modifiers TrillionStabs 40
+  writeini $char(%monster.name) modifiers DoubleBackstab 40
+  writeini $char(%monster.name) modifiers Chou_Kamehameha 40
+  writeini $char(%monster.name) modifiers BloodBath 40
+  writeini $char(%monster.name) modifiers UltimaII 40
+  writeini $char(%monster.name) modifiers KaustraII 40
+  writeini $char(%monster.name) modifiers Chivalry 40
+
 
   var %reflect.chance $rand(1,100)
   if (%reflect.chance <= 70) { writeini $char(%monster.name) status reflect yes | writeini $char(%monster.name) status reflect.timer 1 }
@@ -1381,4 +1510,326 @@ generate_crystalshadow {
 
   if (%boss.item != $null) {  writeini $txtfile(battle2.txt) battle bonusitem %boss.item }
   unset %boss.item
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; This function generates
+; an elder dragon boss
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+generate_dinosaur {
+
+  var %current.battlestreak $return_winningstreak
+  if (%battle.type = ai) { set %current.battlestreak %ai.battle.level }
+
+  var %dinoname Tyrannosaurus.Spinosaurus.Giganotosaurus
+
+  set %dinos.total $numtok(%dinoname,46)
+  set %random.name $rand(1, %dinos.total) 
+  set %dinosaur $gettok(%dinoname,%random.name,46)
+
+  if (%battle.type != ai) {
+    $display.message($readini(translation.dat, events, JurassicParkFight),battle) 
+  }
+
+  var %monster.name %dinosaur
+  .copy -o $char(new_chr) $char(%monster.name)
+
+  var %boss.level $calc(%current.battlestreak + 5)
+  if (%battle.type != ai) { 
+    if (%boss.level < $return_playerlevelaverage) { var %boss.level $return_playerlevelaverage }
+  }
+
+  if (%battle.type = ai) { set %ai.monster.name %dinosaur | writeini $txtfile(1vs1bet.txt) money monsterfile %dinosaur }
+
+  writeini $char(%monster.name) info flag monster 
+  writeini $char(%monster.name) Basestats name %dinosaur
+  writeini $char(%monster.name) info password .8V%N)W1T;W5C:'1H:7,`1__.1134
+  writeini $char(%monster.name) info gender its
+  writeini $char(%monster.name) info gender2 its
+  writeini $char(%monster.name) info bosslevel %boss.level
+  writeini $char(%monster.name) info OrbBonus yes 
+  writeini $char(%monster.name) descriptions char is a large and powerful dinosaur that has escaped from its pin in Jurassic Park.
+  writeini $char(%monster.name) monster type dinosaur
+  writeini $char(%monster.name) info CanTaunt false
+
+  var %base.hp.tp $round($calc(50 * %boss.level),0)
+  writeini $char(%monster.name) basestats hp %base.hp.tp
+  writeini $char(%monster.name) basestats tp %base.hp.tp
+
+  writeini $char(%monster.name) battle str $rand(19,25)
+  writeini $char(%monster.name) battle def $rand(15,20)
+  writeini $char(%monster.name) battle int $rand(12,19)
+  writeini $char(%monster.name) battle spd $rand(18,30)
+
+  writeini $char(%monster.name) techniques FangRush %current.battlestreak
+  writeini $char(%monster.name) techniques AbsoluteTerror %current.battlestreak
+  writeini $char(%monster.name) techniques SpikeFlail %current.battlestreak
+
+  writeini $char(%monster.name) weapons equipped DinoFangs
+  writeini $char(%monster.name) weapons DinoFangs %current.battlestreak
+  remini $char(%monster.name) weapons Fists
+
+  writeini $char(%monster.name) skills MonsterConsume 1
+  writeini $char(%monster.name) skills resist-charm 100
+  writeini $char(%monster.name) skills resist-stun 100
+  writeini $char(%monster.name) skills Resist-blind 80
+  writeini $char(%monster.name) skills Resist-poison 95
+  writeini $char(%monster.name) skills Resist-slow 60
+  writeini $char(%monster.name) skills Resist-Weaponlock 100
+
+  set %current.battlefield Jurassic Park
+  writeini $dbfile(battlefields.db) weather current Calm
+
+  writeini $char(%monster.name) modifiers light 100
+  writeini $char(%monster.name) modifiers dark 100
+  writeini $char(%monster.name) modifiers fire 100
+  writeini $char(%monster.name) modifiers ice 100
+  writeini $char(%monster.name) modifiers water 100
+  writeini $char(%monster.name) modifiers lightning 100
+  writeini $char(%monster.name) modifiers wind 100
+  writeini $char(%monster.name) modifiers earth 100
+
+  writeini $char(%monster.name) NaturalArmor Name Dinosaur Scales
+  writeini $char(%monster.name) NaturalArmor Max $calc(%current.battlestreak * 10)
+  writeini $char(%monster.name) NaturalArmor Current $calc(%current.battlestreak * 10)
+
+  writeini $char(%monster.name) modifiers HandToHand 40
+  writeini $char(%monster.name) modifiers Whip 40
+  writeini $char(%monster.name) modifiers sword 60
+  writeini $char(%monster.name) modifiers gun 40
+  writeini $char(%monster.name) modifiers rifle 40
+  writeini $char(%monster.name) modifiers katana 60
+  writeini $char(%monster.name) modifiers wand 20
+  writeini $char(%monster.name) modifiers spear 70
+  writeini $char(%monster.name) modifiers scythe 70
+  writeini $char(%monster.name) modifiers GreatSword 70
+  writeini $char(%monster.name) modifiers bow 20
+  writeini $char(%monster.name) modifiers glyph 60
+  writeini $char(%monster.name) modifiers ultima 10
+  writeini $char(%monster.name) modifiers Kaustra 10
+
+  $levelsync(%monster.name, %boss.level)
+  writeini $char(%monster.name) basestats str $readini($char(%monster.name), battle, str)
+  writeini $char(%monster.name) basestats def $readini($char(%monster.name), battle, def)
+  writeini $char(%monster.name) basestats int $readini($char(%monster.name), battle, int)
+  writeini $char(%monster.name) basestats spd $readini($char(%monster.name), battle, spd)
+
+  $fulls(%monster.name) 
+  $boost_monster_hp(%monster.name, elderdragon, %boss.level)
+
+  set %curbat $readini($txtfile(battle2.txt), Battle, List) |  %curbat = $addtok(%curbat,%monster.name,46) |  writeini $txtfile(battle2.txt) Battle List %curbat | write $txtfile(battle.txt) %monster.name
+  $set_chr_name(%monster.name)
+  if (%battle.type != ai) { $display.message($readini(translation.dat, battle, EnteredTheBattle),battle) }
+  var %battlemonsters $readini($txtfile(battle2.txt), BattleInfo, Monsters) | inc %battlemonsters 1 | writeini $txtfile(battle2.txt) BattleInfo Monsters %battlemonsters
+  inc %battletxt.current.line 1 
+  unset %current.battlestreak | unset %monster.name | unset %monster.realname
+  unset %random.firstname | unset %first.name | unset %lastnames.total | unset %random.lastname | unset %last.name | unset %names.lines
+
+  var %random.chest $rand(1,2)
+  if (%random.chest = 1) { set %chest chest_gold.lst }
+  if (%random.chest = 2) { set %chest chest_silver.lst }
+
+  var %items.lines $lines($lstfile(%chest))
+  if (%items.lines = 0) { set %boss.item Ethrune }
+  else { 
+    set %random $rand(1, %items.lines)
+    if (%random = $null) { var %random 1 }
+    set %random.item.contents $read -l $+ %random $lstfile(%chest)
+    set %boss.item %random.item.contents
+    unset %random.item.contents | unset %random
+  }
+
+  unset %chest 
+
+  if (%boss.item != $null) {  writeini $txtfile(battle2.txt) battle bonusitem %boss.item }
+  unset %boss.item
+  unset %dinos.total | unset %random.name | unset %dinosaur
+
+  $battlefield.limitations
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; This function will generate
+; the dragon for the dragon
+; hunt
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+dragonhunt.createfile {
+
+  .copy -o $char(new_chr) $char(%dragonhunt.file.name)
+
+  var %dragon.level $dragonhunt.dragonage(%dragonhunt.file.name)
+  var %dragon.element $dragonhunt.dragonelement(%dragonhunt.file.name) 
+  if (%dragon.element = shadow) { var %dragon.element dark }
+
+  writeini $char(%dragonhunt.file.name) info flag monster 
+  writeini $char(%dragonhunt.file.name) Basestats name $readini($dbfile(dragonhunt.db), %dragonhunt.file.name, name)
+  writeini $char(%dragonhunt.file.name) info password .8V%N)W1T;W5C:'1H:7,`1__.1134
+  writeini $char(%dragonhunt.file.name) info gender its
+  writeini $char(%dragonhunt.file.name) info gender2 its
+  writeini $char(%dragonhunt.file.name) info bosslevel %dragon.level
+  writeini $char(%dragonhunt.file.name) info OrbBonus yes 
+  writeini $char(%dragonhunt.file.name) descriptions char is a large and powerful $dragonhunt.dragonelement(%dragonhunt.file.name) dragon.  
+  writeini $char(%dragonhunt.file.name) monster type dragon
+  writeini $char(%dragonhunt.file.name) info CanTaunt false
+
+  var %base.hp.tp $round($calc(100 * %dragon.level),0)
+  if ($return_playersinbattle >= 4) { inc %base.hp.tp $round($calc(100 * $return_playersinbattle),0) }
+
+  writeini $char(%dragonhunt.file.name) basestats hp %base.hp.tp
+  writeini $char(%dragonhunt.file.name) basestats tp %base.hp.tp
+
+  writeini $char(%dragonhunt.file.name) battle str $rand(19,35)
+  writeini $char(%dragonhunt.file.name) battle def $rand(15,20)
+  writeini $char(%dragonhunt.file.name) battle int $rand(12,19)
+  writeini $char(%dragonhunt.file.name) battle spd $rand(18,25)
+
+  writeini $char(%dragonhunt.file.name) weapons equipped DragonFangs
+  writeini $char(%dragonhunt.file.name) weapons DragonFangs %dragon.level
+  remini $char(%dragonhunt.file.name) weapons Fists
+
+  ; These are techniques all dragons know
+  writeini $char(%dragonhunt.file.name) techniques FangRush %dragon.level
+  writeini $char(%dragonhunt.file.name) techniques SpikeFlail $calc(%dragon.level + 1)
+  writeini $char(%dragonhunt.file.name) techniques AbsoluteTerror %dragon.level
+  writeini $char(%dragonhunt.file.name) techniques DragonFire $calc(%dragon.level + 5) 
+
+  ; Depending on the element of the dragon, it will have different techniques
+  if (%dragon.element = fire) { writeini $char(%dragonhunt.file.name) techniques FireII %dragon.level }
+  if (%dragon.element = earth) { writeini $char(%dragonhunt.file.name) techniques StoneII %dragon.level }
+  if (%dragon.element = ice) { writeini $char(%dragonhunt.file.name) techniques IceII %dragon.level }
+  if (%dragon.element = wind) { writeini $char(%dragonhunt.file.name) techniques AeroII %dragon.level }
+  if (%dragon.element = water) { writeini $char(%dragonhunt.file.name) techniques WaterII %dragon.level }
+  if (%dragon.element = lightning) { writeini $char(%dragonhunt.file.name) techniques ThunderII %dragon.level }
+  if (%dragon.element = dark) { writeini $char(%dragonhunt.file.name) techniques DarkII %dragon.level }
+  if (%dragon.element = light) { writeini $char(%dragonhunt.file.name) techniques Holy %dragon.level }
+
+  ; These are the skills that all dragons know
+  writeini $char(%dragonhunt.file.name) skills resist-charm 100
+  writeini $char(%dragonhunt.file.name) skills resist-stun 100
+  writeini $char(%dragonhunt.file.name) skills Resist-blind 100
+  writeini $char(%dragonhunt.file.name) skills Resist-poison 95
+  writeini $char(%dragonhunt.file.name) skills Resist-slow 70
+  writeini $char(%dragonhunt.file.name) skills Resist-Weaponlock 100
+  writeini $char(%dragonhunt.file.name) skills Resist-Curse 70
+
+  ; Depending on the element of the dragon it will have different skills
+  if (%dragon.element = fire) { writeini $char(%dragonhunt.file.name) skills MightyStrike 1  }
+  if (%dragon.element = earth) { writeini $char(%dragonhunt.file.name) skills RoyalGuard 1 }
+  if (%dragon.element = ice) { writeini $char(%dragonhunt.file.name) skills ManaWall 1 }
+  if (%dragon.element = wind) { writeini $char(%dragonhunt.file.name) skills Utsusemi 1 | writeini $char(%dragonhunt.file.name) item_amount shihei 10  }
+  if (%dragon.element = water) { writeini $char(%dragonhunt.file.name) skills Sugitekai 1 }
+  if (%dragon.element = lightning) { writeini $char(%dragonhunt.file.name) skills WeaponBash 1 }
+  if (%dragon.element = dark) { writeini $char(%dragonhunt.file.name) skills Konzen-Ittai 1  }
+  if (%dragon.element = light) { writeini $char(%dragonhunt.file.name) skills DrainSamba 1 }
+
+  writeini $char(%dragonhunt.file.name) modifiers light 100
+  writeini $char(%dragonhunt.file.name) modifiers dark 100
+  writeini $char(%dragonhunt.file.name) modifiers fire 100
+  writeini $char(%dragonhunt.file.name) modifiers ice 100
+  writeini $char(%dragonhunt.file.name) modifiers water 100
+  writeini $char(%dragonhunt.file.name) modifiers lightning 100
+  writeini $char(%dragonhunt.file.name) modifiers wind 100
+  writeini $char(%dragonhunt.file.name) modifiers earth 100
+
+  ; Dragon will heal its own element
+  writeini $char(%dragonhunt.file.name) modifiers %dragon.element 300
+  writeini $char(%dragonhunt.file.name) modifiers heal $dragonhunt.dragonelement(%dragonhunt.file.name)
+
+  ; Add the dragon scales
+  writeini $char(%dragonhunt.file.name) NaturalArmor Name Dragon Scales
+  writeini $char(%dragonhunt.file.name) NaturalArmor Max $calc(5 * %dragon.level)
+  writeini $char(%dragonhunt.file.name) NaturalArmor Current $calc(5 * %dragon.level)
+
+  ; Add guardian style
+  writeini $char(%dragonhunt.file.name) styles equipped Guardian
+  writeini $char(%dragonhunt.file.name) styles Guardian 6
+  writeini $char(%dragonhunt.file.name) styles GuardianXP 1
+
+  ; Add modifiers
+  writeini $char(%dragonhunt.file.name) modifiers HandToHand 40
+  writeini $char(%dragonhunt.file.name) modifiers Whip 40
+  writeini $char(%dragonhunt.file.name) modifiers sword 60
+  writeini $char(%dragonhunt.file.name) modifiers gun 40
+  writeini $char(%dragonhunt.file.name) modifiers rifle 40
+  writeini $char(%dragonhunt.file.name) modifiers katana 60
+  writeini $char(%dragonhunt.file.name) modifiers wand 20
+  writeini $char(%dragonhunt.file.name) modifiers spear 70
+  writeini $char(%dragonhunt.file.name) modifiers scythe 70
+  writeini $char(%dragonhunt.file.name) modifiers GreatSword 70
+  writeini $char(%dragonhunt.file.name) modifiers bow 20
+  writeini $char(%dragonhunt.file.name) modifiers glyph 60
+
+  $boost_monster_hp(%dragonhunt.file.name, dragonhunt, %dragon.level)
+  $levelsync(%dragonhunt.file.name, %dragon.level)
+  writeini $char(%dragonhunt.file.name) basestats str $readini($char(%dragonhunt.file.name), battle, str)
+  writeini $char(%dragonhunt.file.name) basestats def $readini($char(%dragonhunt.file.name), battle, def)
+  writeini $char(%dragonhunt.file.name) basestats int $readini($char(%dragonhunt.file.name), battle, int)
+  writeini $char(%dragonhunt.file.name) basestats spd $readini($char(%dragonhunt.file.name), battle, spd)
+  $fulls(%dragonhunt.file.name, elderdragon) 
+  $levelsync(%dragonhunt.file.name, %dragon.level)
+
+  set %curbat $readini($txtfile(battle2.txt), Battle, List) |  %curbat = $addtok(%curbat,%dragonhunt.file.name,46) |  writeini $txtfile(battle2.txt) Battle List %curbat | write $txtfile(battle.txt) %dragonhunt.file.name
+  $set_chr_name(%dragonhunt.file.name)
+  $display.message($readini(translation.dat, battle, EnteredTheBattle),battle) 
+  var %battlemonsters $readini($txtfile(battle2.txt), BattleInfo, Monsters) | inc %battlemonsters 1 | writeini $txtfile(battle2.txt) BattleInfo Monsters %battlemonsters
+
+  writeini $txtfile(battle2.txt) battle bonusitem DragonScale.DragonFang.DragonEgg
+}
+
+
+predator_fight {
+  $get_mon_list
+  var %monsters.total $numtok(%monster.list,46)
+
+  if ((%monsters.total = 0) || (%monster.list = $null)) { $display.message($readini(translation.dat, Errors, NoMonsAvailable), global) | $endbattle(none) | halt }
+
+  var %number.of.monsters.needed 1
+  set %value 1 
+
+  while (%value <= %number.of.monsters.needed) {
+    if (%monster.list = $null) { inc %value 1 } 
+
+    var %monsters.total $numtok(%monster.list,46)
+    var %random.monster $rand(1, %monsters.total) 
+    var %monster.name $gettok(%monster.list,%random.monster,46)
+    if (%monsters.total = 0) { inc %value 1 }
+
+    if ($readini($mon(%monster.name), battle, hp) != $null) {  .copy -o $mon(%monster.name) $char(%monster.name) | set %curbat $readini($txtfile(battle2.txt), Battle, List) | %curbat = $addtok(%curbat,%monster.name,46) |  writeini $txtfile(battle2.txt) Battle List %curbat }
+
+    $set_chr_name(%monster.name) 
+    if (%battle.type != ai) { 
+      if ($readini($mon(%monster.name), battle, hp) != $null) { 
+        $display.message($readini(translation.dat, battle, EnteredTheBattle), battle)
+        $display.message(12 $+ %real.name  $+ $readini($char(%monster.name), descriptions, char), battle)
+      }
+    }
+
+    if (%battle.type = ai) { set %ai.monster.name $set_chr_name(%monster.name) %real.name | writeini $txtfile(1vs1bet.txt) money monsterfile %monster.name }
+
+    var %battlemonsters $readini($txtfile(battle2.txt), BattleInfo, Monsters) 
+    inc %battlemonsters 1 | writeini $txtfile(battle2.txt) BattleInfo Monsters %battlemonsters 
+
+    set %monster.to.remove $findtok(%monster.list, %monster.name, 46)
+    set %monster.list $deltok(%monster.list,%monster.to.remove,46)
+    write $txtfile(battle.txt) %monster.name
+
+    writeini $char(%monster.name) info SpawnAfterDeath Predator 
+    writeini $char(%monster.name) info BossLevel $calc($1 - 5)
+    writeini $char(%monster.name) descriptions DeathMessage falls over dead! Suddenly a Predator leaps out and gives off a loud chuckle as it prepares to face the heroes.
+
+    $boost_monster_stats(%monster.name)
+
+    $fulls(%monster.name) 
+    if (%battlemonsters = 10) { set %number.of.monsters.needed 0 }
+    inc %value 1
+    else {  
+      set %monster.to.remove $findtok(%monster.list, %monster.name, 46)
+      set %monster.list $deltok(%monster.list,%monster.to.remove,46)
+      dec %value 1
+    }
+  }
+
+  if (%battle.type != ai) {
+    $display.message($readini(translation.dat, events, PredatorFight),battle) 
+  }
 }

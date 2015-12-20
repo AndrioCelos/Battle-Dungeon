@@ -1,5 +1,5 @@
 [weather]
-current=calm
+current=stormy
 list=calm.bright.gloomy.rainy.stormy.snowy.windy.hot.dry
 boost=.25
 
@@ -17,7 +17,7 @@ blood=1
 BloodMoonChance=60
 
 [TimeOfDay]
-CurrentTimeOfDay=Morning
+CurrentTimeOfDay=Day
 CurrentTimeOfDayTurn=1
 
 [TimeOfDayTime]
@@ -52,7 +52,7 @@ into battlefields.lst
 =============================================================
 
 
-[plains]
+[Plains]
 weather=calm.bright.gloomy.rainy.stormy.snowy.windy.hot.dry
 NumberOfEvents=0
 scavenge=Potion.VitalStar.X-Potion.Shihei.Sokubaku.Topaz.Zircon.Ink.Paper.EarthSphere
@@ -60,13 +60,15 @@ limitations=
 CommonMonsters=slime
 Monsters=dragon.undead.zombie.orc.yagudo.quadav.goblin.worm.lizard.elemental.slime.Alpha_Werewolf.AnniDwarf.AnniGnome.Bark_Spider.Chimera.Dark_Knight.Decapiclops.Dhalmel.Final_Guard.Final_Starman.Gnole.Gray_Werewolf.Moblin.Moonfang.Pugil.Retro_Hippie.Sabertooth_Tiger.Unicorn.White_Werewolf.Wild_Rabbit.Wyvern.Zarklet
 
-[graveyard]
+[Graveyard]
 weather=calm.gloomy.rainy.dry.snowy.stormy
 NumberOfEvents=1
 scavenge=Onyx.Red_Fang.Thunder_Orb.Stop_watch
 limitations=no-tech
 CommonMonsters=undead.zombie
 Monsters=undead.zombie.demon.Alpha_Werewolf.AnniDwarf.AnniGnome.Blue_MedusaHead.Dark_Knight.Decapiclops.Ermit_Imp.Gold_MedusaHead.Gray_Werewolf.Heraldic_Imp.Hikari_Reaper.Ruly_Imp.Silver_MedusaHead.Small_Werewolf.White_Werewolf
+Objects=Tombstone.Memorial
+
 event1=damage
 event1Chance=20
 Event1Desc=%real.name trips and falls into an open grave! Ow!
@@ -77,7 +79,7 @@ event1Amount=$rand(50,100)
 weather=gloomy
 NumberOfEvents=3
 scavenge=Slurm.Ectoplasm
-limitations=no-trusts.no-summons.no-mech
+limitations=no-trusts.no-summons.no-mech.no-fleeing
 
 event1=damage
 event1Chance=90
@@ -96,11 +98,13 @@ Event3Desc=Slurms McKenzie, a crazy party worm wearing sunglasses over it's tiny
 Event3Target=players
 Event3Amount=$rand(500,900)
 
-[farm]
+[Farm]
 weather=calm.bright.gloomy.rainy.stormy.snowy.windy.hot.dry
 NumberOfEvents=1
 scavenge=Potion.Topaz.Milk
 Monsters=dragon.undead.zombie.orc.yagudo.goblin.worm.lizard.elemental.slime.Alpha_Werewolf.AnniDwarf.AnniGnome.Bark_Spider.Chimera.Dhalmel.Gnole.Gray_Werewolf.Moblin.Moonfang.Pugil.Retro_Hippie.Sabertooth_Tiger.Unicorn.White_Werewolf.Wild_Rabbit.Wyvern.Zarklet
+Objects=Swingset.Bench.Fence.Barrel
+
 event1=statusonly
 event1statusType=annoyed
 event1chance=10
@@ -168,6 +172,9 @@ NumberOfEvents=4
 scavenge=Shihei.Sokubaku.Hankai.MirrorShard.Potion.VitalStar.X-Potion.Senzu.DustyWing.Tonic.GoldOrb.IgnitionStar.Stop_Watch.Hour_Glass.Holy_Water.Red_Fang.Thunder_Orb.Fire_Flower.Ice_Coin
 CommonMonsters=yagudo
 Monsters=dragon.orc.yagudo.goblin.plant.android.worm.lizard.slime.AnniDwarf.AnniGnome.Bark_Spider.Bee.BeeBear.Beetle.Cactuar.Copper_Beetle.Desert_Beetle.Dhalmel.Final_Starman.Gnole.Goliath_Beetle.Maneating_Hornet.Nightmare_Hornet.Ninja_Assassin.Retro_Hippie.Roaming_Sapling.Scarab_Beetle.Stag_Beetle.Starman_Deluxe.Starman_Junior.Strolling_Sapling.Treant_Sapling.Unicorn.Wild_Rabbit.Zarklet
+Objects=Bench.Fence.Barrel.Trashcan
+
+
 event1=damage
 event1Chance=10
 Event1Desc=The ferris wheel comes loose and rolls onto the battlefield before tipping over and smashes %real.name $+ !
@@ -195,6 +202,8 @@ NumberOfEvents=4
 scavenge=AshLog.Hatchet.emerald.BombFlower
 CommonMonsters=treant.plant
 Monsters=yagudo.goblin.treant.plant.worm.bat.lizard.slime.Alpha_Werewolf.AnniDwarf.AnniGnome.Bark_Spider.Bee.Dhalmel.Forest_Giant.Gnole.Gray_Werewolf.Icefang_Tiger.Moblin.Moonfang.Nightmare_Hornet.Ninja_Assassin.Retro_Hippie.Roaming_Sapling.Sabertooth_Tiger.Sierra_Tiger.Small_Werewolf.Strolling_Sapling.Treant_Sapling.White_Werewolf.Wild_Rabbit.Zarklet.Zu
+Objects=RottingTree.Bench
+
 event1=heal
 event1Chance=30
 Event1Desc=A fairy flips out of a nearby bush and sprinkles some healing dust on %real.name before before zipping away out of sight.
@@ -222,6 +231,8 @@ NumberOfEvents=3
 scavenge=Sand.EarthSphere.Sand.Cloth.BrownKey.Tonic.Sand
 CommonMonsters=quadav
 Monsters=orc.yagudo.quadav.goblin.crab.lizard.elemental.slime.AnniDwarf.AnniGnome.BearShark.Cactuar.Dark_Octopus.Devil_Manta.Gnole.Greater_Pugil.Mad_Piranha.Mud_Pugil.Pugil.Retro_Hippie.Sea_Pugil.Zarklet
+Objects=GiantUmbrella.Cooler.Radio.Chair
+
 event1=damage
 event1statusType=Drowning
 event1Chance=20
@@ -245,6 +256,8 @@ NumberOfEvents=2
 scavenge=Sand.EarthSphere.Sand.Cloth.BrownKey.Sand
 CommonMonsters=elemental
 Monsters=dragon.undead.zombie.worm.elemental.slime.Alpha_Werewolf.AnniDwarf.AnniGnome.Beetle.Blue_MedusaHead.Cactuar.Copper_Beetle.Dark_Knight.Decapiclops.Desert_Beetle.Ermit_Imp.Gold_MedusaHead.Goliath_Beetle.Gray_Werewolf.Heraldic_Imp.Hikari_Reaper.Medium_Armos.Moonfang.Ruly_Imp.Scarab_Beetle.Silver_MedusaHead.Small_Werewolf.Stag_Beetle.Volcano_Wasp.White_Werewolf
+Objects=Cactus
+
 event1=damage
 event1statusType=Burning
 event1Chance=30
@@ -285,6 +298,8 @@ NumberOfEvents=4
 scavenge=RepairHammer.IronOre.Hatchet.Ink
 CommonMonsters=android
 Monsters=android.elemental.AnniDwarf.AnniGnome.Death_Armos.Final_Guard.Final_Starman.Large_Armos.Medium_Armos.Small_Armos.Starman_Deluxe.Starman_Junior
+Objects=Crate.OldMachine
+
 event1=damage
 event1Chance=40
 Event1Desc=A large saw comes loose from a machine and rolls across the battlefield, eventually slicing %real.name $+ .
@@ -336,6 +351,7 @@ NumberOfEvents=4
 limitations=no-item
 scavenge=Shihei.Sokubaku.Hankai.MirrorShard.Potion.VitalStar.X-Potion.Senzu.DustyWing.Tonic.GoldOrb.IgnitionStar.Stop_Watch.Hour_Glass.Holy_Water.Red_Fang.Thunder_Orb.Fire_Flower.Ice_Coin
 Monsters=android.elemental.AnniDwarf.AnniGnome.Death_Armos.Final_Guard.Final_Starman.Large_Armos.Medium_Armos.Small_Armos.Starman_Deluxe.Starman_Junior
+Objects=OldMachine.ChemistrySet.Flask.Chair
 
 event1=heal
 event1Chance=30
@@ -419,6 +435,8 @@ weather=calm.bright.gloomy.rainy.stormy.snowy.windy.hot.dry
 NumberOfEvents=1
 scavenge=Shihei.Sokubaku.Hankai.MirrorShard.Potion.VitalStar.X-Potion.Senzu.DustyWing.Tonic.GoldOrb.IgnitionStar.Stop_Watch.Hour_Glass.Holy_Water.Red_Fang.Thunder_Orb.Fire_Flower.Ice_Coin
 Monsters=undead.zombie.demon.orc.yagudo.goblin.android.slime.AnniDwarf.AnniGnome.Bark_Spider.Bee.BeeBear.Beetle.Copper_Beetle.Dark_Knight.Desert_Beetle.Dhalmel.Final_Starman.Goliath_Beetle.Maneating_Hornet.Moblin.Moonfang.Nightmare_Hornet.Ninja_Assassin.Retro_Hippie.Scarab_Beetle.Shrapnel.Stag_Beetle.Starman_Deluxe.Starman_Junior.Zarklet
+Objects=Swingset.Bench.Fence.Barrel.Crate
+
 event1=damage
 event1Chance=40
 Event1Desc=The ground starts to rumble as the villagers charge through town trying to be first in line for a big sale at the market! Soon, %real.name is trampled by this stampede of humanity! Ow! Ow! Stop stepping on my face!
@@ -438,6 +456,8 @@ NumberOfEvents=1
 scavenge=Potion.VitalStar.X-Potion.Shihei.Sokubaku.Topaz.Zircon.Ink.Paper.EarthSphere
 CommonMonsters=goblin
 Monsters=dragon.orc.yagudo.goblin.plant.android.worm.lizard.slime.AnniDwarf.AnniGnome.Bark_Spider.Bee.BeeBear.Beetle.Cactuar.Copper_Beetle.Desert_Beetle.Dhalmel.Final_Starman.Gnole.Goliath_Beetle.Maneating_Hornet.Nightmare_Hornet.Ninja_Assassin.Retro_Hippie.Roaming_Sapling.Scarab_Beetle.Stag_Beetle.Starman_Deluxe.Starman_Junior.Strolling_Sapling.Treant_Sapling.Unicorn.Wild_Rabbit.Zarklet
+Objects=Swingset.Bench
+
 event1=damage
 event1Chance=20
 Event1Desc=%real.name gets hit in the head with a flying bocce ball. Darn kids!
@@ -473,7 +493,7 @@ event2=statusonly
 event2statusType=annoyed
 event2Chance=30
 Event2Desc=The leader of the French knights suddenly yells out, "You don't frighten us, English pig dogs! Go and boil your bottoms, you children of a silly person. I blow my nose at you, so-called "Allied Forces!"
-Event2Target=all
+Event2Target=players
 Event2Amount=0
 event3=statusonly
 event3statusType=annoyed
@@ -487,9 +507,9 @@ event4desc=The French knight leader whispers "Fetchez la vache." to the other kn
 event4target=random
 event4amount=$rand(70,120)
 
-[Arsenal Gear]
+[Arsenal_Gear]
 weather=gloomy
-NumberOfEvents=16
+NumberOfEvents=20
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 limitations=no-trusts.no-summons.no-mech.no-quicksilver
 
@@ -509,197 +529,240 @@ event3=statusonly
 event3statusType=annoyed
 event3Chance=30
 Event3Desc=Colonel: ...Infiltrate... ...the enemy fortress... ...Outer Heaven! ...Destroy... ...the final weapon... ...Metal Gear!
-Event3Target=random
+Event3Target=all
 
 event4=statusonly
 event4statusType=annoyed
 event4Chance=30
 Event4Desc=Colonel: President Baker should be somewhere to the south of where you blasted through the wall. Hurry and save him before the terrorists discover his code.
-Event4Target=random
+Event4Target=all
 
 event5=statusonly
 event5statusType=annoyed
 event5Chance=30
 Event5Desc=Colonel: You got a PSG-1? You can use that against Sniper Wolf. Hurry up and save Meryl!
-Event5Target=random
+Event5Target=all
 
 event6=statusonly
 event6statusType=annoyed
 event6Chance=30
 Event6Desc=Colonel: Your mission is to infiltrate the fortress Galuade, rescue the hostages and neutralize Metal Gear before its assembly is complete.
-Event6Target=random
+Event6Target=all
 
 event7=statusonly
 event7statusType=annoyed
 event7Chance=30
 Event7Desc=Colonel: Variety Level 13. Rescue Meryl, the "Return of Genola."
-Event7Target=random
+Event7Target=all
 
 event8=statusonly
 event8statusType=annoyed
 event8Chance=30
 Event8Desc=Colonel: Kawanishi-Noseguchi, Kinunobebashi, Takiyama, Uguisunomori, Tsuzumigataki, Tada, Hirano, Ichinotorii, Uneno, Yamashita, Sasabe, Kofudai, Tokiwadai, Myoukenguchi.
-Event8Target=random
+Event8Target=all
 
 event9=statusonly
 event9statusType=annoyed
 event9Chance=30
 Event9Desc=Colonel: I noticed this a while back, but you have far too many Game Overs. Sorry to be blunt, but you really stink at this game.
-Event9Target=random
+Event9Target=players
 
 event10=statusonly
 event10statusType=annoyed
 event10Chance=30
 Event10Desc=Colonel: Honestly, though, you have been playing this game for a long time. Don't you have anything else to do with your time?
-Event10Target=random
+Event10Target=players
 
 event11=statusonly
 event11statusType=annoyed
 event11Chance=30
 Event11Desc=Colonel: You seem to get a real thrill out of slaughtering the enemy. Are you frustrated about something?
-Event11Target=random
+Event11Target=players
 
 event12=statusonly
 event12statusType=annoyed
 event12Chance=30
 Event12Desc=Colonel: I hear it's amazing when the famous purple stuffed worm in flap-jaw space with the tuning fork does a raw blink on Hara-Kiri rock. I need scissors! 61!
-Event12Target=random
+Event12Target=all
 
 event13=statusonly
 event13statusType=annoyed
 event13Chance=30
-Event13Desc=Colonel: I was a North American Fall Webworm in my past life. Those were the good old days.... What were you in your former life?
-Event13Target=random
+Event13Desc=Colonel: I was a North American Fall Webworm in my past life. Those were the good old days... What were you in your former life?
+Event13Target=all
 
 event14=statusonly
 event14statusType=annoyed
 event14Chance=30
 Event14Desc=Colonel: Even my patience has its limits. I just can't leave this thing up to you any longer. I'll do the fighting! You can just go home!
-Event14Target=random
+Event14Target=all
 
 Event15=statusonly
 Event15statusType=annoyed
 Event15Chance=30
 Event15Desc=Colonel: Actually, I am in really bad shape financially. I pay money to my ex-wife as part of our divorce, among other bills... I just had no choice but to make you pay for lunch the other day. I'm really sorry.
-Event15Target=random
+Event15Target=all
 
 Event16=statusonly
+Event16statusType=annoyed
 Event16chance=30
 Event16Desc=Colonel: An Anemone or Clematis plant's juice can cause a rash. When pruning them, it's a good idea to wear gloves.
-Event16Target=random
+Event16Target=all
+
+Event17=statusonly
+Event17statusType=annoyed
+Event17chance=30
+Event17Desc=Colonel: You wouldn't be trying to give yourself a bogus score using some ingenious trick would you? That's just about as low as anyone could possibly stoop! I can't believe you sometimes...
+Event17Target=all
+
+Event18=statusonly
+Event18statusType=annoyed
+Event18chance=40
+Event18Desc=Colonel: La-Li-Lu-Le-Lo! La-Li-Lu-Le-Lo! La-Li-Lu-Le-Lo!
+Event18Target=all
+
+Event19=statusonly
+Event19statusType=annoyed
+Event19chance=30
+Event19Desc=Colonel: Variety Level 7. Shoot down the space invaders! Training will have to be postponed if we are invaded by UFOs.
+Event19Target=all
+
+Event20=statusonly
+Event20statusType=annoyed
+Event20chance=30
+Event20Desc=Colonel: Mind the gap.
+Event20Target=all
+
+[Twin Pines Mall - Parking Lot]
+Weather=calm
+NumberofEvents=2
+scavenge=Shihei.Sokubaku.Hankai.MirrorShard.Potion.VitalStar.X-Potion.Senzu.DustyWing.Tonic.GoldOrb.IgnitionStar.Stop_Watch.Hour_Glass.Holy_Water.Red_Fang.Thunder_Orb.Fire_Flower.Ice_Coin
+
+Event1=damage
+Event1Chance=20
+Event1Desc=Doc Brown: Oh, my god. They found me. I don't know how, but they found me! Run for it, Marty! Marty McFly: Who? Doc Brown: Who do you think? THE LIBYANS! -- A Volkswagen T1 van suddenly speeds into the parking lot and one of the Libyans shoots at all the heroes!
+Event1Target=players
+Event1Amount=$rand(50,100)
+
+Event2=statusonly
+Event2StatusType=annoyed
+Event2Chance=20
+Event2Desc=Marty McFly: Wait a minute. Wait a minute, Doc. Ah... Are you telling me that you built a time machine... out of a Delorean? Doc Brown: The way I see it, if you're gonna build a time machine into a car, why not do it with some *style?*
+Event2Target=players
+Event2Amount=0
 
 [Raptor News Network Studio]
 weather=calm
 NumberOfEvents=0
-Limitations=no-item.no-trusts.no-mech.no-summons
+Limitations=no-item.no-trusts.no-mech.no-summons.no-fleeing
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 
 [Raptor News Network Breaking News Broadcast]
 weather=gloomy
 NumberOfEvents=0
-limitations=no-item.no-trusts.no-mech.no-summons
+limitations=no-item.no-trusts.no-mech.no-summons.no-fleeing
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 
 [Allied Training Field]
 Weather=calm
 NumberOfEvents=0
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
-limitations=no-trusts.no-mech.no-summons
+limitations=no-trusts.no-mech.no-summons.no-fleeing
 
 [Korroloka Tunnel]
 Weather=gloomy
 NumberOfEvents=0
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
-limitations=no-trusts.no-mech.no-summons
+limitations=no-trusts.no-mech.no-summons.no-fleeing
 
 [Jester's Lair]
 Weather=gloomy
 NumberOfEvents=0
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
-limitations=no-trusts.no-mech.no-summons
+limitations=no-trusts.no-mech.no-summons.no-fleeing
 
 [Levithan's Heartcore]
 Weather=calm
 NumberOfEvents=0
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
-limitations=no-trusts.no-mech.no-summons
+limitations=no-trusts.no-mech.no-summons.no-fleeing
 
 [Waughroon Shrine]
 Weather=calm
 NumberOfEvents=0
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
-limitations=no-trusts.no-mech.no-summons
+limitations=no-trusts.no-mech.no-summons.no-fleeing
 
 [Smelly Dungeon]
 Weather=gloomy
 NumberOfEvents=0
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
-limitations=no-trusts.no-mech.no-summons
+limitations=no-trusts.no-mech.no-summons.no-fleeing
 
 [Byakko's Chamber]
 Weather=stormy
 NumberOfEvents=0
-limitations=no-mech.no-trusts.no-summons
+limitations=no-mech.no-trusts.no-summons.no-fleeing
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 
 [Genbu's Chamber]
 Weather=dry
 NumberOfEvents=0
-limitations=no-mech.no-trusts.no-summons
+limitations=no-mech.no-trusts.no-summons.no-fleeing
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 
 [Seiryu's Chamber]
 Weather=hot
 NumberOfEvents=0
-limitations=no-mech.no-trusts.no-summons
+limitations=no-mech.no-trusts.no-summons.no-fleeing
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 
 [Suzaku's Chamber]
 Weather=snowy
 NumberOfEvents=0
-limitations=no-mech.no-trusts.no-summons
+limitations=no-mech.no-trusts.no-summons.no-fleeing
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 
 [The Shrine of Ru'Avitau]
 Weather=light
 NumberOfEvents=0
-limitations=no-mech.no-trusts
+limitations=no-mech.no-trusts.no-fleeing
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 
 [Horlais Peak]
 Weather=Calm
 NumberOfEvents=0
-limitations=no-trusts.no-mech.no-summons
+limitations=no-trusts.no-mech.no-summons.no-fleeing
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 
 [Valkurm Dunes]
 Weather=Dry
 NumberOfEvents=0
-limitations=no-trusts.no-mech.no-summons
+limitations=no-trusts.no-mech.no-summons.no-fleeing
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 
 [Castle Oztroja]
 Weather=Calm
 NumberOfEvents=0
-limitations=no-trusts.no-mech.no-summons
+limitations=no-trusts.no-mech.no-summons.no-fleeing
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 
 [Abyssea - Misareaux Coast]
 Weather=Calm
 NumberOfEvents=0
-limitations=no-trusts.no-mech.no-summons
+limitations=no-trusts.no-mech.no-summons.no-fleeing
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 
 [Abyssea - Uleguerand Range]
 Weather=Snowy
 NumberOfEvents=0
-limitations=no-trusts.no-mech.no-summons
+limitations=no-trusts.no-mech.no-summons.no-fleeing
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 
 [Davoi]
 Weather=Rainy
 NumberOfEvents=0
-limitations=no-trusts.no-mech.no-summons
+limitations=no-trusts.no-mech.no-summons.no-fleeing
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 
 [Abyssea - Empyreal Paradox]
@@ -717,7 +780,7 @@ scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 [Asgard]
 Weather=Light
 NumberOfEvents=0
-limitations=no-mech.no-trusts.no-summons.no-quicksilver.no-fleeing
+limitations=no-mech.no-trusts.no-summons.no-quicksilver.no-fleeing.no-playerignition
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond.Ambrosia
 
 [Atlantis]
@@ -729,13 +792,13 @@ scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond.Ambrosia
 [Underground Arena]
 Weather=gloomy
 NumberOfEvents=0
-limitations=no-mech.no-trusts.no-summons
+limitations=no-mech.no-trusts.no-summons.no-fleeing
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 
 [Deep Jungle]
 Weather=calm
 NumberOfEvents=0
-limitations=no-mech.no-trusts.no-summons
+limitations=no-mech.no-trusts.no-summons.no-fleeing
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond.BombFlower
 
 [Inner Crystal Chamber]
@@ -748,88 +811,94 @@ Event1Desc=The chamber vibrates with energy which then sparks and shoots out, hi
 Event1Target=all
 event1Amount=$rand(500,1000)
 
+[Lunar Core]
+Weather=gloomy
+NumberOfEvents=0
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
+limitations=no-mech.no-trusts.no-summons.no-quicksilver.no-fleeing.no-playerignition
+
 [Eastern Palace]
 Weather=gloomy
 NumberOfEvents=0
-limitations=no-mech.no-ignition.no-trusts.no-summons
+limitations=no-mech.no-playerignition.no-trusts.no-summons.no-fleeing
 scavenge=Sapphire.Onyx.Ruby.Diamond.BombFlower
 
 [Desert Palace]
 Weather=dry
 NumberOfEvents=0
-limitations=no-mech.no-ignition.no-trusts.no-summons
+limitations=no-mech.no-playerignition.no-trusts.no-summons.no-fleeing
 scavenge=Sapphire.Onyx.Ruby.Diamond.BombFlower
 
 [Tower of Hera]
 Weather=gloomy
 NumberOfEvents=0
-limitations=no-mech.no-ignition.no-trusts.no-summons
+limitations=no-mech.no-playerignition.no-trusts.no-summons.no-fleeing
 scavenge=Sapphire.Onyx.Ruby.Diamond.BombFlower
 
 [Hyrule Field]
 Weather=light
 NumberOfEvents=0
-limitations=no-mech.no-ignition.no-trusts.no-summons
+limitations=no-mech.no-playerignition.no-trusts.no-summons.no-fleeing
 scavenge=Diamond.BombFlower
 
 [Overworld - Night]
 Weather=gloomy
 NumberOfEvents=0
-limitations=no-mech.no-playerignition.no-trusts.no-summons
+limitations=no-mech.no-playerignition.no-trusts.no-summons.no-fleeing
 scavenge=Sapphire.Onyx.Ruby.Diamond.BombFlower
 
 [Overworld - The Corruption]
 Weather=gloomy
 NumberOfEvents=0
-limitations=no-mech.no-playerignition.no-trusts.no-summons
+limitations=no-mech.no-playerignition.no-trusts.no-summons.no-fleeing
 scavenge=Sapphire.Onyx.Ruby.Diamond.BombFlower
 
 [Overworld - The Crimson]
 Weather=gloomy
 NumberOfEvents=0
-limitations=no-mech.no-playerignition.no-trusts.no-summons
+limitations=no-mech.no-playerignition.no-trusts.no-summons.no-fleeing
 scavenge=Sapphire.Onyx.Ruby.Diamond.BombFlower
 
 [Overworld - The Dungeon]
 Weather=gloomy
 NumberOfEvents=0
-limitations=no-mech.no-playerignition.no-trusts.no-summons
+limitations=no-mech.no-playerignition.no-trusts.no-summons.no-fleeing
 scavenge=Sapphire.Onyx.Ruby.Diamond.BombFlower
 
 [Underground Jungle]
 Weather=calm
 NumberOfEvents=0
-limitations=no-mech.no-playerignition.no-trusts.no-summons
+limitations=no-mech.no-playerignition.no-trusts.no-summons.no-fleeing
 scavenge=Sapphire.Onyx.Ruby.Diamond.BombFlower
 
 [Underground Jungle - Lihzahrd Temple]
 Weather=gloomy
 NumberOfEvents=0
-limitations=no-mech.no-playerignition.no-trusts.no-summons
+limitations=no-mech.no-playerignition.no-trusts.no-summons.no-fleeing
 scavenge=Sapphire.Onyx.Ruby.Diamond.BombFlower
 
 [Overworld - Ocean]
 Weather=rainy
 NumberOfEvents=0
-limitations=no-mech.no-playerignition.no-trusts.no-summons
+limitations=no-mech.no-playerignition.no-trusts.no-summons.no-fleeing
 scavenge=Sapphire.Onyx.Ruby.Diamond.BombFlower
 
 [Leene Square]
 weather=calm
 NumberOfEvents=0
-limitations=no-mech.no-trusts.no-summons
+limitations=no-mech.no-trusts.no-summons.no-playerignition.no-fleeing
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 
 [Zohar Cave]
 weather=gloomy
 NumberofEvents=0
-limitations=no-item.no-trusts.no-summons.no-quicksilver.no-fleeing
+limitations=no-item.no-trusts.no-summons.no-quicksilver.no-fleeing.no-playerignition
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 
 [Ancient Mayan Ruins]
 weather=gloomy
 NumberofEvents=0
-limitations=no-item.no-trusts.no-summons
+limitations=no-item.no-trusts.no-summons.no-fleeing
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
 
 [Dr. Wily's Castle]
@@ -837,6 +906,37 @@ Weather=gloomy
 NumberOfEvents=0
 limitations=no-mech.no-playerignition.no-trusts.no-summons.no-fleeing.no-quicksilver
 scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
+
+[Iron Keep]
+Weather=Hot
+NumberOfEvents=1
+limitations=no-mech.no-playerignition.no-trusts.no-summons.no-fleeing.no-quicksilver
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond.IronOre
+
+event1=damage
+event1statusType=Burning
+event1Chance=40
+Event1Desc=The molten iron shoots up violently, raining molten iron down upon %real.name $+ .
+Event1Target=random
+Event1Amount=$rand(200,300)
+
+[Land of Lightning]
+weather=Calm
+NumberofEvents=0
+limitations=no-trusts.no-summons.no-playermechs.no-playerignition
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
+
+[Kamui's Dimension]
+weather=Gloomy
+NumberofEvents=1
+limitations=no-trusts.no-summons.no-playermechs.no-playerignition
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
+
+event1=damage
+event1Chance=60
+Event1Desc=Obito summons some of the shurikans he has hidden in the dimension and hurls them at all of the heroes!
+Event1Target=players
+Event1Amount=$rand(400,500)
 
 [Monster's Outpost]
 weather=gloomy
@@ -849,3 +949,109 @@ weather=calm
 NumberOfEvents=0
 scavenge=BeastmenSeal.KindredSeal.KindredCrest
 limitations=no-mech.no-fleeing
+
+[Jurassic Park]
+weather=calm
+NumberOfEvents=0
+scavenge=BeastmenSeal.KindredSeal.KindredCrest
+limitations=no-mech.no-fleeing
+
+[Dragon's Lair]
+weather=gloomy
+NumberOfEvents=0
+scavenge=BeastmenSeal.KindredSeal.KindredCrest
+limitations=no-mech.no-fleeing.no-trusts.no-summons
+
+[Fields of Torment]
+weather=gloomy
+NumberOfEvents=0
+scavenge=KindredSeal.KindredCrest
+limitations=no-mech.no-fleeing.no-trusts.no-summons
+
+==============================================================
+DUNGEON battlefields
+==============================================================
+
+[Tam-Tara Deepcroft Cavern]
+weather=gloomy
+NumberofEvents=0
+limitations=no-trusts.no-summons.no-mech.no-playerignition
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
+
+[Pyramid Hallway]
+weather=calm
+NumberOEvents=0
+limitations=no-trusts.no-summons.no-mech.no-playerignition
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
+
+[Pyramid Chamber]
+weather=gloomy
+NumberOEvents=0
+limitations=no-trusts.no-summons.no-mech.no-playerignition
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
+
+[Pyramid Antechamber]
+weather=gloomy
+NumberOEvents=0
+limitations=no-trusts.no-summons.no-mech.no-playerignition
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
+
+[Pyramid Burial Chamber]
+weather=gloomy
+NumberOEvents=0
+limitations=no-trusts.no-summons.no-mech.no-playerignition
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
+
+[Pyramid Map Room]
+weather=gloomy
+NumberOEvents=0
+limitations=no-trusts.no-summons.no-mech.no-playerignition
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
+
+[Haukke Manor Lobby]
+weather=gloomy
+NumberofEvents=0
+limitations=no-trusts.no-summons.no-mech.no-playerignition
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
+
+[Haukke Manor Fl 1 - Hallway]
+weather=gloomy
+NumberofEvents=0
+limitations=no-trusts.no-summons.no-mech.no-playerignition
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
+
+[Haukke Manor Fl 1 - Rm 1]
+weather=gloomy
+NumberofEvents=0
+limitations=no-trusts.no-summons.no-mech.no-playerignition
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
+
+[Haukke Manor Fl 1 - Rm 2]
+weather=gloomy
+NumberofEvents=0
+limitations=no-trusts.no-summons.no-mech.no-playerignition
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
+
+[Haukke Manor Cellar]
+weather=gloomy
+NumberofEvents=0
+limitations=no-trusts.no-summons.no-mech.no-playerignition
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
+
+[Haukke Manor Top of Staircase]
+weather=gloomy
+NumberofEvents=0
+limitations=no-trusts.no-summons.no-mech.no-playerignition
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
+
+[Haukke Manor Fl 2 - Rm 1]
+weather=gloomy
+NumberofEvents=0
+limitations=no-trusts.no-summons.no-mech.no-playerignition
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond
+
+[Haukke Manor Master Bedroom]
+weather=gloomy
+NumberofEvents=0
+limitations=no-trusts.no-summons.no-mech.no-playerignition
+scavenge=Zircon.Topaz.Emerald.Ruby.Sapphire.Opal.Onyx.Diamond

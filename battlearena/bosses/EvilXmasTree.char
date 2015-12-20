@@ -48,6 +48,7 @@ Created=N/a
 Streak=-1000
 Month=12
 CanTaunt=true
+IgnoreElementalMessage=true
 
 [Monster]
 Type=treant
@@ -96,6 +97,8 @@ MightyStrike=1
 RoyalGuard=1
 ManaWall=1
 MartialArts=100
+Resist-Petrify=60
+Resist-Stun=30
 
 [Techniques]
 Leafstorm=45
@@ -134,3 +137,9 @@ Scythe=100
 Glyph=100
 GreatSword=100
 Bow=100
+Axe=100
+Dagger=100
+Mace=100
+Stave=100
+EnergyBlaster=100
+HolyHandGrenade=0

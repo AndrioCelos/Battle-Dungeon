@@ -54,6 +54,7 @@ LastSeen=N/a
 LastIP=N/a
 Created=N/a
 CanTaunt=false
+IgnoreElementalMessage=true
 
 [Monster]
 Type=dragon
@@ -98,6 +99,8 @@ DragonFangs=15
 
 
 [Skills]
+Resist-Petrify=60
+Resist-Stun=30
 
 
 [Techniques]

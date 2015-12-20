@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; SKILLS 
-;;;; Last updated: 05/02/15
+;;;; Last updated: 12/16/15
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ON 50:TEXT:*does *:*:{ $use.skill($1, $2, $3, $4) }
 
@@ -10,6 +10,9 @@ ON 3:TEXT:*does *:*:{
   if ($readini($char($1), info, flag) = monster) { halt }
   if ($readini($char($1), stuff, redorbs) = $null) { halt }
   $controlcommand.check($nick, $1)
+  if ($return.systemsetting(AllowPlayerAccessCmds) = false) { $display.message($readini(translation.dat, errors, PlayerAccessCmdsOff), private) | halt }
+  if ($char.seeninaweek($1) = false) { $display.message($readini(translation.dat, errors, PlayerAccessOffDueToLogin), private) | halt }
+
   $use.skill($1, $2, $3, $4) 
 }
 alias use.skill { 
@@ -17,6 +20,8 @@ alias use.skill {
   ; $2 = does
   ; $3 = skill name
   ; $4 = target, if necessary
+
+  if ($4 != $null) { $partial.name.match($1, $4) }
 
   if ($3 = speed) { $skill.speedup($1) }
   if ($3 = elementalseal) { $skill.elementalseal($1) }
@@ -26,7 +31,7 @@ alias use.skill {
   if ($3 = manawall) { $skill.manawall($1) } 
   if ($3 = royalguard) { $skill.royalguard($1) }
   if ($3 = utsusemi) { $skill.utsusemi($1) }
-  if ($3 = fullbring) { $skill.fullbring($1, $4) }
+  if ($3 = fullbring) { $skill.fullbring($1, %attack.target) }
   if ($3 = doubleturn) { $skill.doubleturn($1) } 
   if ($3 = sugitekai) { $skill.doubleturn($1) } 
   if ($3 = meditate) { $skill.meditate($1) }
@@ -37,20 +42,22 @@ alias use.skill {
   if ($3 = formlessstrike) { $skill.formlessstrike($1) } 
   if (($3 = regen) && ($4 = $null)) { $skill.regen($1) } 
   if (($3 = regen) && ($4 = stop)) { $skill.regen.stop($1) } 
-  if ($3 = kikouheni) { $skill.kikouheni($1, $4) }
+  if (($3 = regeneration) && ($4 = $null)) { $skill.regen($1) } 
+  if (($3 = regeneration) && ($4 = stop)) { $skill.regen.stop($1) } 
+  if ($3 = kikouheni) { $skill.kikouheni($1, %attack.target) }
   if ($3 = shadowcopy) { $skill.clone($1) }  
-  if ($3 = steal) { $skill.steal($1, $4, !steal) } 
-  if ($3 = analysis) { $skill.analysis($1, $4) } 
+  if ($3 = steal) { $skill.steal($1, %attack.target, !steal) } 
+  if ($3 = analysis) { $skill.analysis($1, %attack.target) } 
   if ($3 = quicksilver) { $skill.quicksilver($1) } 
-  if ($3 = cover) { $skill.cover($1, $4) } 
+  if ($3 = cover) { $skill.cover($1, %attack.target) } 
   if ($3 = aggressor) { $skill.aggressor($1) } 
   if ($3 = defender) { $skill.defender($1) }
-  if ($3 = alchemy) { $skill.alchemy($1, $4) } 
-  if ($3 = craft) { $skill.craft($1, $4) }  
+  if ($3 = alchemy) { $skill.alchemy($1, %attack.target) } 
+  if ($3 = craft) { $skill.craft($1, %attack.target) }  
   if ($3 = holyaura) { $skill.holyaura($1) } 
-  if ($3 = provoke) { $skill.provoke($1, $4) }
-  if ($3 = weaponlock) { $skill.weaponlock($1, $4) }  
-  if ($3 = disarm) { $skill.disarm($1, $4) } 
+  if ($3 = provoke) { $skill.provoke($1, %attack.target) }
+  if ($3 = weaponlock) { $skill.weaponlock($1, %attack.target) }  
+  if ($3 = disarm) { $skill.disarm($1, %attack.target) } 
   if ($3 = konzen-ittai) { $skill.konzen-ittai($1) } 
   if ($3 = sealbreak) { $skill.sealbreak($1) }
   if ($3 = magicmirror) { $skill.magicmirror($1) }
@@ -58,13 +65,13 @@ alias use.skill {
   if ($3 = thirdeye) { $skill.thirdeye($1) }
   if ($3 = scavenge) { $skill.scavenge($1) }
   if ($3 = perfectcounter) { $skill.perfectcounter($1) }
-  if ($3 = justrelease) { $skill.justrelease($1, $4, !justrelease) } 
+  if ($3 = justrelease) { $skill.justrelease($1, %attack.target, !justrelease) } 
   if ($3 = retaliation) { $skill.retaliation($1) } 
   if (($3 = lockpicking) || ($3 = lockpick)) { $skill.lockpicking($1) } 
   if ($3 = stoneskin) { $skill.stoneskin($1) }
-  if ($3 = tabularasa) { $skill.tabularasa($1, $4) }
-  if ($3 = snatch) { $skill.snatch($1, $4) }
-  if ($3 = warp) { $skill.warp($1, $4-) } 
+  if ($3 = tabularasa) { $skill.tabularasa($1, %attack.target) }
+  if ($3 = snatch) { $skill.snatch($1, %attack.target) }
+  if ($3 = warp) { $skill.warp($1, %attack.target-) } 
 
   ; Below are monster-only skills
 
@@ -72,8 +79,8 @@ alias use.skill {
   if ($3 = demonportal) { $skill.demonportal($1) }
   if ($3 = cocoon) { $skill.cocoon.evolve($1) }
   if ($3 = cocoonevolve) { $skill.cocoon.evolve($1) }
-  if ($3 = monsterconsume) { $skill.monster.consume($1, $4) }
-  if ($3 = repairNaturalArmor) { $skill.monster.repairnaturalarmor($1, $4) }
+  if ($3 = monsterconsume) { $skill.monster.consume($1, %attack.target) }
+  if ($3 = repairNaturalArmor) { $skill.monster.repairnaturalarmor($1, %attack.target) }
 }
 
 ;=================
@@ -109,6 +116,7 @@ on 3:TEXT:!speed*:*: { $skill.speedup($nick) }
 
 alias skill.speedup { $set_chr_name($1)
   if ($person_in_mech($1) = true) { $display.message($readini(translation.dat, errors, Can'tDoThatInMech), private) | halt }
+  if (%battle.type = dungeon) { $display.message($readini(translation.dat, errors, Can'tUseThisSkillInDungeon), private) | halt }
   $no.turn.check($1)
   if (no-skill isin %battleconditions) { $display.message($readini(translation.dat, battle, NotAllowedBattleCondition),private) | halt }
   $amnesia.check($1, skill) 
@@ -118,6 +126,15 @@ alias skill.speedup { $set_chr_name($1)
   $check_for_battle($1)
 
   if ($readini($char($1), skills, speed.on) = on) { $set_chr_name($1) | $display.message(4 $+ %real.name has already used this skill once this battle and cannot use it again until the next battle., private)  | halt }
+
+  if ($readini($char($1), info, flag) = $null) { 
+    ; Does the char have enough HP to perform it?
+    var %hp.cost.percent $calc(.25 * $readini($char($1), skills, speed))
+    if (%hp.cost.percent < 10) { var %hp.cost.percent 10 }
+    var %hp.cost $round($return_percentofvalue($readini($char($1), basestats, hp), %hp.cost.percent),0)
+    if (%hp.cost >= $readini($char($1), battle, hp)) { $display.message($readini(translation.dat, errors, NotEnoughHPForSkill) ,private) | halt }
+    else {  writeini $char($1) battle hp $calc($readini($char($1), battle, hp) - %hp.cost)  }
+  }
 
   ; Display the desc. 
   if ($readini($char($1), descriptions, speed) = $null) { set %skill.description forces $gender($1) body to speed up! }
@@ -961,6 +978,7 @@ on 3:TEXT:!blood boost*:*: { $skill.bloodboost($nick) }
 
 alias skill.bloodboost { $set_chr_name($1)
   if ($person_in_mech($1) = true) { $display.message($readini(translation.dat, errors, Can'tDoThatInMech), private) | halt }
+  if (%battle.type = dungeon) { $display.message($readini(translation.dat, errors, Can'tUseThisSkillInDungeon), private) | halt }
   $no.turn.check($1)
   if (no-skill isin %battleconditions) { $display.message($readini(translation.dat, battle, NotAllowedBattleCondition),private) | halt }
   $amnesia.check($1, skill) 
@@ -1030,6 +1048,7 @@ on 3:TEXT:!blood spirit*:*: { $skill.bloodspirit($nick) }
 
 alias skill.bloodspirit { $set_chr_name($1)
   if ($person_in_mech($1) = true) { $display.message($readini(translation.dat, errors, Can'tDoThatInMech), private) | halt }
+  if (%battle.type = dungeon) { $display.message($readini(translation.dat, errors, Can'tUseThisSkillInDungeon), private) | halt }
   $no.turn.check($1)
   if (no-skill isin %battleconditions) { $display.message($readini(translation.dat, battle, NotAllowedBattleCondition),private) | halt }
   $amnesia.check($1, skill) 
@@ -1250,7 +1269,8 @@ alias skill.TPregen.calculate {
 }
 
 alias skill.zombieregen.calculate {
-  var %temp.winning.streak $readini(battlestats.dat, battle, winningstreak)
+  var %temp.winning.streak $return_winningstreak
+
   var %difficulty $readini($txtfile(battle2.txt), BattleInfo, Difficulty)
   inc %temp.winning.streak %difficulty
 
@@ -1351,6 +1371,8 @@ on 3:TEXT:!shadow copy*:*: { $skill.clone($nick) }
 
 alias skill.clone { $set_chr_name($1)
   if ($person_in_mech($1) = true) { $display.message($readini(translation.dat, errors, Can'tDoThatInMech), private) | halt }
+  if (%battle.type = dungeon) { $display.message($readini(translation.dat, errors, Can'tUseThisSkillInDungeon), private) | halt }
+  if (%battle.type = dragonhunt) { $display.message($readini(translation.dat, errors, Can'tUseThisSkillInDragonHunt), private) | halt }
   $no.turn.check($1)
   if (no-skill isin %battleconditions) { $display.message($readini(translation.dat, battle, NotAllowedBattleCondition),private) | halt }
   $amnesia.check($1, skill) 
@@ -1362,7 +1384,7 @@ alias skill.clone { $set_chr_name($1)
   if (%battleis = off) { $display.message($readini(translation.dat, errors, NoBattleCurrently),private) | halt }
   $check_for_battle($1)
 
-  if ($isfile($char($1 $+ _clone)) = $true) { $set_chr_name($1) | $display.message(4Error: %real.name has already used this skill for this battle and cannot use it again!, private) | halt }
+  if (($isfile($char($1 $+ _clone)) = $true) && ($readini($char($1), info, ClonesCanClone) != true)) { $set_chr_name($1) | $display.message(4Error: %real.name has already used this skill for this battle and cannot use it again!, private) | halt }
 
   ; Display the desc. 
   if ($readini($char($1), descriptions, shadowcopy) = $null) { set %skill.description releases $gender($1) shadow, which comes to life as a clone, ready to fight. }
@@ -1378,6 +1400,10 @@ alias skill.clone { $set_chr_name($1)
   writeini $char($1 $+ _clone) info clone yes 
   writeini $char($1 $+ _clone) info cloneowner $1
 
+  var %clones.made $readini($char($1), info, CloneNumber)
+  if (%clones.made = $null) { var %clones.made 0 } 
+  inc %clones.made 1 
+  writeini $char($1 $+ _clone) info CloneNumber %clones.made
 
   if ($2 = $null) {  writeini $char($1 $+ _clone) basestats name Clone of %real.name }
   if ($2 != $null) { writeini $char($1 $+ _clone) basestats name $2- }
@@ -1402,6 +1428,13 @@ alias skill.clone { $set_chr_name($1)
   if ($readini($char($1), info, flag) = npc) {
     set %hp $round($calc(%current.hp / 1.8),0)
     writeini $char($1) skills shadowcopy 0
+
+    if (%battle.type = ai) {
+      var %total.players $readini($txtfile(battle2.txt), BattleInfo, Players)
+      inc %total.players 1
+      writeini $txtfile(battle2.txt) BattleInfo Players %total.players
+    }
+
   }
 
   if ($readini($char($1), info, flag) = monster) { 
@@ -1426,15 +1459,19 @@ alias skill.clone { $set_chr_name($1)
 
   writeini $char($1 $+ _clone) battle hp %hp
   writeini $char($1 $+ _clone) basestats hp %hp
-  writeini $char($1 $+ _clone) skills shadowcopy 0
   writeini $char($1 $+ _clone) info password .8V%N)W1T;W5C:'1H:7,`1__.114
   writeini $char($1 $+ _clone) info CanTaunt false
+  writeini $char($1 $+ _clone) skills shadowcopy 0
+
+  if (($readini($char($1 $+ _clone), info, ClonesCanClone) = true) && (%clones.made  <= 5)) { writeini $char($1 $+ _clone) skills shadowcopy 1 }
 
   remini $char($1 $+ _clone) skills CoverTarget 
 
   unset %hp
 
   writeini $txtfile(battle2.txt) style $1 $+ .lastaction shadowcopy
+
+  if (%portal.bonus != true) { writeini $char($1 $+ _clone) info FirstTurn true }
 
   ; Time to go to the next turn
   if (%battleis = on)  { $check_for_double_turn($1) }
@@ -1463,16 +1500,17 @@ alias skill.clonecontrol {
 
   if (($3 = scavenge) || ($3 = steal)) { $display.message($readini(translation.dat, errors, CloneCannotUseSkill), private) | halt }
 
-  if (%shadow.command = taunt) {  $taunt($1 $+ _clone, $3) }
-  if (%shadow.command = attack) { set %attack.target $3 | covercheck $3 |  $attack_cmd($1 $+ _clone , %attack.target) }
-  if (%shadow.command = tech) { set %attack.target $4 | covercheck $4 |  $tech_cmd($1 $+ _clone, $3, %attack.target) }
   if (%shadow.command = skill) { $use.skill($1 $+ _clone, $2, $3, $4) } 
+  if (%shadow.command = taunt) {   $partial.name.match($1, $3) | $taunt($1 $+ _clone, %attack.target) }
+  if (%shadow.command = attack) {  $partial.name.match($1, $3) | covercheck %attack.target | $attack_cmd($1 $+ _clone , %attack.target) }
+  if (%shadow.command = tech) {   $partial.name.match($1, $4) | $tech_cmd($1 $+ _clone, $3, %attack.target) }
+
 }
 
 ;=================
 ; STEAL
 ;=================
-on 3:TEXT:!steal*:*: { $skill.steal($nick, $2, !steal) }
+on 3:TEXT:!steal*:*: { $partial.name.match($nick, $2)  | $skill.steal($nick, %attack.target, !steal) }
 
 alias skill.steal { $set_chr_name($1)
   if ($person_in_mech($1) = true) { $display.message($readini(translation.dat, errors, Can'tDoThatInMech), private) | halt }
@@ -1542,7 +1580,7 @@ alias skill.steal { $set_chr_name($1)
 
   if (%steal.chance >= 85) {
     var %stolen.from.counter $readini($char($2), status, stolencounter)
-    if (%stolen.from.counter >= 2) { $set_chr_name($2) | $display.message(4 $+ %real.name  has nothing left to steal!, battle) | halt }
+    if (%stolen.from.counter >= 3) { $set_chr_name($2) | $display.message(4 $+ %real.name  has nothing left to steal!, battle) | halt }
 
     inc %stolen.from.counter 1 | writeini $char($2) status stolencounter %stolen.from.counter 
 
@@ -1586,8 +1624,8 @@ alias skill.steal { $set_chr_name($1)
 ;=================
 ; ANALYSIS
 ;=================
-on 3:TEXT:!analyze*:*: { $skill.analysis($nick, $2) }
-on 3:TEXT:!analysis*:*: { $skill.analysis($nick, $2) }
+on 3:TEXT:!analyze*:*: { $partial.name.match($nick, $2)  | $skill.analysis($nick, %attack.target)  }
+on 3:TEXT:!analysis*:*: { $partial.name.match($nick, $2)  | $skill.analysis($nick, %attack.target) }
 
 alias skill.analysis { $set_chr_name($1)
   $no.turn.check($1)
@@ -1692,6 +1730,9 @@ alias skill.analysis { $set_chr_name($1)
   if (%analysis.element.absorb = $null) { var %analysis.element.absorb none }
   if (%analysis.element.heal = $null) { var %analysis.element.heal none }
 
+  var %analysis.defeat.conditions $readini($char($2), info, DeathConditions)
+  if (%analysis.defeat.conditions = $null) { var %analysis.defeat.conditions none }
+
   set %replacechar $chr(044) $chr(032)
   %analysis.weapon.weak = $replace(%analysis.weapon.weak, $chr(046), %replacechar)
   %analysis.weapon.strength = $replace(%analysis.weapon.strength, $chr(046), %replacechar)
@@ -1699,6 +1740,7 @@ alias skill.analysis { $set_chr_name($1)
   %analysis.element.strength = $replace(%analysis.element.strength, $chr(046), %replacechar)
   %analysis.element.absorb = $replace(%analysis.element.absorb, $chr(046), %replacechar)
   %analysis.element.heal = $replace(%analysis.element.heal, $chr(046), %replacechar)
+  %analysis.defeat.conditions = $replace(%analysis.defeat.conditions, $chr(046), %replacechar)
 
   if (%analysis.level = 1) {  $set_chr_name($2) | $display.private.message(3You analyze %real.name and determine $gender3($2) has %analysis.hp HP left.) | goto next_turn_check }
   if (%analysis.level = 2) {  $set_chr_name($2) | $display.private.message(3You analyze %real.name and determine $gender3($2) has %analysis.hp HP and %analysis.tp TP left.) | goto next_turn_check }
@@ -1722,6 +1764,15 @@ alias skill.analysis { $set_chr_name($1)
     $display.private.message(3 $+ %real.name is completely immune to the following elements: %analysis.element.absorb)
     $display.private.message(3 $+ %real.name will be healed by the following elements: %analysis.element.heal)
 
+    goto next_turn_check
+  }
+
+  if (%analysis.level = 7) {  $set_chr_name($2) | $display.private.message(3You analyze %real.name and determine $gender3($2) has %analysis.hp HP and %analysis.tp TP left.)
+    $display.private.message(3You also determine %real.name has the following stats: [str: %analysis.str $+ ] [def: %analysis.def $+ ] [int: %analysis.int $+ ] [spd: %analysis.spd $+ ])
+    $display.private.message(3 $+ %real.name is also resistant against the following weapon types: %analysis.weapon.strength and is resistant against the following elements: %analysis.element.strength  $+ $chr(124) %real.name is weak against the following weapon types: %analysis.weapon.weak and weak against the following elements: %analysis.element.weak) 
+    $display.private.message(3 $+ %real.name is completely immune to the following elements: %analysis.element.absorb)
+    $display.private.message(3 $+ %real.name will be healed by the following elements: %analysis.element.heal)
+    if (%analysis.defeat.conditions != none) {  $display.private.message(3 $+ %real.name has special death conditions and will continue to revive if not killed with these conditions) }
     goto next_turn_check
   }
 
@@ -1850,7 +1901,7 @@ alias skill.cover { $set_chr_name($1)
 ;=================
 ; SNATCH
 ;=================
-on 3:TEXT:!snatch*:*: { $skill.snatch($nick, $2) }
+on 3:TEXT:!snatch*:*: { $partial.name.match($nick, $2)  | $skill.snatch($nick, %attack.target) }
 
 alias skill.snatch { $set_chr_name($1)
   if ($person_in_mech($1) = true) { $display.message($readini(translation.dat, errors, Can'tDoThatInMech), private) | halt }
@@ -2054,14 +2105,14 @@ alias skill.alchemy {
     set %item_amount $readini($char($1), item_amount, %item.name)
     set %item_type $readini($dbfile(items.db), %item.name, type)
     set %amount.needed $calc($readini($dbfile(crafting.db), $2, %item.name) * %amount.to.craft)
-    if (%amount.needed = $null) { set %amount.needed %amount.to.craft }
+    if ((%amount.needed == $null) || (%amount.needed == 0)) { set %amount.needed %amount.to.craft }
 
     if (%item_type = accessory) { 
       var %equipped.accessory $readini($char($1), equipment, accessory) 
       if (%equipped.accessory = %item.name) { dec %item_amount 1 }
     }
     if (%item_type = $null) { 
-      set %item_type $readini(equipment.db, %item.name, EquipLocation)
+      set %item_type $readini($dbfile(equipment.db), %item.name, EquipLocation)
       if (%item_type = head) {
         var %equipped.armor $readini($char($1), equipment, head) 
         if (%equipped.armor = %item.name) { dec %item_amount 1 }
@@ -2093,7 +2144,7 @@ alias skill.alchemy {
   if (%player.ingredients < %total.ingredients) { $display.message($readini(translation.dat, errors, MissingIngredients),private)  | halt }
 
   ; Display the desc. 
-  if ($readini($char($1), descriptions, aggressor) = $null) { set %skill.description uses the power of the gem to combine ingredients in an attempt to create something better! }
+  if ($readini($char($1), descriptions, alchemy) = $null) { set %skill.description uses the power of the gem to combine ingredients in an attempt to create something better! }
   else { set %skill.description $readini($char($1), descriptions, alchemy) }
   $set_chr_name($1) | $display.message(12 $+ %real.name  $+ %skill.description, global) 
 
@@ -2102,6 +2153,11 @@ alias skill.alchemy {
 
     set %base.success $readini($dbfile(crafting.db), $2, successrate)
     inc %base.success $readini($char($1), skills, alchemy)
+
+    if ($augment.check($1, EnhanceCrafting) = true) {
+      inc %base.success $calc(2 + %augment.strength)
+    }
+
     var %random.chance $rand(1,100)
 
     if (%random.chance <= %base.success) { 
@@ -2121,6 +2177,11 @@ alias skill.alchemy {
     while (%crafting.value <= %amount.to.craft) {
       set %base.success $readini($dbfile(crafting.db), $2, successrate)
       inc %base.success $readini($char($1), skills, alchemy)
+
+      if ($augment.check($1, EnhanceCrafting) = true) {
+        inc %base.success $calc(2 + %augment.strength)
+      }
+
       var %random.chance $rand(1,100)
 
       if (%random.chance <= %base.success) { 
@@ -2411,7 +2472,6 @@ alias skill.monster.repairnaturalarmor {
   if (%battleis = on)  { $check_for_double_turn($1) }
 }
 
-
 ;=================
 ; MONSTER SUMMON
 ;=================
@@ -2484,7 +2544,7 @@ alias skill.monstersummon {
 ;=================
 ; PROVOKE
 ;=================
-on 3:TEXT:!provoke*:*: { $skill.provoke($nick, $2) }
+on 3:TEXT:!provoke*:*: { $partial.name.match($nick, $2)  | $skill.provoke($nick, %attack.target) }
 
 alias skill.provoke { $set_chr_name($1)
   if ($person_in_mech($1) = true) { $display.message($readini(translation.dat, errors, Can'tDoThatInMech), private) | halt }
@@ -2515,6 +2575,7 @@ alias skill.provoke { $set_chr_name($1)
   writeini $char($2) skills provoke.target $1
 
   ; Display the desc. 
+  set %enemy $get_chr_name($2) 
   if ($readini($char($1), descriptions, provoke) = $null) { $set_chr_name($2) | set %skill.description makes a series of gestures towards %real.name in order to provoke $gender2($2) }
   else { set %skill.description $readini($char($1), descriptions, provoke) }
   $set_chr_name($1) | $display.message(12 $+ %real.name  $+ %skill.description, battle) 
@@ -2531,8 +2592,8 @@ alias skill.provoke { $set_chr_name($1)
 ;=================
 ; WEAPON LOCK
 ;=================
-on 3:TEXT:!weaponlock*:*: { $skill.weaponlock($nick, $2) }
-on 3:TEXT:!weapon lock*:*: { $skill.weaponlock($nick, $3) }
+on 3:TEXT:!weaponlock*:*: { $partial.name.match($nick, $2)  | $skill.weaponlock($nick, %attack.target) }
+on 3:TEXT:!weapon lock*:*: { $partial.name.match($nick, $3)  | $skill.weaponlock($nick, %attack.target) }
 
 alias skill.weaponlock { $set_chr_name($1)
   if ($person_in_mech($1) = true) { $display.message($readini(translation.dat, errors, Can'tDoThatInMech), private) | halt }
@@ -2590,13 +2651,11 @@ alias skill.weaponlock { $set_chr_name($1)
       writeini $char($2) status weaponlock.timer 1 
     }
 
-
   }
   if (($readini($char($2), info, flag) = npc) || ($readini($char($2), info, flag) = $null)) {
     writeini $char($2) status weapon.locked yes 
     writeini $char($2) status weaponlock.timer 1 
   }
-
 
   ; Time to go to the next turn
   if (%battleis = on)  { $check_for_double_turn($1) }
@@ -2605,7 +2664,7 @@ alias skill.weaponlock { $set_chr_name($1)
 ;=================
 ; DISARM
 ;=================
-on 3:TEXT:!disarm*:*: { $skill.disarm($nick, $2) }
+on 3:TEXT:!disarm*:*: { $partial.name.match($nick, $2)  | $skill.disarm($nick, %attack.target) }
 
 alias skill.disarm { $set_chr_name($1)
   if ($person_in_mech($1) = true) { $display.message($readini(translation.dat, errors, Can'tDoThatInMech), private) | halt }
@@ -2763,7 +2822,7 @@ alias skill.magicmirror { $set_chr_name($1)
   ; Check to see if enough time has elapsed
   $skill.turncheck($1, MagicMirror, !magicmirror, true)
 
-  ; Check for the item "Shihei" and consume it, or display an error if they don't have any.
+  ; Check for the item "MirrorShard" and consume it, or display an error if they don't have any.
   set %check.item $readini($char($1), item_amount, MirrorShard)
   if ((%check.item = $null) || (%check.item <= 0)) { $display.message(4Error: %real.name does not have enough MirrorShards to perform this skill, private) | halt }
   $decrease_item($1, MirrorShard) 
@@ -2938,6 +2997,8 @@ alias skill.bloodpact {
   writeini $char($1 $+ _summon) info owner $1
   writeini $char($1 $+ _summon) access list $1
 
+  if (%portal.bonus != true) { writeini $char($1 $+ _summon) info FirstTurn true }
+
   return
 }
 
@@ -3106,8 +3167,8 @@ alias skill.retaliation { $set_chr_name($1) |  $check_for_battle($1)
 ;=================
 ; JUST RELEASE
 ;=================
-on 3:TEXT:!justrelease*:*: { $skill.justrelease($nick, $2, !justrelease) }
-on 3:TEXT:!just release*:*: { $skill.justrelease($nick, $3, !justrelease) }
+on 3:TEXT:!justrelease*:*: { $partial.name.match($1, $2) | $skill.justrelease($nick, %attack.target, !justrelease) }
+on 3:TEXT:!just release*:*: { $partial.name.match($1, $3) | $skill.justrelease($nick, %attack.target, !justrelease) }
 
 alias skill.justrelease { $set_chr_name($1)
   if ($person_in_mech($1) = true) { $display.message($readini(translation.dat, errors, Can'tDoThatInMech), private) | halt }
@@ -3210,13 +3271,11 @@ alias skill.stoneskin { $set_chr_name($1)
   unset %current.playerstyle | unset %current.playerstyle.level | unset %stoneskin.used
 }
 
-
-
 ;=================
-; TABULA ROSA
+; TABULA RASA
 ;=================
-on 3:TEXT:!tabularasa*:*: { $skill.tabularasa($nick, $2) }
-on 3:TEXT:!tabula rasa *:*: { $skill.tabularasa($nick, $3) }
+on 3:TEXT:!tabularasa*:*: { $partial.name.match($nick, $2)  | $skill.tabularasa($nick, %attack.target) }
+on 3:TEXT:!tabula rasa *:*: { $partial.name.match($nick, $3)  | $skill.tabularasa($nick, %attack.target) }
 
 alias skill.tabularasa { $set_chr_name($1)
   if ($skillhave.check($1, TabulaRasa) = false) { $set_chr_name($1) | $display.message($readini(translation.dat, errors, DoNotHaveSkill), private)  | halt }
@@ -3233,10 +3292,9 @@ alias skill.tabularasa { $set_chr_name($1)
 
   writeini $char($1) skills tabularasa.time %current.turn
 
-  if ($readini($char($1), descriptions, stoneskin) = $null) { $set_chr_name($2) | set %skill.description unleashes a powerful and ancient technique upon %real.name in an attempt to inflict amnesia. }
+  if ($readini($char($1), descriptions, tabularasa) = $null) { $set_chr_name($2) | set %skill.description unleashes a powerful and ancient technique upon %real.name in an attempt to inflict amnesia. }
   else { set %skill.description $readini($char($1), descriptions, tabularasa) }
   $set_chr_name($1) | $display.message(12 $+ %real.name  $+ %skill.description, battle) 
-
 
   ; check for immunity/resistance and inflict amensia
   var %resist.skill $readini($char($2), skills, resist-amnesia)
@@ -3265,8 +3323,8 @@ alias skill.tabularasa { $set_chr_name($1)
 ;=================
 on 3:TEXT:!warp *:*: { $skill.warp($nick, $2-) }
 alias skill.warp { $set_chr_name($1)
-  if ($skillhave.check($1, warp) = false) { $set_chr_name($1) | $display.system.message($readini(translation.dat, errors, DoNotHaveSkill), private) | halt }
-  if ((%battleis = on) && (%battleisopen != on)) { $display.system.message($readini(translation.dat, errors, Can'tUseSkillInBattle), private) | halt }
+  if ($skillhave.check($1, warp) = false) { $set_chr_name($1) | $display.message($readini(translation.dat, errors, DoNotHaveSkill), private) | halt }
+  if ((%battleis = on) && (%battleisopen != on)) { $display.message($readini(translation.dat, errors, Can'tUseSkillInBattle), private) | halt }
   if (%warp.battlefield != $null) { $display.message(4The Warp skill has already been used this battle!, private) | halt }
 
   ; Check the battlefield.
@@ -3275,7 +3333,7 @@ alias skill.warp { $set_chr_name($1)
 
   ; Check for 2k orbs
   set %check.item $readini($char($1), stuff, RedOrbs)
-  if ((%check.item = $null) || (%check.item <= 2000)) { $display.system.message(4Error: %real.name does not have enough $readini(system.dat, system, currency) to perform this skill [need $calc(2000 - %check.item) more!], private) | halt }
+  if ((%check.item = $null) || (%check.item <= 2000)) { $display.message(4Error: %real.name does not have enough $readini(system.dat, system, currency) to perform this skill [need $calc(2000 - %check.item) more!], private) | halt }
   dec %check.item 2000
   writeini $char($1) stuff RedOrbs %check.item
 

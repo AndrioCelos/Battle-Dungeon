@@ -99,6 +99,7 @@ Resist-Charm=100
 Resist-Intimidate=100
 Resist-Confuse=100
 Resist-Paralysis=10
+Resist-Petrify=60
 
 [Techniques]
 LoveAtFirstSight=20
@@ -136,3 +137,9 @@ Scythe=100
 Glyph=100
 GreatSword=100
 Bow=100
+Axe=100
+Dagger=100
+Mace=100
+Stave=100
+EnergyBlaster=100
+HolyHandGrenade=0

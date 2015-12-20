@@ -108,11 +108,24 @@ Resist-Charm=100
 Resist-Zombie=100
 Resist-Curse=100
 Resist-Stun=50
+Resist-Poison=50
+Resist-Intimidate=100
+Resist-Amnesia=100
+Resist-Blind=100
+Resist-Slow=100
+Resist-Stop=100
+Resist-Paralysis=100
+Resist-confuse=100
+Resist-Weaponlock=100
+Resist-Drunk=100
+Resist-Sleep=100
+Resist-Disarm=100
 ShadowCopy=1
 Bloodpact=15
 Summon=Jester's_Ball
 Royalguard.on=on
 Manawall.on=on
+Resist-Petrify=60
 
 
 [Techniques]
@@ -120,10 +133,6 @@ Portal=30
 ClownHead=31
 ClownFire=31
 
-
-[Element]
-Weakness=none
-Strong=Dark
 
 [NaturalArmor]
 Name=Protective Energy Field
@@ -287,3 +296,11 @@ MechIceIV=10
 MechThunderIV=10
 MechLightIV=10
 MechShadowIV=10
+HolyHandGrenade=1
+Dynamite=1
+BombFragment=1
+
+[Styles]
+Equipped=Guardian
+Guardian=4
+GuardianXP=1

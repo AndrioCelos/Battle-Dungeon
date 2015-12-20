@@ -49,6 +49,7 @@ BossLevel=200
 CanTaunt=False
 IgnoreQuicksilver=true
 RageMode=ignore
+IgnoreElementalMessage=true
 ;=======================================
 ; These are optional flags you can set:
 ;========================================
@@ -342,3 +343,9 @@ MechIceIV=10
 MechThunderIV=10
 MechLightIV=10
 MechShadowIV=10
+Axe=100
+Dagger=100
+Mace=100
+Stave=100
+EnergyBlaster=100
+HolyHandGrenade=0

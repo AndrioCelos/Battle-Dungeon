@@ -52,6 +52,7 @@ LastIP=N/a
 Created=N/a
 Streak=120
 CanTaunt=false
+IgnoreElementalMessage=true
 
 [Status]
 Poison=no
@@ -93,9 +94,10 @@ GiygasPower=100
 [Skills]
 Resist-Charm=100
 Resist-Zombie=100
-Resist-Stun=10
 MartialArts=85
 Resist-Paralysis=10
+Resist-Petrify=60
+Resist-Stun=30
 
 [Techniques]
 CannotGrasp=80
@@ -133,3 +135,9 @@ Scythe=100
 Glyph=100
 GreatSword=100
 Bow=100
+Axe=100
+Dagger=100
+Mace=100
+Stave=100
+EnergyBlaster=100
+HolyHandGrenade=0

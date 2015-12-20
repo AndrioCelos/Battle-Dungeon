@@ -13,7 +13,7 @@ on 3:TEXT:!dcc*:*:{
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; DCC CHAT CMDS
-;;;; Last updated: 04/29/15
+;;;; Last updated: 10/28/15
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -649,6 +649,11 @@ on 2:Chat:!achievements*: {
 
 on 2:Chat:!dragonballs*: { $db.display($nick) }
 
+on 2:Chat:!dragon hunt*: { $character.dragonhunt($nick) } 
+on 2:Chat:!dragon list*: {  $dragonhunt.listdragons } 
+
+on 2:Chat:!bounty*: { $bounty.display }
+
 on 2:Chat:ACTION gives *: {
   if ($3 !isnum) {  $gives.command($nick, $5, 1, $3)  }
   else { $gives.command($nick, $6, $3, $4) }
@@ -761,7 +766,7 @@ on 2:Chat:!score*: {
   else {
     $checkchar($2) 
     var %flag $readini($char($2), info, flag)
-    if ((%flag = monster) || (%flag = npc)) { display.system.message($readini(translation.dat, errors, SkillCommandOnlyOnPlayers), private) | halt }
+    if ((%flag = monster) || (%flag = npc)) { display.message($readini(translation.dat, errors, SkillCommandOnlyOnPlayers), private) | halt }
     var %score $get.score($2,null)
     var %score $readini($char($2), scoreboard, score)
     $set_chr_name($2) | $display.message($readini(translation.dat, system, CurrentScore), private)
@@ -799,7 +804,7 @@ on 2:Chat:!bat list*: { $battlelist }
 on 2:Chat:!battle list*: { $battlelist }
 on 2:Chat:!bat info*: { $battlelist }
 ON 2:Chat:!enter*: { 
-  if ($readini(system.dat, system, automatedaibattlecasino) = on) { $display.message($readini(translation.db, errors, CannotJoinAIBattles), private) | halt } 
+  if ($readini(system.dat, system, automatedaibattlecasino) = on) { $display.message($readini(translation.dat, errors, CannotJoinAIBattles), private) | halt } 
   $enter($nick)
 }
 ON 2:Chat:!flee*: {  $flee($nick) }
@@ -834,8 +839,7 @@ on 2:Chat:ACTION attacks *: {
   if ($is_charmed($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyCharmed)) | halt }
   if ($is_confused($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyConfused)) | halt }
   $set_chr_name($nick) 
-  set %attack.target $matchtok($return_peopleinbattle, $3, 1, 46)
-  if (%attack.target = $null) { set %attack.target $3 }
+  $partial.name.match($nick, $3)
   covercheck %attack.target
   $attack_cmd($nick , %attack.target) 
 }
@@ -843,8 +847,7 @@ on 2:Chat:attacks *: {
   if ($is_charmed($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyCharmed)) | halt }
   if ($is_confused($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyConfused)) | halt }
   $set_chr_name($nick)
-  set %attack.target $matchtok($return_peopleinbattle, $2, 1, 46)
-  if (%attack.target = $null) { set %attack.target $2 }
+  $partial.name.match($nick, $3)
   covercheck %attack.target
   $attack_cmd($nick , %attack.target) 
 }
@@ -907,16 +910,14 @@ on 2:Chat:ACTION uses * * on *: {
   if ($is_charmed($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyCharmed)) | halt }
   if ($is_confused($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyConfused)) | halt }
   $set_chr_name($nick) 
-  set %attack.target $matchtok($return_peopleinbattle, $6, 1, 46)
-  if (%attack.target = $null) { set %attack.target $6 }
+  $partial.name.match($nick, $6)
   $tech_cmd($nick , $4 , %attack.target, $7) | halt 
 } 
 on 2:Chat:uses * * on *: {
   if ($is_charmed($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyCharmed)) | halt }
   if ($is_confused($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyConfused)) | halt }
   $set_chr_name($nick) 
-  set %attack.target $matchtok($return_peopleinbattle, $5, 1, 46)
-  if (%attack.target = $null) { set %attack.target $5 }
+  $partial.name.match($nick, $5)
   $tech_cmd($nick , $3 , %attack.target, $6) | halt 
 } 
 on 2:Chat:ACTION sings *: {
@@ -946,25 +947,29 @@ ON 2:Chat:!use*: {  unset %real.name | unset %enemy
   if ($is_confused($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyConfused)) | halt }
   if ((no-item isin %battleconditions) || (no-items isin %battleconditions)) { $dcc.private.message($nick, $readini(translation.dat, battle, NotAllowedBattleCondition))  | halt }
   if (($person_in_mech($nick) = true) && ($4 = $nick)) { $display.message($readini(translation.dat, errors, Can'tDoThatInMech), private) | halt }
-  set %attack.target $matchtok($return_peopleinbattle, $4, 1, 46)
-  if (%attack.target = $null) { set %attack.target $4 }
+  $partial.name.match($nick, $4) 
   covercheck %attack.target
   $uses_item($nick, $2, $3, %attack.target)
 }
 ON 2:Chat:!taunt*: { $set_chr_name($nick)
   if ($is_charmed($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyCharmed)) | halt }
   if ($is_confused($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyConfused)) | halt }
-  $taunt($nick, $2) | halt 
+  $partial.name.match($nick, $2) | $taunt($nick , %attack.target) | halt
 }
 on 2:Chat:ACTION taunts *: {
   if ($is_charmed($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyCharmed)) | halt }
   if ($is_confused($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyConfused)) | halt }
-  $taunt($nick , $3) | halt 
+  $partial.name.match($nick, $3) | $taunt($nick , %attack.target) | halt
 }
 on 2:Chat:taunts *: {
   if ($is_charmed($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyCharmed)) | halt }
   if ($is_confused($nick) = true) { $set_chr_name($nick) | $dcc.private.message($nick, $readini(translation.dat, status, CurrentlyConfused)) | halt }
-  $taunt($nick , $2) | halt 
+  $partial.name.match($nick, $2) | $taunt($nick , %attack.target) | halt
+}
+ON 2:Chat:!rest*: { 
+  if ($is_charmed($nick) = true) { $display.message($readini(translation.dat, status, CurrentlyCharmed),private) | halt }
+  if ($is_confused($nick) = true) { $set_chr_name($nick) | $display.message($readini(translation.dat, status, CurrentlyConfused),private) | halt }
+  $rest.cmd($nick)
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

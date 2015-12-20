@@ -54,6 +54,7 @@ Streak=250
 SpawnAfterDeath=AbsoluteVirtue
 IgnoreQuicksilver=true
 CanTaunt=false
+IgnoreElementalMessage=true
 
 [Status]
 Poison=no
@@ -108,6 +109,8 @@ Resist-Blind=100
 Resist-Slow=100
 Resist-Stop=100
 Resist-Paralysis=100
+Resist-Petrify=60
+Resist-Stun=30
 BloodBoost=20
 
 [Techniques]
@@ -146,3 +149,9 @@ Scythe=100
 Glyph=100
 GreatSword=100
 Bow=100
+Axe=100
+Dagger=100
+Mace=100
+Stave=100
+EnergyBlaster=100
+HolyHandGrenade=0

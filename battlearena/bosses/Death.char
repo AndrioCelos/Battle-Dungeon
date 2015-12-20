@@ -55,9 +55,10 @@ passhurt=0
 LastSeen=N/a
 LastIP=N/a
 Created=N/a
-Streak=30
+Streak=-1000
 IgnoreQuicksilver=true
 CanTaunt=true
+IgnoreElementalMessage=true
 
 [Status]
 Poison=no
@@ -101,6 +102,7 @@ Death's_Scythe=10
 resist-stun=50
 resist-blind=30
 resist-charm=100
+Resist-Petrify=60
 
 [Techniques]
 GrimReaper=10

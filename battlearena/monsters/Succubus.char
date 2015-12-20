@@ -1,21 +1,21 @@
 [BaseStats]
-Hp=250
+Hp=400
 Tp=100
-Str=$calc(5 + $current.battlestreak)
-Def=$calc(5 + $current.battlestreak)
-Int=$calc(5 + $current.battlestreak)
-Spd=$calc(10 + $current.battlestreak)
+Str=$calc(90 + $current.battlestreak)
+Def=$calc(90 + $current.battlestreak)
+Int=$calc(90 + $current.battlestreak)
+Spd=$calc(90 + $current.battlestreak)
 IgnitionGauge=2
 Name=Succubus
 
 
 [Battle]
-Hp=250
+Hp=400
 Tp=100
-Str=$calc(5 + $current.battlestreak)
-Def=$calc(5 + $current.battlestreak)
-Int=$calc(5 + $current.battlestreak)
-Spd=$calc(10 + $current.battlestreak)
+Str=90
+Def=90
+Int=90
+Spd=90
 IgnitionGauge=2
 Status=alive
 
@@ -49,7 +49,7 @@ passhurt=0
 LastSeen=N/a
 LastIP=N/a
 Created=N/a
-Streak=50
+Streak=61
 CanTaunt=true
 
 [Monster]
@@ -91,18 +91,26 @@ MPRegenerating=no
 
 [Weapons]
 Equipped=SuccubusPower
-SuccubusPower=$current.battlestreak
+SuccubusPower=$calc(1 + $current.battlestreak)
 
 [Skills]
-Resist-charm=100
-Resist-zombie=100
-
+Resist-Paralysis=100
+Resist-Amnesia=10
+Resist-Zombie=100
+Resist-Charm=100
+Resist-Stun=25
+Resist-Blind=100
+Resist-Weaponlock=100
+Resist-Intimidate=100
+Resist-Disarm=100
+Resist-Drunk=100
+Resist-Sleep=100
 
 
 [Techniques]
 Temptation=1
-VampireBite=$current.battlestreak
-FireII=$current.battlestreak
+VampireBite=$calc(1 + $current.battlestreak)
+FireII=$calc(1 + $current.battlestreak)
 
 
 [Item_Amount]
@@ -110,24 +118,78 @@ FireII=$current.battlestreak
 
 
 [modifiers]
-Heal=none
-Earth=100
+Heal=dark
+Earth=80
 Fire=30
-Wind=100
-Water=100
+Wind=80
+Water=80
 Ice=30
-Lightning=100
-Light=120
-Dark=10
-HandToHand=100
-Whip=100
-Sword=100
-Gun=100
-Rifle=100
-Katana=100
-Wand=100
-Spear=100
-Scythe=100
-Glyph=100
-GreatSword=100
-Bow=100
+Lightning=80
+Light=150
+Dark=150
+HandToHand=80
+Whip=110
+Sword=110
+Gun=110
+Rifle=110
+Katana=110
+Wand=110
+Spear=110
+Scythe=110
+Glyph=110
+GreatSword=110
+Bow=110
+Axe=110
+Dagger=110
+Mace=110
+Stave=110
+EnergyBlaster=120
+HolyHandGrenade=0
+Crissaegrim=60
+Valmanway=60
+Naturaleza=60
+AsuranFists=50
+VictorySmite=50
+ShinjinSpiral=50
+MillionStab=30
+VorpalBlade=50
+DeathBlossom=50
+SwiftBlade=50
+ChantDuCygne=50
+Requiescat=20
+Resolution=20
+Guillotine=20
+Insurgency=40
+Pentathrust=30
+Drakesbane=30
+Stardiver=30
+PyrrhicKleos=40
+Evisceration=30
+DancingEdge=40
+Ultima=30
+Kaustra=30
+Ashes=30
+Dismay=30
+ThousandCuts=30
+Tachi:Shoha=50
+Tachi:Rana=50
+Rainstorm=30
+SpinningAttack=30
+TornadoKick=30
+CircularChain=30
+CircleBlade=30
+SonicThrust=30
+ApexArrow=30
+UrielBlade=30
+FellCleave=30
+AeolianEdge=30
+Twin_Slice=30
+LightningStrike=30
+BladeBeamII=30
+TrillionStabs=70
+DoubleBackstab=70
+Chou_Kamehameha=70
+BloodBath=70
+UltimaII=70
+KaustraII=70
+Chivalry=70

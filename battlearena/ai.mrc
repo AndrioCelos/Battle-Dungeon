@@ -1,10 +1,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; AI COMMANDS
-;;;; Last updated: 05/02/15
+;;;; Last updated: 11/07/15
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 alias aicheck { 
   set %debug.location aicheck
-  unset %statusmessage.display | unset %action.bar | unset %song.name | unset %ai.item
+  unset %statusmessage.display | unset %action.bar | unset %song.name | unset %ai.item | unset %element | unset %status.type
   remini $char($1) renkei
 
   ; Determine if the current person in battle is a monster or not.  If so, they need to do a turn.  If not, return.
@@ -167,11 +167,20 @@ alias ai_turn {
   }
 
   ; do an action
-  if (%ai.action = $null) { var %ai.action attack | echo -a 4ERORR: AI ACTION WAS NULL!  }
+  if (%ai.action = $null) { set %ai.action attack | echo -a 4ERORR: AI ACTION WAS NULL!  }
   writeini $txtfile(battle2.txt) BattleInfo $1 $+ .lastactionbar %ai.action
 
-  if (%ai.action = attack) { $ai_gettarget($1) | $attack_cmd($1, %ai.target) | halt }
-  if (%ai.action = tech) { $ai_gettarget($1) |  $tech_cmd($1, %ai.tech, %ai.target) | halt } 
+  if (%ai.action = tech) { 
+    $ai_gettarget($1)
+    if (%ai.target = $null) { echo -a target null! | set %ai.action $iif($readini($char($1), info, ai_type) = techonly, taunt, attack)  }
+    else { $tech_cmd($1, %ai.tech, %ai.target) | halt }
+  } 
+
+  if (%ai.action = attack) { $ai_gettarget($1) 
+    if (%ai.target = $null) { echo -a target null | set %ai.action taunt }
+    else { $attack_cmd($1, %ai.target) | halt }
+  }
+
   if (%ai.action = taunt) { set %taunt.action true | $ai_gettarget($1) | $taunt($1 , %ai.target) | halt } 
   if (%ai.action = flee) { $ai.flee($1) | halt }
   if (%ai.action = skill) { $ai_chooseskill($1) | halt }
@@ -355,7 +364,7 @@ alias ai_mechcheck {
   if ($readini($char($1), status, ignition.on) = on) { return false }
   if ($readini($char($1), status, boosted) = yes) { return false }
   if ($person_in_mech($1) = true) { return false }
-  if ((no-mech isin %battleconditions) && (no-mechs isin %battleconditions)) { return false }
+  if ((no-mech isin %battleconditions) || (no-mechs isin %battleconditions)) { return false }
 
   var %base.energycost $round($calc($mech.baseenergycost($1) / 2),0)
   var %mech.currentenergy $readini($char($1), mech, energyCurrent)
@@ -420,17 +429,17 @@ alias ai.flee {
 
 alias ai_gettarget {
   set %debug.location alias ai.gettarget
-  unset %ai.targetlist | unset %tech.type
+  unset %ai.targetlist | unset %tech.type | unset %status.type
 
   var %provoke.target $readini($char($1), skills, provoke.target)
 
   if (%provoke.target != $null) { 
-    if ($readini($char(%provoke.target), battle, status) = dead) { unset %provoke.target | remini $char($1) skills provoke.target }
+    if (($readini($char(%provoke.target), battle, status) = dead) || ($readini($char(%provoke.target), battle, status) = $null)) { unset %provoke.target | remini $char($1) skills provoke.target }
   }
 
-
-  if (%ai.action = tech) { 
-    set %tech.type $readini($dbfile(techniques.db), %ai.tech, type)
+  if (%ai.action = tech) {  
+    set %tech.type $readini($dbfile(techniques.db), %ai.tech, type)  
+    var %status.type $readini($dbfile(techniques.db), %ai.tech, statusType)
   }
 
   if ((((%tech.type = heal) || (%tech.type = aoeheal) || (%tech.type = ClearStatusNegative) || (%tech.type = buff)))) {
@@ -452,75 +461,101 @@ alias ai_gettarget {
 
   set %battletxt.lines $lines($txtfile(battle.txt)) | set %battletxt.current.line 1 | unset %tech.type
 
+  if ((%opponent.flag = monster) && ($readini($char($1), info, flag) = npc)) {
+    if ($is_confused($1) != true) {
+      if (%ai.action = tech) { var %element $readini($dbfile(techniques.db), %ai.tech, Element) }
+      if (%ai.action = attack) { var %element $readini($dbfile(weapons.db), $readini($char($1), Weapons, Equipped), Element) }
+
+      if ((%element = none) || (%element = $null)) { unset %element }
+    }
+  }
+
+
   while (%battletxt.current.line <= %battletxt.lines) { 
     set %who.battle.ai $read -l $+ %battletxt.current.line $txtfile(battle.txt)
 
-    if (%ai.type = berserker) { 
-      if (%who.battle.ai = $1) { 
-        if (($is_confused($1) = true) || ($is_charmed($1) = true)) { $add_target }
+    if ($readini($char(%who.battle.ai), monster, type) != object) { 
+
+
+      if (%ai.type = berserker) { 
+        if (%who.battle.ai = $1) { 
+          if (($is_confused($1) = true) || ($is_charmed($1) = true)) { $add_target }
+        }
+        if (%who.battle.ai != $1) { $add_target }   
       }
-      if (%who.battle.ai != $1) { $add_target }   
-    }
 
-    if (%ai.type != berserker) { 
+      if (%ai.type != berserker) { 
 
-      ; The AI is targeting a player or npc.
-      if (%opponent.flag = player) {
+        ; The AI is targeting a player or npc.
+        if (%opponent.flag = player) {
 
-        if ($readini($char(%who.battle.ai), info, flag) != monster) {
+          if ($readini($char(%who.battle.ai), info, flag) != monster) {
 
-          ; Get a target for clones
-          if ($readini($char($1), info, clone) = yes) {
-            if ($readini($char($1), info, cloneowner) = %who.battle.ai) {  
-              if (($is_confused($1) = true) || ($is_charmed($1) = true)) { $add_target }
-            }
-            if (($readini($char($1), info, cloneowner) != %who.battle.ai) && (%who.battle.ai != $1)) { $add_target }
-          }
-
-          ; Get a target for non-clones
-          if ($readini($char($1), info, clone) != yes) { 
-            if (($readini($char($1), info, ai_type) = healer) && ($readini($char(%who.battle.ai), status, zombie) = no)) { $add_target }
-
-            if ($readini($char($1), info, ai_type) != healer) { 
-              if (%who.battle.ai = $1) { 
+            ; Get a target for clones
+            if ($readini($char($1), info, clone) = yes) {
+              if ($readini($char($1), info, cloneowner) = %who.battle.ai) {  
                 if (($is_confused($1) = true) || ($is_charmed($1) = true)) { $add_target }
               }
-              if (%who.battle.ai != $1) { $add_target }   
+              if (($readini($char($1), info, cloneowner) != %who.battle.ai) && (%who.battle.ai != $1)) { $add_target }
+            }
+
+            ; Get a target for non-clones
+            if ($readini($char($1), info, clone) != yes) { 
+              if (($readini($char($1), info, ai_type) = healer) && ($readini($char(%who.battle.ai), status, zombie) = no)) { $add_target }
+
+              if ($readini($char($1), info, ai_type) != healer) { 
+                if (%who.battle.ai = $1) { 
+                  if (($is_confused($1) = true) || ($is_charmed($1) = true)) { $add_target }
+                }
+                if (%who.battle.ai != $1) { $add_target }   
+              }
             }
           }
         }
-      }
 
-      ; The AI is targeting a monster.
-      if (%opponent.flag = monster) {
-        if ($readini($char(%who.battle.ai), info, flag) = monster) {
+        ; The AI is targeting a monster.
+        if (%opponent.flag = monster) {
 
-          ; Get a target for clones
-          if ($readini($char($1), info, clone) = yes) {
-            if ($readini($char($1), info, cloneowner) = %who.battle.ai) {  
-              if (($is_confused($1) = true) || ($is_charmed($1) = true)) { $add_target }
-            }
-            if (($readini($char($1), info, cloneowner) != %who.battle.ai) && (%who.battle.ai != $1)) { $add_target }
+          ; Ensure that Allied NPCs don't attack monsters with attacks they absorb.
+          if (%element != $null) {
+            var %absorb.list $readini($char(%who.battle.ai), Modifiers, Heal)
+            if ($istok(%absorb.list, %element, 46) = $true) { inc %battletxt.current.line | continue }
           }
 
+          if (%status.type != $null) {
+            var %current.target.status $readini($char(%who.battle.ai), status, %status.type) 
+            if (((%current.target.status = true) || (%current.target.status = yes) || (%current.target.status = on))) {  inc %battletxt.current.line | continue }
+          }
 
-          ; Get a target for non-clones
-          if ($readini($char($1), info, clone) != yes) { 
+          if ($readini($char(%who.battle.ai), info, flag) = monster) {
 
-            if ($readini($char($1), info, ai_type) = healer) {     
-              if ((%who.battle.ai != demon_portal) && ($readini($char(%who.battle.ai), status, zombie) = no)) { $add_target }   
-            }
-            else { 
-              if (%who.battle.ai = $1) { 
+            ; Get a target for clones
+            if ($readini($char($1), info, clone) = yes) {
+              if ($readini($char($1), info, cloneowner) = %who.battle.ai) {  
                 if (($is_confused($1) = true) || ($is_charmed($1) = true)) { $add_target }
               }
-              if (%who.battle.ai != $1) { $add_target }   
+              if (($readini($char($1), info, cloneowner) != %who.battle.ai) && (%who.battle.ai != $1)) { $add_target }
+            }
 
+
+            ; Get a target for non-clones
+            if ($readini($char($1), info, clone) != yes) { 
+
+              if ($readini($char($1), info, ai_type) = healer) {     
+                if ((%who.battle.ai != demon_portal) && ($readini($char(%who.battle.ai), status, zombie) = no)) { $add_target }   
+              }
+              else { 
+                if (%who.battle.ai = $1) { 
+                  if (($is_confused($1) = true) || ($is_charmed($1) = true)) { $add_target }
+                }
+                if (%who.battle.ai != $1) { $add_target }   
+
+              }
             }
           }
         }
-      }
 
+      }
     }
 
     inc %battletxt.current.line 1
@@ -540,17 +575,20 @@ alias ai_gettarget {
       set %ai.target $gettok(%ai.targetlist,%random.target,46)
     }
 
-    if (%ai.target = $null) { echo -a 4NULL TARGET. SWITCHING TO BERSERK TYPE | set %ai.target $1 | writeini $char($1) info ai_type berserk  }
+    if (%ai.target = $null) { 
+      if ((%element = $null) && (%status.type = $null)) { echo -a 4NULL TARGET. SWITCHING TO BERSERK TYPE | set %ai.target $1 | writeini $char($1) info ai_type berserk }
+    }
+
+    if (%ai.action != tech) { 
+      covercheck %ai.target $1
+      set %ai.target %attack.target 
+    }
+
+    unset %random.target | unset %total.targets | unset %taunt.action
   }
 
-  if (%ai.action != tech) { 
-    covercheck %ai.target $1
-    set %ai.target %attack.target 
-  }
 
-  unset %random.target | unset %total.targets | unset %taunt.action
 }
-
 alias ai_getmontarget {
   set %debug.location alias ai_getmontarget
   ; $1 = AI user
@@ -610,11 +648,15 @@ alias ai_skillcheck {
     }
   }
   if ($readini($char($1), skills, bloodboost) != $null) { 
+    if (%battle.type = dungeon) { return }
+
     if ($readini($char($1), status, ignition.on) != on) {
       if ($readini($char($1), skills, bloodboost.time) = $null) { %ai.skilllist  = $addtok(%ai.skilllist, bloodboost, 46) }
     }
   }
   if ($readini($char($1), skills, bloodspirit) != $null) { 
+    if (%battle.type = dungeon) { return }
+
     if ($readini($char($1), status, ignition.on) != on) {
       if ($readini($char($1), skills, bloodspirit.time) = $null) { %ai.skilllist  = $addtok(%ai.skilllist, bloodspirit, 46) }
     }
@@ -654,6 +696,7 @@ alias ai_skillcheck {
     }
   }
   if ($readini($char($1), skills, shadowcopy) >= 1) {
+    if (%battle.type = dungeon) { return }
     if ($isfile($char($1 $+ _clone)) = $false) { %ai.skilllist  = $addtok(%ai.skilllist, shadowcopy, 46)  }
   }
   if ($readini($char($1), skills, cocoonevolve) >= 1) { 
@@ -958,6 +1001,8 @@ alias ai.monstersummon {
       if (($readini(system.dat, system, botType) = IRC) || ($readini(system.dat, system, botType) = TWITCH)) { 
         var %max.number.of.mons $readini(system.dat, system, MaxNumberOfMonsInBattle)
         if (%max.number.of.mons = $null) { var %max.number.of.mons 6 }
+        if (%battle.type = dungeon) { inc %max.number.of.mons 4 }
+
       }
 
       if ($readini(system.dat, system, botType) = DCCchat) { var %max.number.of.mons 50 }

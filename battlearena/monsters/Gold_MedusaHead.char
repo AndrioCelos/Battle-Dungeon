@@ -57,6 +57,7 @@ LastIP=N/a
 Created=N/a
 Streak=250
 CanTaunt=false
+IgnoreElementalMessage=true
 
 
 [Status]
@@ -135,3 +136,9 @@ Scythe=100
 Glyph=100
 GreatSword=100
 Bow=100
+Axe=100
+Dagger=100
+Mace=100
+Stave=100
+EnergyBlaster=100
+HolyHandGrenade=0

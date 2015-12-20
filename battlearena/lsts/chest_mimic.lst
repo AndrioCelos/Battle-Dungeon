@@ -6,8 +6,6 @@ CerberusMeat
 DefenseSource
 PowerSource
 Herring
-TurkeyLeg
-DiscountCard
 UltraDiscountCard
 Wizard's-Amulet
 Blessed-Ankh
@@ -23,8 +21,7 @@ Fool's-Tablet
 Ribbon
 Aztec-Goldcoin
 Lucky-Rabbit'sFoot
-VirilityCan
-NewsOrb
+$read -l $+ $rand(1, $lines($lstfile(chest_black.lst))) $lstfile(chest_black.lst)
 HiRune
 GeRune
 NinRune
@@ -37,4 +34,4 @@ BloodScroll
 BurntScroll
 Songsheet:ToxicMelody
 Songsheet:FoeLullaby
-BigWhoop
+DragonCharm

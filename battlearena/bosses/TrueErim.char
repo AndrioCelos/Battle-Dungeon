@@ -50,8 +50,9 @@ passhurt=0
 LastSeen=N/a
 LastIP=N/a
 Created=N/a
-Streak=350
+Streak=300
 CanTaunt=true
+IgnoreElementalMessage=true
 
 [Status]
 Poison=no
@@ -103,7 +104,8 @@ Resist-Charm=100
 Resist-Zombie=100
 Resist-Stop=100
 Resist-Slow=100
-Resist-Stun=40
+Resist-Stun=50
+Resist-Petrify=60
 MagicMirror=1
 
 [Techniques]
@@ -146,6 +148,12 @@ Scythe=100
 Glyph=100
 GreatSword=100
 Bow=100
+Axe=100
+Dagger=100
+Mace=100
+Stave=100
+EnergyBlaster=100
+HolyHandGrenade=0
 
 
 [Styles]

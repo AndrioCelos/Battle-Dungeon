@@ -54,6 +54,7 @@ Streak=75
 StreakMax=250
 IgnoreQuicksilver=true
 CanTaunt=false
+IgnoreElementalMessage=true
 
 [Status]
 Poison=no
@@ -97,7 +98,8 @@ Resist-Charm=100
 Resist-Zombie=100
 Resist-Stun=100
 Resist-Intimidate=100
-Resist-Paralysis=10
+Resist-Paralysis=20
+Resist-Petrify=60
 Wizardry=50
 ClearMind=3
 ElementalSeal=3
@@ -145,3 +147,9 @@ Scythe=100
 Glyph=100
 GreatSword=100
 Bow=100
+Axe=100
+Dagger=100
+Mace=100
+Stave=100
+EnergyBlaster=100
+HolyHandGrenade=0

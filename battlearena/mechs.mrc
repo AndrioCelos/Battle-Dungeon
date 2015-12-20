@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; MECH COMMANDS
-;;;; Last updated: 01/31/15
+;;;; Last updated: 10/25/15
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ON 3:ACTION:activates * mech:#:{ $mech.activate($nick) } 
@@ -8,17 +8,24 @@ ON 3:ACTION:deactivates * mech:#:{ $mech.deactivate($nick) }
 ON 50:TEXT:* activates * mech:*:{ $mech.activate($1) } 
 ON 50:TEXT:*deactivates * mech:*:{ $mech.deactivate($1) } 
 
+ON 3:TEXT:!activates mech:#:{ $mech.activate($nick) } 
+ON 3:TEXT:!deactivates mech:#:{ $mech.deactivate($nick) } 
+
 ON 3:TEXT:* activates * mech:*:{ 
   if (($2 != activates) && ($4 != mech)) { halt }
   if ($readini($char($1), info, flag) = monster) { halt }
   $no.turn.check($1)
   $controlcommand.check($nick, $1)
+  if ($return.systemsetting(AllowPlayerAccessCmds) = false) { $display.message($readini(translation.dat, errors, PlayerAccessCmdsOff), private) | halt }
+  if ($char.seeninaweek($1) = false) { $display.message($readini(translation.dat, errors, PlayerAccessOffDueToLogin), private) | halt }
   $mech.activate($1) 
 } 
 ON 3:TEXT:* deactivates * mech:*:{ 
   if (($2 != activates) && ($4 != mech)) { halt }
   if ($readini($char($1), info, flag) = monster) { halt }
   $controlcommand.check($nick, $1)
+  if ($return.systemsetting(AllowPlayerAccessCmds) = false) { $display.message($readini(translation.dat, errors, PlayerAccessCmdsOff), private) | halt }
+  if ($char.seeninaweek($1) = false) { $display.message($readini(translation.dat, errors, PlayerAccessOffDueToLogin), private) | halt }
   $mech.deactivate($1)
 } 
 
@@ -364,6 +371,7 @@ alias mech.activate {
   if ($readini(system.dat, system, AllowMechs) = false) { $display.message($readini(translation.dat, errors, MechsNotAllowed), private) | halt }
 
   if ((no-mech isin %battleconditions) || (no-mechs isin %battleconditions)) { $set_chr_name($1) | $display.message($readini(translation.dat, battle, NotAllowedBattleCondition),private) | halt  }
+  if ((no-playermechs isin %battleconditions) && ($readini($char($1), info, flag) != monster)) { $set_chr_name($1) | $display.message($readini(translation.dat, battle, NotAllowedBattleCondition),private) | halt  }
 
   $set_chr_name($1)
   $check_for_battle($1)

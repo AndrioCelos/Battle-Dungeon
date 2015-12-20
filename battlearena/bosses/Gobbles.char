@@ -55,7 +55,8 @@ LastIP=N/a
 Created=N/a
 Streak=-1000
 Month=11
-CanTaunt=true
+CanTaunt=false
+IgnoreElementalMessage=true
 
 [Monster]
 type=
@@ -102,6 +103,7 @@ TurkeyPower=20
 [Skills]
 resist-stun=55
 resist-blind=55
+Resist-Petrify=60
 
 
 [Techniques]

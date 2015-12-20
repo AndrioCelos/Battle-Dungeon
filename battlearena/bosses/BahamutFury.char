@@ -51,6 +51,7 @@ LastSeen=N/a
 LastIP=N/a
 Created=N/a
 CanTaunt=false
+IgnoreElementalMessage=true
 
 [Status]
 Poison=no
@@ -97,6 +98,7 @@ Resist-Amnesia=100
 Resist-Stun=100
 MartialArts=35
 Wizardry=35
+Resist-Petrify=60
 
 [Techniques]
 MegaFlare=15
@@ -135,3 +137,9 @@ Scythe=100
 Glyph=100
 GreatSword=100
 Bow=100
+Axe=100
+Dagger=100
+Mace=100
+Stave=100
+EnergyBlaster=100
+HolyHandGrenade=0

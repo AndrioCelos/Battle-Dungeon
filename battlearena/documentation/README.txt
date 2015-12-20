@@ -1,5 +1,5 @@
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-Battle Arena Bot - Version 3.0.1
+Battle Arena Bot - Version 3.1
 Programmed by James "Iyouboushi" (Iyouboushi@gmail.com)
 FREEWARE!
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -87,118 +87,127 @@ As usual be sure to read the versions.txt in the documentation folder
 for a full list of everything this version does.  Listed below are some 
 of the highlights.
 
+* Added the Dragon Hunt system
+The game will now generate special dragon monsters that hide in lairs. Plaers
+must use !dragon hunt to hunt for and discover these lairs to face the dragons
+within.  Leaving the dragons alone is dangerous as they can kidnap NPCs for 
+the evil forces.
 
-3.0.1 Fixes a few minor issues that popped up after 3.0's release. 
+* Added the Bounty System
+The game will pick a random boss from any boss in the \bosses\ folder. If this
+boss is defeated before the bot picks a new boss an orb bonus will be applied to
+the battle. 
 
-- Fixed a bug in which !steal wasn't allowing items to be stolen
-- Fixed a bug with AIs who were switching weapons even though they were dual-wielding
-- Fixed a bug in which using !bat info before a battle started would cause the battle to end
-- Fixed an issue in which the ignition TwiliPower could be purchased
+* Added the Torment Battle Type (aka Endgame)
+Using Torment Orbs players can enter a 3-wave battle against any enemy in the game.
+Winning will result in items that can be used to craft high level equipment and items.
+Torment Orbs can be crafted using a new misc item, Death'sBreath and higher Torment Orbs
+result in harder battles but more rewards.
 
+* Added Dungeons
+These are special battles that can be activated once per 24 hours by using special keys
+bought in the shop once the new shop NPC shows up. The dungeons have a variety of monsters
+and bosses within as well as unique accessory rewards.
 
-Below are the 3.0 notes.
+* Added an October shop
+During the month of October players can accumulate CandyCorn and spend it in a special
+Halloween shop with unique items and armor.
 
-* New Method of Doing Monster/Summon/NPC Stats Upon Summoning to Battlefield
-The way the bot determines the stats for monsters, bosses, summons and npcs
-when they're summoned to the battlefield has been changed quite a bit. It
-should be more balanced now.
+* Added new Augments
+Several new augments have been added into the game.
 
-* Added a new battle type: Defend Outpost
-In this battle type players will have to survive 5 waves of monsters in
-order to successfully defend an Allied Forces HQ Outpost.
+* Added a Resting Bonus
+For every 1 hour that a player isn't in battle the player will receive +150 orbs to 
+their next battle.  Note that at least one battle has to have happened before the 
+player can start to accumulate this resting bonus.
 
-* Added a new battle type: Assault
-In this type players will have to defeat monsters in order to 
-weaken an enemy outpost's strength meter and capture it. 
+* Added Breakable Objects to Battlefields
+There's a 25% chance that one will spawn on certain battlefields. Although they are
+technically monsters, they don't get turns and only have 1 HP. Just break them to 
+help boost your style.
 
-* Added Capacity and Enhancement Points. 
-10,000 Capacity Points will equal 1 Enhancement Point. Players gain capacity
-points by being in battles that are higher than streak 100. Note that the 
-player level has to be within 10 of the streak in order to gain capacity points. 
-After streak 500, the amount is 500+(10% of streak level).   Enhancement
-points can then be used in the shop to purchase additional skills and stat
-enhancements.
-
-* Added the ability for monsters and npcs to be able to use battle items.
-Watch out players! Some monsters now have the ability to use items in
-battle.
-
-* Added NPC Trust Items
-These special items will summon an NPC companion to fight alongside you
-if you are playing solo.  NPC Trust Items can be purchased in the shop
-using Login Points--a special currency that you get each new day that
-you log into the game (using !id).  Login Points accumulate every day
-and do not go away until they have been spent.
-
-* Added the SPIRIT OF THE HERO buff
-Are you tired of not being able to do anything in battle because your
-friends are fighting in battle levels that are way higher than your 
-own? Well, never fear.  With the Spirit of the Hero buff it will
-automatically set you somewhat close to the current battle level
-allowing you to participate! The trade off is that you will receive
-a little bit less orbs at the end of battle compared to the others.
-
-
+* Added Info Upon Logging In
+Upon logging into the game players will be greeted with a bit of information including
+the local bot time/date and how much of various currencies he/she has. A message of
+the day (admin message) will also display if an admin has set one.
 
 Changes:
-- Changed the !augment commands to work in private or channel. 
-- Changed the portal battles so that they have a level cap. 
-- Changed the shop to allow players to view and buy techniques that are on the left-hand weapon.
-- Changed the drops in the bot
-- Changed the lockpicking skill to be 3% per level, up from 2%.
-- Changed Evil Doppelgangers so that they are generated correctly if the user is level synced.
-- Changed chests so that red chests can never spawn mimics.
-- Changed the GIVES command so that players can now give red orbs to certain NPCs.  
-- Changed the way the bot picks NPCs to have more settings like bosses/monsters
-- Changed the scoreboard.html to include the level of the player
-- Changed the drunk status to last 2 rounds
-- Changed the GIVES message to hopefully show grammatically correct lines
-- Changed the way the bot handles negative status effects on targets.
-- Changed the way the bot does all of the status timers to make it consistent
-- Changed the modifier checks so that they will also check for weapon names
-- Changed the way the bot displays damage (purple = resisted, orange = enhanced)
-- Changed the way the bot displays the "battle open" message 
-- Changed the chance of a rescue allied president battle to 25% and lowered the streak from 100 to 20. 
-- Changed how the allied forces president is generated slightly (stat-wise)
-- Changed the chance of certain special boss types of occurring by a small amount.
-- Changed the way the bot boosts portal monsters, hopefully keeping them closer to the synced levels
-- Changed the way the bot does the stats for monsters, npcs and summons upon summoning to the battlefield.
-- Changed the way the HP for monsters/summons/NPCs/bosses are boosted at the start of battle
-- Changed demon portals so that monsters spawning out of them will be slightly less than the battle streak.
-- Changed the code to allow partial target name matches on attacks and techs. 
-- Changed the way players purchase stats; they must be kept somewhat close to each other now.
+- Changed the code for techs and items so that you can use ME as a valid target name to target yourself
+- Changed the warmachine boss battle type to no longer spawn additional monsters alongside it
+- Changed the boss "Magus" to "Maou_Magus" to stop an exploit with the trust NPC Magus.
+- Changed the "TechBonus" augment so that it only applies to non-magic techs
+- Changed the code for checking for an item drop so that it's centralized in one spot 
+- Changed Player Access commands so that players must have logged in within the last week in order to be controlled.
+- Changed PVP battles so that bot admins can specify a level cap for players to enter under. Use !startbat pvp # to set the cap
+- Changed the skill Speed to consume 10-25% of a user's HP based on the skill's level
+- Changed portal items so that they cannot be used if Shenron's Wish is on.
+- Changed the maximum resist-skill that a player can have in a dungeon to 50, down from 100. This does not include accessories.
+- Changed certain boss battles to hopefully give a slightly bigger orb reward
+- Changed certain bosses/monsters/summons/npcs to have the ignore elemental message flag
+- Changed some modifiers on certain monsters/bosses
+- Changed gold chests to remove Big Whoop from them and to read from the black chests for portal items
+- Changed ignitions to remove str/def/spd down as people were abusing that
+- Changed the technique Torcleaver to not be magic and made its AoE damage and TP cost match the -jaII spells
+- Changed the guardian style to be capped at level 5 in dungeons and portals
+- Changed the streaks you can use a portal item on to 1-20. Anything higher will block portal usage.
+- Changed the elemental weapon to use attack_elemental.txt since they don't technically use staves/wands
+- Changed healing/battle items a little bit
+- Changed elementals to use different techs based on streaks (a minor change)
+- Changed the way the shop displays certain error messages and what it says when you use !shop by itself. 
+- Changed the way summons and clones work when summoned outside of a portal battle. Now they are skipped 
+  on the round they are summoned on and will only take action on the following round.
+- Changed the "Battle open" message to show the current winning/losing battle streak at the end of the line.
+- Changed HP healing items to work on a percent amount of a target's max HP rather than a static value.
+- Changed portal battles so that the allied notes reward is split by the number of people who enter the battle
+- Changed the shop so that the maximum amount play can upgrade a weapon via the shop to is level 250.
+- Changed the armor equip command so that players do not need to !unequip armor before !equip armor 
+  The bot will automatically remove the old armor before wearing the new one.
+- Changed the shop so that shadow portals show up on their own line
+- Changed the max amount of portal items players can use per 24 hours to 10 (up from 8)
+- Changed the AI slightly to try and prevent NPCs from using techs that will heal monsters
+- Changed the AI slightly to try and prevent NPCs from using techs that would inflict the same status a monster already has on
+- Changed the code for how the bot generates the deathboards. 
+- Changed the bot so that if the streak is automatically reset to 0 the next battle will be an AI vs AI battle
+- Changed the max amount of enhancement points for HP
+- Changed !npc status to be color-coded. Red means kidnapped, maroon means not found yet and green means at the HQ
+- Changed code so that +1 accessories, weapons and armor all show up in blue. Legendary weapons and armor will show up in orange.
+- Changed code so that Torment reward items (Horadric and crafting) show up in orange in the items list
+- Changed the max level of the skill OrbHunter to 30. However, the base cost from 21+ is 2500 per level instead of 250.
+- Changed the cost of the Orb Bonus potion effect
+- Changed the chance of certain special bosses to occur
+- Changed the orb penalty for Spirit of the Hero to be not as much
+- Changed many lines in translation.dat to be consistent with equipment and weapon colors
 
 Fixes:
-- Fixed an issue with songs showing resists on targets who shouldn't be affected by the song to begin with.
-- Fixed an issue with counter attacks showing the wrong pronouns sometimes.
-- Fixed an issue with lost souls appearing in gauntlet battles.
-- Fixed an issue where instruments could be used with !use
-- Fixed an issue with the mech shop so that cores and weapons that cost 0 won't show up for purchase.
-- Fixed an issue with the snatch error message showing the wrong name
-- Fixed an issue with monsters being unable to take action while charmed.
-- Fixed an issue with techniques doing too much damage when a player was level synced.
-- Fixed an issue in which Ghost Turkey could show up in other months besides November
-- Fixed an issue with !view-info style doppelganger getting cut off
-- Fixed an issue with the bot not checking left-handed weapons for augments
-- Fixed a bug with !augment list that would say players had no augments even if they did.
-- Fixed a bug with !fullbring when used with +TP items.
-- Fixed a bug in which Inactive monsters would attack even while inactive if they went first in battle
-- Fixed a bug with the drunk status effect
-- Fixed a bug with !augments list not showing in private even if the command was used in private
-- Fixed a bug with !unequip armor
-- Fixed a bug with shadow clones attacking their owners in PVP mode
-- Fixed a bug with shadow clones attacking themselves in PVP mode
-- Fixed a bug with items occasionally not showing damage correctly 
-- Fixed a bug in which players could trade armor they were still wearing
-- Fixed multiple typos and errors found in weapons.db/items.db/techniques.db (courtesy of Andrio)
+- Fixed a typo that was preventing ignition augments from working right
+- Fixed a typo in !misc info
+- Fixed an issue with !view-info and the pokeball summon item
+- Fixed an issue with %enemy in a provoke skill description not showing the right name
+- Fixed an issue with "Conserve TP" showing up in both status and skill lists.  It should only be in skills now.
+- Fixed an issue where a person who was asleep would still get an extra turn occasionally
+- Fixed an issue with the DTrigger ignition description
+- Fixed an issue with charm not wearing off immediately if the charmer was erased due to multiple wave
+- Fixed an issue with berserker NPCs 
+- Fixed minor issues with the various damage formulas
+- Fixed a potential bug with the monster list
+- Fixed a portal battlefield limitation issue that could be exploited
+- Fixed the "On the Edge" achievement so that it actually gives the Super Potion item correctly
+- Fixed the elemental spell totals in misc info being counted multiple times on AOEs
+- Fixed a bug with orb rewards for players who are far under the streak and not using SotH
+- Fixed a bug in which fists were being calculated wrong for their damage (being counted twice, basically)
+- Fixed a bug in which NPCs who had mechs would try to use them in no-mech battlefield conditions.
+- Fixed a bug with en-spells counting towards the elemental spell totals in misc info when they shouldn't have been
+- Fixed a bug in which the elemental messages for en-spells were not showing upon melee hits
+- Fixed a bug in which npcs and trusts weren't being killed in portals that had no-trust or no-npc set.
+- Fixed a bug with AI vs AI battles when NPCs used shadow copy
+- Fixed a bug with AI vs AI battles in which if the streak was less than 0 it wouldn't work properly
+- Fixed a bug with !flee not counting the number of times fled properly
+- Fixed a bug in which provoked NPCs may try to attack dead targets that have been erased due to multiple waves
+- Fixed a bug in which player clones would die if they were summoned before a no-trust or no-npc portal battle happened
+- Fixed a bug with the enhancement point shop that might prevent certain skills from showing up in the shop
+- Fixed a bug that would prevent the wall of flesh from ever being chosen
+- Fixed an exploit that allowed players to get around the melee penalty if the same weapon is used twice in a row
 
-Removals:
-- Removed the following monsters: Final_Guard, Prime_Vise, Excenmille, NajaSalaheem, Wind-UpShantotto
-- Removed the following NPCs: Nauthima
-- Removed the following bosses: Adlanna, Eldora, EldoraAdlanna, NauthimaTiranadel, RuneFencer_Nauthima
-- Removed Battle Formulas 1 & 2. The bot now only has 1 battle formula
-- Removed the !toggle battle formula bot admin command
-- Removed the bot setting the user levels of bot owner/admins upon starting to prevent a security hole
 
 Again, this isn't everything. Be sure to read the versions.txt in the documentation folder for a full 
 list of everything 

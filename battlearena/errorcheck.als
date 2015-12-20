@@ -1,5 +1,5 @@
 ; A Battle Arena error checking script
-; version 1.4.3 (Monday 3 August 2015)
+; version 1.5 (Saturday 19 December 2015)
 ; by Andrio Celos
 
 check {
@@ -25,11 +25,15 @@ check {
     else if ($regex($battle.version(), ^(\d\.\d)_?beta_?(\d\d)(\d\d)(\d\d)$) > 0) {
       if ($regml(1) > 3.1) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
       else if ($regml(1) < 3.0) set -u0 %old $true
-      else if ($regml(4) > 15) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
+      else if ($regml(4) > 16) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
       else if ($regml(4) < 15) set -u0 %old $true
-      else if ($regml(2) > 10) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
-      else if ($regml(2) < 2) set -u0 %old $true
-      else if (($regml(2) == 2) && ($regml(3) < 21)) set -u0 %old $true
+      else if ($regml(4) == 16) {
+        if ($regml(2) > 2) { echo 4 This script appears to be out of date. Use /check $1 ignoreversion to ignore this. | halt }
+      }
+      else {
+        if ($regml(2) < 2) set -u0 %old $true
+        else if (($regml(2) == 2) && ($regml(3) < 21)) set -u0 %old $true
+      }
     }
     else {
       echo 4 Could not parse the Arena version ($battle.version).
@@ -54,6 +58,8 @@ check {
     check_monsters
     set %issues_total 0 | set %issues_major 0
     check_weapons
+    set %issues_total 0 | set %issues_major 0
+    check_armor
   }
   else if (($1 == techs) || ($1 == techniques)) check_techs new_chr DoublePunch new_chr
   ; Those parameters are there in case of techniques like Asura Strike that need to reference a character.
@@ -66,6 +72,7 @@ check {
     check_monsters
   }
   else if (($1 == weapons)) check_weapons
+  else if (($1 == armor)) check_armor
   else { echo 2 Usage: /check category [subcategory] [ignoreversion] | echo 2 The following can be checked: techs, items, NPCs, weapons, all. Subcategories for NPCs are monsters, allies and bosses. | halt }
 
   titlebar %old_title
@@ -124,13 +131,13 @@ check_techs {
       var %buff.type = $readini($dbfile(techniques.db), %technique_name, status)
       if (%buff.type == en-spell) {
         var %enspell.element = $readini($dbfile(techniques.db), %technique_name, element)
-        if ((. isin %enspell.element) || (%enspell.element !isin Earth.Fire.Wind.Water.Ice.Lightning.Light.Dark.HandToHand.Whip.Sword.Gun.Rifle.Katana.Wand.Stave.Spear.Scythe.Glyph.GreatSword.Bow)) $&
+        if ((. isin %enspell.element) || (%enspell.element !isin Earth.Fire.Wind.Water.Ice.Lightning.Light.Dark && (!$isweapontype(%enspell.element)))) $&
           log_issue Moderate Technique %technique_name uses an invalid modifier: technique will have no effect.
       }
       else {
         var %modifier.type = $readini($dbfile(techniques.db), %technique_name, modifier)
         if (%modifier.type != $null) {
-          if ((. isin %modifier.type) || (%modifier.type !isin Earth.Fire.Wind.Water.Ice.Lightning.Light.Dark.HandToHand.Whip.Sword.Gun.Rifle.Katana.Wand.Stave.Spear.Scythe.Glyph.GreatSword.Bow)) $&
+          if ((. isin %modifier.type) || (%modifier.type !isin Earth.Fire.Wind.Water.Ice.Lightning.Light.Dark && (!$isweapontype(%modifier.type)))) $&
             log_issue Moderate Technique %technique_name uses an invalid modifier: technique will have no effect.
         }
       }
@@ -254,8 +261,8 @@ check_items {
   check_item_lists items_gems.lst gem
   check_item_lists items_healing.lst heal.tp.revive.ignitiongauge.curestatus
   check_item_lists items_misc.lst misc.trade
-  check_item_lists items_portal.lst portal
-  check_item_lists items_random.lst random
+  check_item_lists items_portal.lst portal.torment
+  check_item_lists items_random.lst random.tormentreward
   check_item_lists items_reset.lst shopreset
   check_item_lists items_summons.lst summon
 
@@ -368,6 +375,14 @@ check_item {
 
     return
   }
+  
+  if (%item_type == Torment) {
+    ; Torment reward items must define a valid level.
+    var %level = $readini($dbfile(items.db), $2, TormentLevel)
+    if (%level !isnum) log_issue Moderate Item $2 $+ 's level is not a number; it will have no effect.
+    else if (%level < 0)  log_issue Moderate Item $2 $+  has a negative level.
+    return
+  }
 
   if (%item_type == Key) {
     var %unlocks = $readini($dbfile(items.db), $2, Unlocks)
@@ -408,7 +423,7 @@ check_item {
         else if (%amount !isnum) log_issue Moderate Accessory $2 $+ 's %type amount is not a number; it will have no effect.
         else if (%amount >= 10) log_issue Moderate Accessory $2 $+ 's %type amount is very high. It should be a fractional factor instead of a percentage.
       }
-      else if (%type isin IncreaseCriticalHits.BlockAllStatus.IncreaseSteal.IncreaseTreasureOdds.IncreaseMimicOdds.EnhanceBlocking, %i, 46) {
+      else if (%type isin IncreaseCriticalHits.BlockAllStatus.IncreaseSteal.IncreaseTreasureOdds.IncreaseMimicOdds.EnhanceBlocking.EnhanceDragonHunt, %i, 46) {
         var %amount = $readini($dbfile(items.db), $2, %type $+ .amount)
         if (%amount = $null) log_issue Moderate Accessory $2 has no %type amount; it will have no effect.
         else if (%amount !isnum) log_issue Moderate Accessory $2 $+ 's %type amount is not a number; it will have no effect.
@@ -420,7 +435,7 @@ check_item {
         else if (%amount !isnum) log_issue Moderate Accessory $2 $+ 's %type amount is not a number; it will have no effect.
         else if ((%amount > -0.5) && (%amount < 0.5) && (%amount != 0)) log_issue Moderate Accessory $2 $+ 's %type amount is very low. It should be a number to add directly instead of a fraction.
       }
-      else if (%type !isin CurseAddDrain.Mug.Stylish.IgnoreQuicksilver) $&
+      else if (%type !isin CurseAddDrain.Mug.Stylish.IgnoreQuicksilver.AutoRegen) $&
         log_issue Moderate Accessory $2 has unrecognised type %type $+ .
       inc %i
     }
@@ -430,11 +445,25 @@ check_item {
   if (%item_type == Random) {
     return
   }
+  
+  if (%item_type == TormentReward) {
+    ; Torment reward items must define a valid amount.
+    var %item_count = $readini($dbfile(items.db), $2, ItemsInside)
+    if (%item_count !isnum) log_issue Moderate Item $2 $+ 's reward count is not a number; it will give d10 items.
+    return
+  }
 
   if (%item_type == ShopReset) {
     ; Discount items must define a valid amount.
     var %shop.reset.amount = $readini($dbfile(items.db), $2, amount)
     if (%shop.reset.amount !isnum) log_issue Moderate Item $2 $+ 's discount amount is not a number; it will have no effect.
+    return
+  }
+
+  if (%item_type == IncreaseWeaponLevel) {
+    ; Weapon enhancement items must define a valid amount.
+    var %enhancement.amount = $readini($dbfile(items.db), $2, IncreaseAmount)
+    if (%enhancement.amount !isnum) log_issue Moderate Item $2 $+ 's increase amount is not a number; it will enhance by 1 level.
     return
   }
 
@@ -556,6 +585,10 @@ check_item {
     if (!$isfile($dungeonfile(%dungeon))) log_issue Moderate Item $2 $+  references missing dungeon %dungeon $+ ; it cannot be used.
     return
   }   
+
+  if (%item_type == Armor) {
+    return
+  }
 
   log_issue Moderate Item $2 $+  has an unrecognised type ( $+ %item_type $+ ). If it's a mod, this script will need to be edited. Otherwise, the item will have no effect.
 
@@ -798,7 +831,7 @@ check_monster {
       inc %i
       var %modifier = $gettok(%weakness, %i, 46)
       if (. isin %modifier) noop
-      else if (%modifier isin fire.ice.earth.wind.lightning.water.light.dark.HandToHand.Whip.Sword.Gun.Rifle.Katana.Wand.Stave.Spear.Scythe.Glyph.Greatsword.Bow.Axe.Dagger) continue
+      else if (%modifier isin fire.ice.earth.wind.lightning.water.light.dark || ($isweapontype(%modifier))) continue
       else if ($ini($dbfile(weapons.db), %modifier)) continue
       else if ($ini($dbfile(techniques.db), %modifier)) continue
       else if ($ini($dbfile(items.db), %modifier)) continue
@@ -813,7 +846,7 @@ check_monster {
       inc %i
       var %modifier = $gettok(%strong, %i, 46)
       if (. isin %modifier) noop
-      else if (%modifier isin fire.ice.earth.wind.lightning.water.light.dark.HandToHand.Whip.Sword.Gun.Rifle.Katana.Wand.Stave.Spear.Scythe.Glyph.Greatsword.Bow.Axe.Dagger) continue
+      else if (%modifier isin fire.ice.earth.wind.lightning.water.light.dark || ($isweapontype(%modifier))) continue
       else if ($ini($dbfile(weapons.db), %modifier)) continue
       else if ($ini($dbfile(techniques.db), %modifier)) continue
       else if ($ini($dbfile(items.db), %modifier)) continue
@@ -839,7 +872,7 @@ check_monster {
       else if (%modifier_value < 0) log_issue Minor %category $+  $1 $+ 's %modifier modifier value is less than 0; these attacks will have no effect.
     }
 
-    if ((. !isin %modifier) && (%modifier isin fire.ice.earth.wind.lightning.water.light.dark.HandToHand.Whip.Sword.Gun.Rifle.Katana.Wand.Stave.Spear.Scythe.Glyph.Greatsword.Bow.Axe.Dagger)) continue
+    if ((. !isin %modifier) && (%modifier isin fire.ice.earth.wind.lightning.water.light.dark || ($isweapontype(%modifier)))) continue
     if ($ini($dbfile(techniques.db), %modifier)) continue
     if ($ini($dbfile(weapons.db), %modifier)) continue
     if ($ini($dbfile(items.db), %modifier)) continue
@@ -891,7 +924,9 @@ validate_expression {
   ;   $1-: The expression to check.
 
   if ($!char isin $1-) return $false
-  if (battle isin $1-) return $false
+  if ($!dungeon.haukke.lampcount isin $1-) return $false
+  if (battle.txt isin $1-) return $false
+  if (battle2.txt isin $1-) return $false
   return $true
 }
 
@@ -948,6 +983,7 @@ check_weapons {
 
     var %weapon_name = $ini($dbfile(weapons.db), %current_weapon)
     if (%weapon_name == Weapons) continue
+    if (%weapon_name == WeaponDisplayTitles) continue
     if (%weapon_name == Shields) continue
     if (%weapon_name == ExampleWeapon) continue
     titlebar Battle Arena $battle.version � Checking weapon %current_weapon / %total_weapons : %weapon_name ...
@@ -1069,6 +1105,11 @@ check_shield {
   else if (%weapon_blockamount > 0 && %weapon_blockamount < 1) log_issue Minor Shield $1 $+ 's block amount is a decimal where a percentage (0-100) is expected.
 }
 
+isweapontype {
+  ; Returns $true if the parameter is a weapon type, or $false if it isn't.
+  return $isfile($txtfile(attack_ $+ $1- $+ .txt))
+}
+
 check_statuseffects {
   ; Checks a list of status effects, to make sure that they all exist.
   ;   $1 : the list of effects
@@ -1091,6 +1132,115 @@ check_statuseffects {
   }
 }
 
+check_armor_lists {
+  ; Checks an armor .lst file to ensure all armor listed are of the correct type.
+  ;  $1 : The filename to check, relative to the /lsts folder.
+  ;  $2 : The type (equipment slot) of armor that is considered valid.
+  if ($isid) return
+
+  var %total_armor = $lines($lstfile($1))
+  var %current_armor = 0
+
+  while (%current_armor < %total_armor) {
+    inc %current_armor
+
+    set %armor_name $read($lstfile($1), %current_armor)
+    var %armor_type = $readini($dbfile(equipment.db), %armor_name, EquipLocation)
+
+    if (%armor_type) {
+      if (%armor_type != $2) log_issue Moderate Armor %armor_name is listed in $1 but isn't for the $2 slot.
+    }
+    else log_issue Moderate Missing item %armor_name is listed in $1 $+ .
+
+  } 
+}
+check_armor {
+  ; Checks armor.
+  ;   No parameters.
+  if ($isid) return
+  window @issues
+  
+  ; Check armor lists.
+  check_armor_lists armor_head.lst head
+  check_armor_lists armor_body.lst body
+  check_armor_lists armor_hands.lst hands
+  check_armor_lists armor_legs.lst legs
+  check_armor_lists armor_feet.lst feet
+
+  ; Now check each armor piece.
+  set %total_armor $ini($dbfile(equipment.db), 0)
+  var %current_armor = 0
+
+  while (%current_armor < %total_armor) {
+    inc %current_armor
+
+    var %armor_name = $ini($dbfile(equipment.db), %current_armor)
+    titlebar Battle Arena $battle.version � Checking armor %current_armor / %total_armor : %armor_name ...
+
+    ; Spaces and = can't be in armor names.
+    if (($chr(32) isin %armor_name) || (= isin %armor_name)) log_issue Moderate Armor %armor_name has an invalid name: the armor will be unusable.
+
+    ; Sell price
+    var %armor_price = $readini($dbfile(equipment.db), %armor_name, SellPrice)
+    if (%armor_price == $null) {
+      var %armor_price = $readini($dbfile(equipment.db), %armor_name, Cost)
+    }
+    if (%armor_price == $null) log_issue Minor Armor %armor_name $+  has no sell price.
+    else if (%armor_price !isnum) log_issue Minor Armor %armor_name $+ 's sell price is not a number.
+
+    ; Attributes
+    armor_get_attributes new_chr %armor_name
+    if (%hp  !isnum) log_issue Moderate Armor %armor_name $+ 's HP bonus is not a number.
+    if (%tp  !isnum) log_issue Moderate Armor %armor_name $+ 's TP bonus is not a number.
+    if (%str !isnum) log_issue Moderate Armor %armor_name $+ 's strength bonus is not a number.
+    if (%def !isnum) log_issue Moderate Armor %armor_name $+ 's defense bonus is not a number.
+    if (%int !isnum) log_issue Moderate Armor %armor_name $+ 's intelligence bonus is not a number.
+    if (%spd !isnum) log_issue Moderate Armor %armor_name $+ 's speed bonus is not a number.
+
+    ; Augments
+    var %armor_augments = $readini($dbfile(equipment.db), %armor_name, Augment)
+    if (%armor_augments && %armor_augments != none) {
+      var %total_augments = $numtok(%armor_augments, 46), %i = 1
+      while (%i <= %total_augments) {
+        var %augment = $gettok(%armor_augments, %i, 46)
+        if (!$read($lstfile(augments.lst), w, %augment)) log_issue Moderate Armor %armor_name has unknown augment %augment $+ .
+        inc %i
+      }
+    }
+    
+    ; Location
+    var %armor_location = $readini($dbfile(equipment.db), %armor_name, EquipLocation)
+    if (%armor_location !isin head.body.hands.legs.feet) log_issue Moderate Armor %armor_name specifies an invalid equipment slot.
+
+    continue
+    :error
+    log_issue Critical Checking armor %armor_name failed: $error
+    reseterror
+  } 
+  if (%issues_total == 0) echo -a 12Checked $calc(%current_armor - 1) armor pieces and found no issues. Yay!
+  else echo -a 12Checked $calc(%current_armor - 1) armor pieces and found %issues_total  $+ $iif(%issues_total == 1, issue, issues) $+ .
+}
+armor_get_attributes {
+  ; Retrieves an armor piece's attributes (HP, TP, STR, DEF, INT, SPD).
+  ;   $1 : new_chr
+  ;   $2 : The armor piece
+  ; Output to %hp, %tp, %str, %def, %int, %spd : The attributes.
+
+  ; We ignore the check if the value contains $char
+  set %hp $readini($dbfile(equipment.db), $2, Str)
+  if (!$validate_expression($readini($dbfile(equipment.db), n, $2, Str))) set %hp 0
+  set %tp $readini($dbfile(equipment.db), $2, Str)
+  if (!$validate_expression($readini($dbfile(equipment.db), n, $2, Str))) set %tp 0
+  set %str $readini($dbfile(equipment.db), $2, Str)
+  if (!$validate_expression($readini($dbfile(equipment.db), n, $2, Str))) set %str 0
+  set %def $readini($dbfile(equipment.db), $2, Def)
+  if (!$validate_expression($readini($dbfile(equipment.db), n, $2, Def))) set %def 0
+  set %int $readini($dbfile(equipment.db), $2, Int)
+  if (!$validate_expression($readini($dbfile(equipment.db), n, $2, Int))) set %int 0
+  set %spd $readini($dbfile(equipment.db), $2, Spd)
+  if (!$validate_expression($readini($dbfile(equipment.db), n, $2, Spd))) set %spd 0
+}
+
 log_issue {
   ; Records an issue message to the window @issues.
   ;   $1 : The severity of the issue: 'Minor', 'Moderate', 'Major' or 'Critical'.
@@ -1107,3 +1257,5 @@ log_issue {
   if ($1 == Major   ) { aline -p 4 @issues [Major]    $2- | inc %issues_major }
   if ($1 == Critical) { aline -p 5 @issues [Critical] $2- | inc %issues_major }
 }
+
+

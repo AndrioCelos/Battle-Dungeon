@@ -1,21 +1,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; ATTACKS COMMAND
-;;;; Last updated: 04/22/15
+;;;; Last updated: 10/25/15
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ON 3:ACTION:attacks *:#:{ 
   $no.turn.check($nick)
   $set_chr_name($nick) 
-  set %attack.target $matchtok($return_peopleinbattle, $2, 1, 46)
-  if (%attack.target = $null) { set %attack.target $2 }
+  $partial.name.match($nick, $2)
   covercheck %attack.target
   $attack_cmd($nick , %attack.target) 
 } 
 on 3:TEXT:!attack *:#:{ 
   $no.turn.check($nick)
   $set_chr_name($nick)
-  set %attack.target $matchtok($return_peopleinbattle, $2, 1, 46)
-  if (%attack.target = $null) { set %attack.target $2 }
+  $partial.name.match($nick, $2)
   covercheck %attack.target
   $attack_cmd($nick , %attack.target) 
 } 
@@ -26,8 +24,7 @@ ON 50:TEXT:*attacks *:*:{
     $no.turn.check($1,admin)
     if ($readini($char($1), Battle, HP) = $null) { halt }
     $set_chr_name($1) 
-    set %attack.target $matchtok($return_peopleinbattle, $3, 1, 46)
-    if (%attack.target = $null) { set %attack.target $3 }
+    $partial.name.match($1, $3)
     covercheck %attack.target
     $attack_cmd($1 , %attack.target) 
   }
@@ -38,12 +35,13 @@ ON 3:TEXT:*attacks *:*:{
   if ($readini($char($1), info, flag) = monster) { halt }
   if ($readini($char($1), stuff, redorbs) = $null) { halt }
   $controlcommand.check($nick, $1)
+  if ($return.systemsetting(AllowPlayerAccessCmds) = false) { $display.message($readini(translation.dat, errors, PlayerAccessCmdsOff), private) | halt }
+  if ($char.seeninaweek($1) = false) { $display.message($readini(translation.dat, errors, PlayerAccessOffDueToLogin), private) | halt }
   $no.turn.check($1)
   unset %real.name 
   if ($readini($char($1), Battle, HP) = $null) { halt }
   $set_chr_name($1) 
-  set %attack.target $matchtok($return_peopleinbattle, $3, 1, 46)
-  if (%attack.target = $null) { set %attack.target $3 }
+  $partial.name.match($1, $3)
   covercheck %attack.target
   $attack_cmd($1 , %attack.target) 
 }
@@ -51,10 +49,6 @@ ON 3:TEXT:*attacks *:*:{
 alias attack_cmd { 
   set %debug.location alias attack_cmd
   $check_for_battle($1) | $person_in_battle($2) | $checkchar($2) | var %user.flag $readini($char($1), info, flag) | var %target.flag $readini($char($2), info, flag)
-  if ($is_charmed($1) = true) { var %user.flag monster }
-  if ($is_confused($1) = true) { var %user.flag monster } 
-  if (%mode.pvp = on) { var %user.flag monster }
-
   var %ai.type $readini($char($1), info, ai_type)
 
   if ((%ai.type != berserker) && (%covering.someone != on)) {
@@ -65,9 +59,15 @@ alias attack_cmd {
     }
   }
 
+  if ($is_charmed($1) = true) { var %user.flag monster }
+  if ($is_confused($1) = true) { var %user.flag monster } 
+  if (%tech.type = heal) { var %user.flag monster }
+  if (%tech.type = heal-aoe) { var %user.flag monster }
+  if (%mode.pvp = on) { var %user.flag monster }
+  if (%ai.type = berserker) { var %user.flag monster }
   if (%covering.someone = on) { var %user.flag monster }
 
-  if ((%user.flag = $null) && (%target.flag != monster)) { $set_chr_name($1) | $display.message($readini(translation.dat, errors, CanOnlyAttackMonsters),private) | halt }
+  if ((%user.flag != monster) && (%target.flag != monster)) { $set_chr_name($1) | $display.message($readini(translation.dat, errors, CanOnlyAttackMonsters),private)  | halt }
   if ($readini($char($1), Battle, Status) = dead) { $set_chr_name($1) | $display.message($readini(translation.dat, errors, CanNotAttackWhileUnconcious),private)  | unset %real.name | halt }
   if ($readini($char($2), Battle, Status) = dead) { $set_chr_name($1) | $display.message($readini(translation.dat, errors, CanNotAttackSomeoneWhoIsDead),private) | unset %real.name | halt }
   if ($readini($char($2), Battle, Status) = RunAway) { $set_chr_name($1) | $display.message($readini(translation.dat, errors, CanNotAttackSomeoneWhoFled),private) | unset %real.name | halt } 
@@ -178,7 +178,6 @@ alias attack_cmd {
     var %power = $attack_power_standard($1, %weapon.equipped, $2)
     strike_standard_aoe $1 %weapon.equipped $2 %power
   }
-
 
   unset %attack.damage |  unset %attack.damage1 | unset %attack.damage2 | unset %attack.damage3 | unset %attack.damage4 | unset %attack.damage5 | unset %attack.damage6 | unset %attack.damage7 | unset %attack.damage8 | unset %attack.damage.total
   unset %drainsamba.on | unset %absorb |  unset %element.desc | unset %spell.element | unset %real.name  |  unset %user.flag | unset %target.flag | unset %trickster.dodged | unset %covering.someone
@@ -394,8 +393,12 @@ alias strike_standard {
 
     if ($augment.check($1, EnhanceCriticalHits) = true) { inc %chance %augment.strength }
 
+    if      (%modifiers < 1) set %damage.display.color 6
+    else if (%modifiers > 1) set %damage.display.color 7
+    else                     set %damage.display.color 4
+
     if (%roll <= %chance) {
-      $set_chr_name($1) |  $display.system.message($readini(translation.dat, battle, LandsACriticalHit), battle)
+      $set_chr_name($1) |  $display.message($readini(translation.dat, battle, LandsACriticalHit), battle)
       %modifiers = $calc(%modifiers * 1.5)
       %defense = 0
     }
@@ -446,7 +449,7 @@ alias strike_standard {
 
     guardianmon.check $1 $2 $3
 
-    set -u0 %attack_effect did $+ %damage.display.color $bytes(%attack.damage, b) damage 
+    set -u0 %attack_effect did $+ %damage.display.color $+  $bytes(%attack.damage, b) damage 
   }
   else set %attack.damage 0
 
@@ -579,9 +582,19 @@ alias calculate_damage_weapon {
   ; $4 = a special flag for mugger's belt.
 
   if ($readini($char($1), info, flag) = monster) { $formula.meleedmg.monster($1, $2, $3, $4) }
-  else { $formula.meleedmg.player($1, $2, $3, $4) }
-}
+  else { 
 
+    if (%battle.type = dungeon) { $formula.meleedmg.player.formula_3.0($1, $2, $3, $4) }
+    if (%battle.type = torment) { $formula.meleedmg.player.formula_2.5($1, $2, $3, $4)  }
+
+    if ((%battle.type != dungeon) && (%battle.type != torment)) { 
+      if (($readini(system.dat, system, BattleDamageFormula) = 1) || ($readini(system.dat, system, BattleDamageFormula) = $null)) { $formula.meleedmg.player.formula_3.0($1, $2, $3, $4) }
+      if ($readini(system.dat, system, BattleDamageFormula) = 2) { $formula.meleedmg.player.formula_2.5($1, $2, $3, $4) }
+      if ($readini(system.dat, system, BattleDamageFormula) = 3) { $formula.meleedmg.player.formula_2.0($1, $2, $3, $4) }
+      if ($readini(system.dat, system, BattleDamageFormula) = 4) { $formula.meleedmg.player.formula_1.0($1, $2, $3, $4) }
+    }
+  }
+}
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Performs a melee AOE
@@ -641,7 +654,7 @@ alias melee.aoe {
               covercheck %who.battle $2 AOE
 
               $calculate_damage_weapon($1, %weapon.equipped, %who.battle)
-              $deal_damage($1, %who.battle, %weapon.equipped)
+              $deal_damage($1, %who.battle, %weapon.equipped, melee)
 
               $display_aoedamage($1, %who.battle, $2, %absorb, melee)
               unset %attack.damage
@@ -686,7 +699,7 @@ alias melee.aoe {
 
 
               $calculate_damage_weapon($1, %weapon.equipped, %who.battle)
-              $deal_damage($1, %who.battle, %weapon.equipped)
+              $deal_damage($1, %who.battle, %weapon.equipped, melee)
               $display_aoedamage($1, %who.battle, $2, %absorb, melee)
 
             }

@@ -1,22 +1,22 @@
 [BaseStats]
-Hp=500
-Tp=50
-Str=20
-Def=15
-Int=25
-Spd=15
-IgnitionGauge=0
-Name=Magus
+Hp=$iif($return_playersinbattle > 1, 9000, 8000)
+Tp=300
+Str=772
+Def=772
+Int=772
+Spd=772
+IgnitionGauge=1000
+Name=Smelter Demon
 
 
 [Battle]
-Hp=500
-Tp=50
-Str=20
-Def=15
-Int=25
-Spd=15
-IgnitionGauge=0
+Hp=9000
+Tp=300
+Str=772
+Def=772
+Int=772
+Spd=772
+IgnitionGauge=1000
 Status=alive
 
 
@@ -26,9 +26,9 @@ RageCountDown=0
 
 
 [Descriptions]
-Char=is a tall man with long purple hair, long ears, and weas a red cape over his armor and clothing. The man also carries a large scythe in hand as well.
-Rage=screams in rage 
-BossQuote=The black wind howls...
+Char=is a large golem made entirely of iron, with a hollow in the middle which contains a core of flames.
+Rage=roars in rage as a flame aura covers the area!
+BossQuote=I will toss your corpse into the molten iron!
 
 
 [Stuff]
@@ -46,9 +46,15 @@ passhurt=0
 LastSeen=N/a
 LastIP=N/a
 Created=N/a
-Streak=20
+BossLevel=150
+Streak=-1000
 CanTaunt=false
-JustReleaseDefense=75
+IgnoreQuicksilver=true
+JustReleaseDefense=100
+CanFlee=false
+IgnoreDrain=true
+IgnorePresident=true
+IgnoreElementalMessage=true
 ;=======================================
 ; These are optional flags you can set:
 ;========================================
@@ -125,14 +131,14 @@ JustReleaseDefense=75
 
 [monster]
 ; Type is the type of monster it is. 
-type=
+type=demon
 
 ; TechLearn is a special flag where if it's hit by a tech, it will become immune to that tech for the rest of the battle.
 ; Change it to "true" to turn it on.
 TechLearn=false
 
 ; Size is the size of the monster. Small/Medium/Large
-size=Medium
+size=large
 
 [Status]
 Poison=no
@@ -167,20 +173,18 @@ sleep=no
 stun=no
 MPRegenerating=no
 
+
 [Weapons]
-Equipped=DoomSickle
-DoomSickle=$calc(10 + $current.battlestreak)
+Equipped=SmelterDemonSword
+SmelterDemonSword=$current.battlestreak
 
 
 [Skills]
-Wizardry=100
-Harvester=100
-MagicMirror=10
-MagicShift=1
-ElementalSeal=1
-MightyStrike=1
-ClearMind=3
 Zen=5
+Impetus=20
+WeaponBash=1
+SwordMaster=100
+Resist-Stun=100
 Resist-Charm=100
 Resist-Poison=100
 Resist-Zombie=100
@@ -191,42 +195,35 @@ Resist-Slow=100
 Resist-Stop=100
 Resist-Paralysis=100
 Resist-confuse=100
-Resist-stun=100
-Resist-Drunk=100
 Resist-Weaponlock=100
-Resist-Curse=100
-Resist-Petrify=100
 Resist-Disarm=100
+Resist-Drunk=100
+Resist-Sleep=100
+Resist-Petrify=60
 
 [Techniques]
-Thundaja=$calc(10 + $current.battlestreak)
-Blizzaja=$calc(10 + $current.battlestreak)
-Firaja=$calc(10 + $current.battlestreak)
-DarkBomb=$calc(10 + $current.battlestreak)
-DarkMist=$calc(10 + $current.battlestreak)
-Dark_Matter=$calc(10 + $current.battlestreak)
-
+SmelterSlam=$current.battlestreak
+SmelterLunge=$current.battlestreak
+SmelterStrike=$current.battlestreak
+SmelterJump=$current.battlestreak
 
 [Item_Amount]
 
-[Styles]
-Equipped=Spellmaster
-SpellMaster=10
-SpellMasterXP=0
-
+[Augments]
+SmelterDemonSword=MeleeBonus.TechBonus.IgnoreGuardian.HurtEthereal.IgnoreMetalDefense
 
 [modifiers]
 ; This section controls how much resistance/weakness this monster has the elements and weapon types.
 ; 100 = it does 100% normal damage. Over 100 = weakness, under 100 = resistance. 0 = immune.
-Heal=none
-Earth=90
-Fire=90
-Wind=90
-Water=90
-Ice=90
-Lightning=90
-Light=90
-Dark=90
+Heal=Fire
+Earth=70
+Fire=500
+Wind=70
+Water=70
+Ice=70
+Lightning=110
+Light=70
+Dark=70
 HandToHand=90
 Whip=90
 Sword=90
@@ -239,5 +236,65 @@ Scythe=90
 Glyph=90
 GreatSword=90
 Bow=90
-AsuranFists=75
-RainStorm=75
+Axe=90
+Dagger=90
+Mace=90
+Stave=90
+EnergyBlaster=90
+HolyHandGrenade=0
+Crissaegrim=45
+Valmanway=45
+Naturaleza=45
+AsuranFists=45
+VictorySmite=45
+ShinjinSpiral=45
+MillionStab=45
+VorpalBlade=45
+DeathBlossom=45
+SwiftBlade=45
+ChantDuCygne=45
+Requiescat=45
+Resolution=45
+Guillotine=45
+Insurgency=45
+Pentathrust=45
+Drakesbane=45
+Stardiver=45
+PyrrhicKleos=45
+Evisceration=45
+DancingEdge=45
+Ultima=45
+Kaustra=45
+Ashes=45
+Dismay=45
+ThousandCuts=45
+Tachi:Shoha=45
+Tachi:Rana=45
+Rainstorm=45
+SpinningAttack=45
+TornadoKick=45
+CircularChain=45
+CircleBlade=45
+SonicThrust=45
+ApexArrow=45
+UrielBlade=45
+FellCleave=45
+AeolianEdge=45
+Twin_Slice=45
+LightningStrike=45
+BladeBeamII=45
+TrillionStabs=45
+DoubleBackstab=45
+Chou_Kamehameha=45
+BloodBath=45
+UltimaII=45
+KaustraII=45
+Chivalry=45
+
+[Styles]
+Equipped=WeaponMaster
+WeaponMaster=10
+WeaponMasterXP=1
+
+[Ignitions]
+SmelterDemonFlame=$iif(%battle.type = ai, 1, $iif($calc(($readini($char(Smelter_Demon), battle, hp) / $readini($char(Smelter_Demon), basestats, hp)) * 100) <= 75, 1, 0))

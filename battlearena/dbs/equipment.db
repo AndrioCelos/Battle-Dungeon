@@ -12,6 +12,19 @@ Valid EquipLocations are: Head, Body, Legs, Feet, Hands
 HEAD
 ========
 
+[Chef'sHat]
+Name=Chef's Hat
+hp=0
+tp=0
+Str=0
+def=0
+int=0
+spd=0
+Augment=EnhanceCrafting
+EquipLocation=head
+cost=50
+SellPrice=50
+
 [BucketHat]
 Name=Bucket Hat
 hp=50
@@ -51,6 +64,20 @@ EquipLocation=head
 cost=0
 SellPrice=100
 Exclusive=yes
+
+[SpookyHat]
+Name=Spooky Hat
+hp=10
+tp=5
+str=1
+def=1
+int=1
+spd=0
+Augment=EnhanceKillerTraits
+Cost=0
+SellPrice=50
+Exclusive=yes
+EquipLocation=head
 
 [FloppyHat]
 Name=Floppy Hat
@@ -113,6 +140,19 @@ def=0
 int=50
 spd=50
 Augment=EnhanceSummons
+EquipLocation=head
+cost=50
+SellPrice=50
+
+[JesterHat+1]
+Name=Jester Hat+1
+hp=50
+tp=150
+Str=0
+def=0
+int=100
+spd=50
+Augment=EnhanceSummons.EnhanceBloodpact
 EquipLocation=head
 cost=50
 SellPrice=50
@@ -221,6 +261,7 @@ spd=100
 Augment=EnhanceCounter
 EquipLocation=Head
 cost=50
+Exclusive=yes
 SellPrice=3000
 LevelRequirement=300
 
@@ -265,6 +306,7 @@ spd=100
 Augment=MagicBonus
 EquipLocation=Head
 cost=50
+Exclusive=yes
 SellPrice=3000
 LevelRequirement=300
 
@@ -548,6 +590,19 @@ Exclusive=yes
 BODY
 ========
 
+[ApprenticeSmock]
+Name=Apprentice Smock
+hp=0
+tp=0
+Str=0
+def=0
+int=0
+spd=0
+Augment=EnhanceCrafting
+EquipLocation=Body
+cost=50
+SellPrice=50
+
 [RustyMail]
 Name=Rusty Mail
 hp=0
@@ -573,6 +628,20 @@ Augment=none
 EquipLocation=body
 cost=50
 SellPrice=20
+
+[SpookyCostume]
+Name=Spooky Costume
+hp=10
+tp=5
+str=1
+def=1
+int=1
+spd=0
+Augment=EnhanceKillerTraits
+Cost=0
+SellPrice=50
+Exclusive=yes
+EquipLocation=body
 
 [ClothRobe]
 name=Cloth Robe
@@ -613,7 +682,6 @@ EquipLocation=body
 cost=50
 SellPrice=100
 
-
 [Haubergeon]
 Name=Haubergeon
 hp=0
@@ -626,6 +694,20 @@ Augment=MeleeBonus
 EquipLocation=body
 cost=50
 SellPrice=150
+
+[DragonMail]
+Name=Dragon Mail
+hp=0
+tp=0
+str=50
+def=100
+int=0
+spd=0
+Augment=EnhanceDragonHunt.EnhanceDefender
+EquipLocation=body
+cost=50
+SellPrice=500
+
 
 [MyochinDomaru]
 name=Myochin Domaru
@@ -722,6 +804,21 @@ SellPrice=50000
 LevelRequirement=300
 Exclusive=yes
 
+[AtlantianMail+1]
+name=Atlantian Mail+1
+hp=600
+tp=200
+Str=550
+def=500
+int=200
+spd=200
+Augment=IgnoreDefense.EnhanceCriticalHits.EnhanceAggressor.EnhanceDodge.EnhanceDoubleTurnChance.EnhanceKatana.Drain.EnhanceDragonHunt
+EquipLocation=body
+cost=50
+SellPrice=50000
+LevelRequirement=1000
+Exclusive=yes
+
 [AtlantianRobe]
 name=Atlantian Robe
 hp=500
@@ -735,6 +832,21 @@ EquipLocation=body
 cost=50
 SellPrice=50000
 LevelRequirement=300
+Exclusive=yes
+
+[AtlantianRobe+1]
+name=Atlantian Robe+1
+hp=600
+tp=200
+Str=200
+def=500
+int=550
+spd=200
+Augment=IgnoreDefense.EnhanceDefender.EnhanceDodge.EnhanceDoubleTurnChance.Drain.EnhanceGlyph.EnhanceWand.EnhanceDragonHunt
+EquipLocation=body
+cost=50
+SellPrice=50000
+LevelRequirement=1000
 Exclusive=yes
 
 [WarlockTabard]
@@ -803,6 +915,7 @@ spd=100
 Augment=EnhanceDoubleTurnChance
 EquipLocation=Body
 cost=50
+Exclusive=yes
 SellPrice=5000
 LevelRequirement=300
 
@@ -847,6 +960,7 @@ spd=100
 Augment=EnhanceDoubleTurnChance
 EquipLocation=Body
 cost=50
+Exclusive=yes
 SellPrice=5000
 LevelRequirement=300
 
@@ -1139,7 +1253,7 @@ EquipLocation=Body
 cost=50
 SellPrice=500000
 Exclusive=yes
-
+Legendary=true
 
 [VashTheStampede'sJacket]
 Name=Vash the Stampede's Jacket
@@ -1177,6 +1291,19 @@ LevelRequirement=200
 LEGS
 ========
 
+[ApprenticeChausses]
+Name=Apprentice Chausses
+hp=0
+tp=0
+Str=0
+def=0
+int=0
+spd=0
+Augment=EnhanceCrafting
+EquipLocation=Legs
+cost=50
+SellPrice=50
+
 [RustyHose]
 Name=Rusty Hose
 hp=0
@@ -1189,6 +1316,20 @@ Augment=none
 EquipLocation=legs
 cost=50
 SellPrice=20
+
+[SpookyLeggings]
+Name=Spooky Leggings
+hp=10
+tp=5
+str=1
+def=1
+int=1
+spd=0
+Augment=EnhanceKillerTraits
+Cost=0
+SellPrice=50
+Exclusive=yes
+EquipLocation=legs
 
 [DarksteelHose]
 Name=Darksteel Hose
@@ -1308,6 +1449,7 @@ spd=150
 Augment=EnhanceThirdEye
 EquipLocation=Legs
 cost=50
+Exclusive=yes
 SellPrice=2000
 LevelRequirement=300
 
@@ -1352,6 +1494,7 @@ spd=100
 Augment=CuringBonus
 EquipLocation=Legs
 cost=50
+Exclusive=yes
 SellPrice=2000
 LevelRequirement=300
 
@@ -1635,6 +1778,19 @@ Exclusive=yes
 FEET
 ========
 
+[ApprenticePattens]
+Name=Apprentice Pattens
+hp=0
+tp=0
+Str=0
+def=0
+int=0
+spd=0
+Augment=EnhanceCrafting
+EquipLocation=Feet
+cost=50
+SellPrice=50
+
 [RustyBoots]
 Name=Rusty Boots
 hp=0
@@ -1647,6 +1803,20 @@ Augment=none
 EquipLocation=feet
 cost=50
 SellPrice=20
+
+[SpookyBoots]
+Name=Spooky Boots
+hp=10
+tp=5
+str=1
+def=1
+int=1
+spd=0
+Augment=EnhanceKillerTraits
+Cost=0
+SellPrice=50
+Exclusive=yes
+EquipLocation=feet
 
 [DarksteelBoots]
 Name=Darksteel Boots
@@ -1791,6 +1961,7 @@ spd=150
 Augment=RenkeiBonus
 EquipLocation=Feet
 cost=50
+Exclusive=yes
 SellPrice=5000
 LevelRequirement=300
 
@@ -1835,6 +2006,7 @@ spd=100
 Augment=EnhanceEnfeeble
 EquipLocation=Feet
 cost=50
+Exclusive=yes
 SellPrice=5000
 LevelRequirement=300
 
@@ -2067,7 +2239,7 @@ Str=35
 def=35
 int=85
 spd=35
-Augment=EnhanceBloodpact.EnhanceSdtaff
+Augment=EnhanceBloodpact.EnhanceStaff
 EquipLocation=Feet
 cost=50
 SellPrice=1500
@@ -2118,6 +2290,19 @@ Exclusive=yes
 HANDS
 ========
 
+[ApprenticeGloves]
+Name=ApprenticeGloves
+hp=0
+tp=0
+Str=0
+def=0
+int=0
+spd=0
+Augment=EnhanceCrafting
+EquipLocation=Hands
+cost=50
+SellPrice=50
+
 [LeatherGloves]
 Name=Leather Gloves
 hp=0
@@ -2130,6 +2315,20 @@ Augment=none
 EquipLocation=hands
 cost=50
 SellPrice=20
+
+[SpookyGloves]
+Name=Spooky Gloves
+hp=10
+tp=5
+str=1
+def=1
+int=1
+spd=0
+Augment=EnhanceKillerTraits
+Cost=0
+SellPrice=50
+Exclusive=yes
+EquipLocation=hands
 
 [RustyKnuckles]
 Name=Rusty Knuckles
@@ -2288,6 +2487,7 @@ spd=100
 Augment=TechBonus
 EquipLocation=Hands
 cost=50
+Exclusive=yes
 SellPrice=5000
 LevelRequirement=300
 
@@ -2332,6 +2532,7 @@ spd=100
 Augment=EnhanceParry
 EquipLocation=Hands
 cost=50
+Exclusive=yes
 SellPrice=5000
 LevelRequirement=300
 

@@ -53,6 +53,7 @@ Streak=30
 StreakMax=250
 IgnoreQuicksilver=true
 CanTaunt=false
+IgnoreElementalMessage=true
 
 [Status]
 Poison=no
@@ -100,7 +101,7 @@ Resist-Paralysis=100
 Wizardry=20
 ClearMind=3
 ElementalSeal=3
-
+Resist-Petrify=60
 
 [Techniques]
 FirajaII=20
@@ -139,3 +140,9 @@ GreatSword=100
 Bow=100
 AsuranFists=70
 Rainstorm=70
+Axe=100
+Dagger=100
+Mace=100
+Stave=100
+EnergyBlaster=100
+HolyHandGrenade=0

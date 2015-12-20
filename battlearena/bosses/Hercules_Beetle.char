@@ -28,6 +28,7 @@ RageCountDown=0
 [Descriptions]
 Char=is a giant red and black beetle. It has a massive jaw that's ready to bite you.
 Rage=screams in rage 
+BossQuote=...
 
 [Stuff]
 RedOrbs=0
@@ -47,6 +48,7 @@ Created=N/a
 Streak=110
 StreakMax=300
 CanTaunt=false
+IgnoreElementalMessage=true
 
 [Monster]
 Type=beetle
@@ -92,6 +94,8 @@ BeetleJaw=$current.battlestreak
 [Skills]
 zen=10
 speed=5
+Resist-Petrify=60
+Resist-Stun=30
 
 [Techniques]
 PowerAttack=$current.battlestreak

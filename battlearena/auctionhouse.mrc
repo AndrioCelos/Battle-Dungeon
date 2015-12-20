@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; AUCTION HOUSE COMMANDS
-;;;; Last updated: 02/15/15
+;;;; Last updated: 11/23/15
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; See info on the auction
@@ -40,7 +40,6 @@ alias auctionhouse.winners {
   var %total.winner.lines $lines($txtfile(auction_winners.txt))
   if (%total.winner.lines = 0) { $display.private.message2($1, $readini(translation.dat, errors, NoAuction)) | halt }
 
-
   if ($2 = $null) { 
 
     if (%total.winner.lines <= 3) { var %last.line 3 | var %starting.line 1 }
@@ -56,16 +55,28 @@ alias auctionhouse.winners {
       $display.private.message2($1, $read -l $+ %starting.line $txtfile(auction_winners.txt))
       inc %starting.line
     }
-
   }
 
   if ($2 != $null) {
     if ($2 !isnum) { $display.private.message2($1, 4Error: Must input a number) | halt }
-    var %winner.auctionline $read -l $+ $2 $txtfile(auction_winners.txt)
-    if (%winner.auctionline = $null) {  $display.private.message2($1, 4Error: Invalid auction number) | halt }
-    var %winner.displayline 3Auction No. - Date - Time - Winner - Item - Notes Paid
-    $display.private.message2($1, %winner.displayline)
-    $display.private.message2($1, %winner.auctionline)
+
+    var %auction.lines $lines($txtfile(auction_winners.txt)) 
+    var %current.line 1
+    while (%current.line <= %auction.lines) {
+      var %winner.auctionline $read -l $+ %current.line $txtfile(auction_winners.txt)
+      var %auction.number $gettok(%winner.auctionline, 1, 45)
+
+      if ($2 = %auction.number) { 
+        var %winner.displayline 3Auction No. - Date - Time - Winner - Item - Notes Paid
+        $display.private.message2($1, %winner.displayline)
+        $display.private.message2($1, %winner.auctionline)
+        halt
+      }
+
+      inc %current.line
+    }
+
+    $display.private.message2($1, 4Error: Invalid auction number) | halt 
   }
 
 }
@@ -80,6 +91,7 @@ alias auctionhouse.bid {
   if ($readini($char($1), status, alliednotes.lock) = true) { $display.private.message2($1, $readini(translation.dat, errors, AlreadyPlacedBid)) |  halt }
 
   if ((. isin $2) || ($2 < 1)) { $display.private.message2($1, 4Error: You must bid a whole number greater than 1.) | halt }
+  if ($2 = $null) { $display.private.message2($1, 4Error: You must supply a number of notes to bid with) | halt }
 
   ; Does the person have that many notes?
   var %current.alliednotes $readini($char($1), stuff, alliednotes)
@@ -92,7 +104,7 @@ alias auctionhouse.bid {
 
   ; Check to see if the person is the highest bidder.
   var %highest.bid $readini(system.dat, auctionInfo, current.bid)
-  if (%highest.bid = $null) || ($2 > %highest.bid) { writeini system.dat auctionInfo current.bid $2 | writeini system.dat auctionInfo current.winner $1 } 
+  if ((%highest.bid = $null) || ($2 > %highest.bid)) { writeini system.dat auctionInfo current.bid $2 | writeini system.dat auctionInfo current.winner $1 } 
 
   ; Write the flag.
   writeini $char($1) status alliednotes.lock true
@@ -111,7 +123,7 @@ alias auctionhouse.check {
   ; Checks to see if an auction is in progress and if it needs to wrap up.  
   ; If no auction is currently happening, it will start one.
 
-  if ($readini(system.dat, system, enableauctionhouse) = false) { halt }
+  if ($readini(system.dat, system, enableauctionhouse) = false) { return }
 
   var %auction.time $readini(system.dat, auctionInfo, startingTime)
   var %current.time $ctime 
@@ -154,6 +166,9 @@ alias auctionhouse.create {
   if (%total.auctions = $null) { var %total.auctions 0 }
   inc %total.auctions 1
   writeini system.dat auctionInfo NumberOfAuctions %total.auctions
+
+  ; Check to write the channel's topic
+  $auctionhouse.topic
 }
 
 alias auctionhouse.end {
@@ -200,6 +215,9 @@ alias auctionhouse.end {
     write $txtfile(auction_winners.txt) %auction.number  - $date - $time - No Winner - $readini(system.dat, auctionInfo, current.item)
   }
 
+  if ($readini(system.dat, auctionInfo, current.item) = $null) { writeini system.dat auctionInfo previous.item none }
+  else { writeini system.dat auctionInfo previous.item $readini(system.dat, auctionInfo, current.item) }
+
   unset %auction.winner | unset %auction.item | unset %player.amount
 
 }
@@ -223,7 +241,22 @@ alias auctionhouse.clear {
     }
 
     .remove $txtfile(temp_auction_bidders.txt)
+  }
+}
 
+alias auctionhouse.topic {
+  var %allow.topic.change $return.systemsetting(AllowAuctionHouseTopicChange)
+  if (%allow.topic.change = null) { var %allow.topic.change true | writeini system.dat system AllowAuctionHouseTopicChange true }
+
+  if (%allow.topic.change = true) {
+    var %current.topic $chan(%battlechan).topic
+    var %previous.auction.topic $chr(124) [Current Auction: $readini(system.dat, auctionInfo, previous.item) $+ ]
+    var %current.auction.topic [Current Auction: $readini(system.dat, auctionInfo, current.item) $+ ]
+    var %current.topic $remove(%current.topic, %previous.auction.topic)
+    var %new.topic %current.topic $chr(124) %current.auction.topic
+
+    if ($len(%new.topic) >= 390) { return }
+    else { /topic %battlechan %new.topic }
   }
 
 }

@@ -53,6 +53,7 @@ BattleStats=ignoreHP
 Streak=80
 CanTaunt=false
 MoonPhase=New Moon
+IgnoreElementalMessage=true
 
 [Monster]
 Type=undead
@@ -95,8 +96,7 @@ ethereal=yes
 [Weapons]
 Equipped=GhostPower
 GhostPower=15
-weakness=handtohand
-strong=katana.gun.rifle.wand.greatsword.sword.glyph.whip
+
 
 [Skills]
 zen=3
@@ -115,13 +115,13 @@ GraveCurse=10
 [modifiers]
 Heal=fire
 Earth=50
-Fire=300
+Fire=150
 Wind=50
 Water=50
 Ice=50
-Lightning=100
+Lightning=50
 Light=150
-Dark=20
+Dark=0
 HandToHand=100
 Whip=100
 Sword=100
@@ -134,3 +134,9 @@ Scythe=100
 Glyph=100
 GreatSword=100
 Bow=100
+Axe=100
+Dagger=100
+Mace=100
+Stave=100
+EnergyBlaster=100
+HolyHandGrenade=0

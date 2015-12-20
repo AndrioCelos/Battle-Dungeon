@@ -60,6 +60,7 @@ Created=N/a
 Streak=50
 TauntFile=taunts_vergil.txt
 CanTaunt=true
+IgnoreElementalMessage=true
 
 [Status]
 Poison=no
@@ -102,6 +103,7 @@ Yamato=10
 [Skills]
 resist-stun=55
 resist-blind=55
+Resist-Petrify=60
 RoyalGuard=1
 
 

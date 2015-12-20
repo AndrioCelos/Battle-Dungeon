@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; characters.als
-;;;; Last updated: 04/29/15
+;;;; Last updated: 12/16/15
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -29,7 +29,7 @@ starting_character_checks {
   unset %name | unset %file | unset %ip.address. [ $+ [ $1 ] ]
 }
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Allows chars to add/remove
 ; access to his/her characters
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -143,7 +143,7 @@ get.level.basestats {
   inc %level %spd
 
   var %level $round($calc(%level / 18), 1)
-  return %level
+  return $round(%level,0)
 }
 get.level.old {
   var %str $readini($char($1),battle, str)
@@ -301,16 +301,35 @@ lookat {
   var %equipped.armor.hands $readini($char($1), equipment, hands) 
   if (%equipped.armor.hands = $null) { var %equipped.armor.hands nothing }
 
+  var %equipped.accessory $equipment.color(%equipped.accessory) $+  $+ %equipped.accessory $+ 3
+  var %equipped.armor.head $equipment.color(%equipped.armor.head) $+ %equipped.armor.head $+ 3
+  var %equipped.armor.body $equipment.color(%equipped.armor.body) $+ %equipped.armor.body $+ 3
+  var %equipped.armor.legs $equipment.color(%equipped.armor.legs) $+ %equipped.armor.legs $+ 3
+  var %equipped.armor.feet $equipment.color(%equipped.armor.feet) $+ %equipped.armor.feet $+ 3 
+  var %equipped.armor.hands $equipment.color(%equipped.armor.hands) $+ %equipped.armor.hands $+ 3
+
+  var %weapon.equipped $equipment.color(%weapon.equipped) $+ %weapon.equipped
+
   if ($readini($char($1), info, CustomTitle) != $null) { var %custom.title " $+ $readini($char($1), info, CustomTitle) $+ " }
 
   if ($readini(system.dat, system, botType) = IRC) { 
-    if ($2 = channel) {  $display.message(3 $+ %real.name %custom.title is wearing %equipped.armor.head on $gender($1) head; %equipped.armor.body on $gender($1) body; %equipped.armor.legs on $gender($1) legs; %equipped.armor.feet on $gender($1) feet; %equipped.armor.hands on $gender($1) hands. %real.name also has %equipped.accessory equipped as an accessory and is currently using the %weapon.equipped $iif(%weapon.equipped.left != $null, and %weapon.equipped.left weapons, weapon),private) }
-    if ($2 != channel) { $display.private.message(3 $+ %real.name %custom.title is wearing %equipped.armor.head on $gender($1) head; %equipped.armor.body on $gender($1) body; %equipped.armor.legs on $gender($1) legs; %equipped.armor.feet on $gender($1) feet; %equipped.armor.hands on $gender($1) hands. %real.name also has %equipped.accessory equipped as an accessory and is currently using the %weapon.equipped $iif(%weapon.equipped.left != $null, and %weapon.equipped.left weapons, weapon)) }
+    if ($2 = channel) {  $display.message(3 $+ %real.name %custom.title is wearing %equipped.armor.head on $gender($1) head; %equipped.armor.body on $gender($1) body; %equipped.armor.legs on $gender($1) legs; %equipped.armor.feet on $gender($1) feet; %equipped.armor.hands on $gender($1) hands. %real.name also has %equipped.accessory equipped as an accessory and is currently using the %weapon.equipped $iif(%weapon.equipped.left != $null, 3and $equipment.color(%weapon.equipped.left) $+ %weapon.equipped.left 3weapons, 3weapon),private) }
+    if ($2 != channel) { $display.private.message(3 $+ %real.name %custom.title is wearing %equipped.armor.head on $gender($1) head; %equipped.armor.body on $gender($1) body; %equipped.armor.legs on $gender($1) legs; %equipped.armor.feet on $gender($1) feet; %equipped.armor.hands on $gender($1) hands. %real.name also has %equipped.accessory equipped as an accessory and is currently using the %weapon.equipped $iif(%weapon.equipped.left != $null, 3and $equipment.color(%weapon.equipped.left) $+ %weapon.equipped.left 3weapons, 3weapon)) }
   }
   if ($readini(system.dat, system, botType) = DCCchat) {
-    var %look.message 3 $+ %real.name is wearing %equipped.armor.head on $gender($1) head, %equipped.armor.body on $gender($1) body, %equipped.armor.legs on $gender($1) legs, %equipped.armor.feet on $gender($1) feet, %equipped.armor.hands on $gender($1) hands. %real.name also has %equipped.accessory equipped as an accessory and is currently using the %weapon.equipped weapon.
+    var %look.message 3 $+ %real.name is wearing %equipped.armor.head on $gender($1) head, %equipped.armor.body on $gender($1) body, %equipped.armor.legs on $gender($1) legs, %equipped.armor.feet on $gender($1) feet, %equipped.armor.hands on $gender($1) hands. %real.name also has %equipped.accessory equipped as an accessory and is currently using the the %weapon.equipped $iif(%weapon.equipped.left != $null, 3and $equipment.color(%weapon.equipped.left) $+ %weapon.equipped.left 3weapons, 3weapon)
   $dcc.private.message($nick, %look.message) }
 } 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; The rest command
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+rest.cmd {
+  $no.turn.check($1)
+  $check_for_battle($1)
+  $display.message($readini(translation.dat, Battle,RestMessage),battle)
+  $next | halt
+}
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Returns a person's allied
@@ -640,11 +659,19 @@ readkeys {
     if ($2 = private) { $display.private.message($readini(translation.dat, system, ViewKeysItems)) }
     if ($2 = dcc) {  $dcc.private.message($nick, $readini(translation.dat, system, ViewKeysItems)) }
   } 
-  else { 
+  if (%dungeon.keys.items.list != $null) { 
+    if ($2 = channel) { $display.message($readini(translation.dat, system, ViewDungeonKeysItems)) }
+    if ($2 = private) { $display.private.message($readini(translation.dat, system, ViewDungeonKeysItems)) }
+    if ($2 = dcc) {  $dcc.private.message($nick, $readini(translation.dat, system, ViewDungeonKeysItems)) }
+  } 
+
+  if ((%keys.items.list = $null) && (%dungeon.keys.items.list = $null)) { 
     if ($2 = channel) { $display.message($readini(translation.dat, system, HasNoKeys),private) }
     if ($2 = private) { $display.private.message($readini(translation.dat, system, HasNoKeys)) }
     if ($2 = dcc) {  $dcc.private.message($nick, $readini(translation.dat, system, HasNoKeys)) }
   }    
+
+  unset %dungeon.keys.items.list | unset %keys.items.list
 }
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Displays a char's gems
@@ -774,12 +801,11 @@ readitems {
     if ($2 = dcc) { $dcc.private.message($nick, $readini(translation.dat, system, ViewShopResetItems)) }
   }
   if (%portals.items.list != $null) { 
-    if ($2 = channel) { $display.message($readini(translation.dat, system, ViewPortalItems),private) } 
-    if ($2 = private) {  $display.private.message($readini(translation.dat, system, ViewPortalItems)) } 
-    if ($2 = dcc) { $dcc.private.message($nick, $readini(translation.dat, system, ViewPortalItems)) }
+    if ($2 = channel) { $display.message($readini(translation.dat, system, ViewPortalItems),private) | if (%portals.items.list2 != $null) { $display.message( $+ %portals.items.list2,private) }  } 
+    if ($2 = private) {  $display.private.message($readini(translation.dat, system, ViewPortalItems)) |  if (%portals.items.list2 != $null) { $display.private.message( $+ %portals.items.list2) } } 
+    if ($2 = dcc) { $dcc.private.message($nick, $readini(translation.dat, system, ViewPortalItems)) | if (%portals.items.list2 != $null) { $dcc.private.message($nick,  $+ %portals.items.list2) } }
   }
-  if (%misc.items.list != $null) { 
-    if ($2 = channel) { $display.message($readini(translation.dat, system, ViewMiscItems),private) | if (%misc.items.list2 != $null) { $display.message( $+ %misc.items.list2,private) } | if (%misc.items.list3 != $null) { $display.message( $+ %misc.items.list3,private) } | if (%misc.items.list4 != $null) { $display.message( $+ %misc.items.list4,private) }  }
+  if (%misc.items.list != $null) { if ($2 = channel) { $display.message($readini(translation.dat, system, ViewMiscItems),private) | if (%misc.items.list2 != $null) { $display.message( $+ %misc.items.list2,private) } |  if (%misc.items.list3 != $null) { $display.message( $+ %misc.items.list3,private) } | if (%misc.items.list4 != $null) { $display.message( $+ %misc.items.list4,private) }  }
     if ($2 = private) { $display.private.message($readini(translation.dat, system, ViewMiscItems)) | if (%misc.items.list2 != $null) { $display.private.message(5 $+ %misc.items.list2) } | if (%misc.items.list3 != $null) { $display.private.message( $+ %misc.items.list3) } | if (%misc.items.list4 != $null) { $display.private.message( $+ %misc.items.list4) } }
     if ($2 = dcc) { $dcc.private.message($nick, $readini(translation.dat, system, ViewMiscItems)) | if (%misc.items.list2 != $null) {  $dcc.private.message($nick,  $+ %misc.items.list2) } | if (%misc.items.list3 != $null) { $dcc.private.message($nick,  $+ %misc.items.list3) } | if (%misc.items.list4 != $null) { $dcc.private.message($nick,  $+ %misc.items.list4) } }
   }
@@ -789,9 +815,9 @@ readitems {
     if ($2 = dcc) { $dcc.private.message($nick, $readini(translation.dat, system, ViewMechCoreItems)) | if (%mech.items.list2 != $null) {  $dcc.private.message($nick,  $+ %mech.items.list2) } }
   }
   if (%special.items.list != $null) { 
-    if ($2 = channel) { $display.message($readini(translation.dat, system, ViewShopSpecialItems),private) }
-    if ($2 = private) { $display.private.message($readini(translation.dat, system, ViewShopSpecialItems)) }
-    if ($2 = dcc) { $dcc.private.message($nick, $readini(translation.dat, system, ViewShopSpecialItems)) }
+    if ($2 = channel) { $display.message($readini(translation.dat, system, ViewShopSpecialItems),private) | if (%special.items.list2 != $null) { $display.message( $+ %special.items.list2) }   }
+    if ($2 = private) { $display.private.message($readini(translation.dat, system, ViewShopSpecialItems)) | if (%special.items.list2 != $null) { $display.private.message( $+ %special.items.list2) } } 
+    if ($2 = dcc) { $dcc.private.message($nick, $readini(translation.dat, system, ViewShopSpecialItems)) | if (%special.items.list2 != $null) { $dcc.private.message($nick,  $+ %special.items.list2) } }
   }
   if (%trust.items.list != $null) { 
     if ($2 = channel) { $display.message($readini(translation.dat, system, ViewTrustItems),private) }
@@ -823,9 +849,15 @@ readaccessories {
     if ($2 = dcc) { $dcc.private.message($nick, $readini(translation.dat, system, ViewAccessories)) }
 
     if (%accessories.list2 != $null) { 
-      if ($2 = channel) {  $display.message(3 $+ %accessories.list2,private) }
-      if ($2 = private) { $display.private.message(3 $+ %accessories.list2) }
-      if ($2 = dcc) { $dcc.private.message($nick, 3 $+ %accessories.list2) }
+      if ($2 = channel) {  $display.message(3 $+ %accessories.list2,private) }
+      if ($2 = private) { $display.private.message(3 $+ %accessories.list2) }
+      if ($2 = dcc) { $dcc.private.message($nick, 3 $+ %accessories.list2) }
+    }
+
+    if (%accessories.list3 != $null) { 
+      if ($2 = channel) {  $display.message(3 $+ %accessories.list3,private) }
+      if ($2 = private) { $display.private.message(3 $+ %accessories.list3) }
+      if ($2 = dcc) { $dcc.private.message($nick, 3 $+ %accessories.list3) }
     }
 
     var %equipped.accessory $readini($char($1), equipment, accessory)
@@ -839,7 +871,7 @@ readaccessories {
       if ($2 = private) {  $display.private.message($readini(translation.dat, system, ViewEquippedAccessory)) }
       if ($2 = dcc) { $dcc.private.message($nick, $readini(translation.dat, system, ViewEquippedAccessory)) }
     }
-    unset %accessories.list 
+    unset %accessories.list | unset %accessories.list2 | unset %accessories.list3
   }
   else { 
     if ($2 = channel) { $display.message($readini(translation.dat, system, HasNoAccessories),private) }
@@ -1198,7 +1230,7 @@ augments.list {
     while (%value <= %number.of.weapons) {
       set %weapon.name $gettok(%display.weaponlist, %value, 46)
       set %weapon.name $gettok(%weapon.name,1, 40)
-      set %weapon_augment $readini($char($1), augments, %weapon.name)
+      set %weapon_augment $readini($char($1), augments, $strip(%weapon.name))
 
       if (%weapon_augment != $null) { 
         inc %number.of.augments 1
@@ -1248,7 +1280,6 @@ augments.list {
   unset %augment.list2 | unset %augment.list3 | unset %augment.list4
   unset %weapon.list | unset %base.weapon.list  | unset %weapons
   unset %weapon_augment | unset %mech.weapon.list | unset %mech.weaponlist2 | unset %replacechar
-
 }
 
 augments.strength {
@@ -1299,4 +1330,92 @@ augments.strength {
   if (%augment.list = $null) { $set_chr_name($1) | $display.message($readini(translation.dat, system, Noaugments), private) }
   unset %augment.list | unset %augment.list.2 | unset %augment.list.3 | unset %augment.list.4
   unset %weapon.list | unset %base.weapon.list  | unset %weapons
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Dragon Hunt command
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+character.dragonhunt {
+  ; $1 = person doing the hunting
+
+  if ($readini(battlestats.dat, dragonballs, ShenronWish) = on) { $display.message($readini(translation.dat, errors, NoHuntsDuringShenron), private) | halt }
+
+  ; Has enough time elapsed?
+  var %player.lastHunt $readini($char($1), info, LastDragonHuntTime)
+  var %time.difference $calc($ctime - %player.lastHunt)
+  var %dragonhunt.time.setting 3600
+  if ((%time.difference = $null) || (%time.difference < %dragonhunt.time.setting)) { 
+    $display.message($readini(translation.dat, errors, DragonHunt.Can'tHunt), private)
+    halt 
+  }
+
+  ; Are there any dragons to hunt?
+  var %dragonhunt.numberofdragons $ini($dbfile(dragonhunt.db),0)
+  if (%dragonhunt.numberofdragons = 0) { 
+    $display.message($readini(translation.dat, errors, DragonHunt.NoDragons), private) 
+    halt
+  }
+
+  ; Write the time the user has hunted for a lair
+  writeini $char($1) info LastDragonHuntTime $ctime
+
+  ; Check for a dragon's lair
+  var %dragonhunt.chance 5
+
+  ; If there's more than 3 dragons let's increase the odds of finding one
+  if (%dragonhunt.numberofdragons > 3) { inc %dragonhunt.chance %dragonhunt.numberofdragons } 
+
+  ; If the combined dragon age is over 800 improve the odds of finding one
+  if ($dragonhunt.dragonage.combined > 800) { inc %dragonhunt.chance 10 }
+
+  ; Check for accessories and augments to improve chances
+  if ($augment.check($1, EnhanceDragonHunt) = true) { inc %dragonhunt.chance $calc(5 * %augment.strength) }
+
+  if ($accessory.check($1, EnhanceDragonHunt) = true) {
+    inc %dragonhunt.chance %accessory.amount
+    unset %accessory.amount
+  }
+
+  ; Check for DragonHunter skill
+  var %dragonhunter.skill $readini($char($1), skills, DragonHunter)
+  if (%dragonhunter.skill != $null) { inc %dragonhunt.chance %dragonhunter.skill }
+
+  var %dragonhunt.randomnum $rand(1,100)
+
+  if (%dragonhunt.randomnum > %dragonhunt.chance) { 
+    $display.message($readini(translation.dat, errors, DragonHunt.NoLairFound), private) 
+    halt
+  }
+
+  else {
+    var %dragonhunts.total $readini(battlestats.dat, Battle, TotalDragonHunts)
+    if (%dragonhunts.total = $null) { var %dragonhunts.total 0 }
+    inc %dragonhunts.total 1
+    writeini battlestats.dat Battle TotalDragonHunts %dragonhunts.total
+
+    ; Get the dragon's name that we'll be facing
+    var %dragonhunt.numberofdragons $ini($dbfile(dragonhunt.db),0)
+    var %random.dragon $rand(1,%dragonhunt.numberofdragons)
+    set %dragonhunt.file.name $ini($dbfile(dragonhunt.db), %random.dragon)
+    set %dragonhunt.name $readini($dbfile(dragonhunt.db), %dragonhunt.file.name, name)
+
+    $startnormal(DragonHunt, $1)
+    halt
+  }  
+}
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Returns the average damage
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+character.averagedmg {
+  ; $1 = person
+  ; $2 = melee or tech
+
+  var %average.damage $readini($char($1), stuff, TotalDmg. $+ $2)
+  if (%average.damage = $null) { writeini $char($1) stuff TotalDmg. $+ $2 0 | return 0 }
+
+  var %number.of.hits $readini($char($1), stuff, $2 $+ Hits)
+  var %average.damage $round($calc(%average.damage / %number.of.hits),2)
+
+  return %average.damage
 }

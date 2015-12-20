@@ -47,6 +47,7 @@ LastIP=N/a
 Created=N/a
 Streak=170
 CanTaunt=false
+IgnoreElementalMessage=true
 
 [Monster]
 Type=bat
@@ -95,6 +96,8 @@ MartialArts=100
 Impetus=20
 MightyStrike=1
 Resist-Poison=100
+Resist-Petrify=60
+Resist-Stun=30
 
 [Techniques]
 SonicBoom=18
@@ -133,3 +136,9 @@ Scythe=100
 Glyph=100
 GreatSword=100
 Bow=100
+Axe=100
+Dagger=100
+Mace=100
+Stave=100
+EnergyBlaster=100
+HolyHandGrenade=0

@@ -57,7 +57,7 @@ Created=N/a
 Streak=150
 StreakMax=250
 CanTaunt=false
-
+IgnoreElementalMessage=true
 
 [Status]
 Poison=no
@@ -133,3 +133,9 @@ Scythe=100
 Glyph=100
 GreatSword=100
 Bow=100
+Axe=100
+Dagger=100
+Mace=100
+Stave=100
+EnergyBlaster=100
+HolyHandGrenade=0

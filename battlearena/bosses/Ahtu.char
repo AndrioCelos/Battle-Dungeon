@@ -47,7 +47,7 @@ LastIP=N/a
 Created=N/a
 Streak=290
 CanTaunt=false
-
+IgnoreElementalMessage=true
 
 [Monster]
 Type=Treant
@@ -94,6 +94,8 @@ TreantPower=100
 Zen=5
 MightyStrike=1
 MartialArts=100
+Resist-Petrify=60
+Resist-Stun=30
 
 [Techniques]
 Leafstorm=45

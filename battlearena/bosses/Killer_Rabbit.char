@@ -53,9 +53,10 @@ LastSeen=N/a
 LastIP=N/a
 Created=N/a
 ai_type=berserker
-Streak=20
+Streak=200
 IgnoreQuicksilver=true
 CanTaunt=false
+IgnoreElementalMessage=true
 
 [Status]
 Poison=no
@@ -95,9 +96,11 @@ Equipped=CuteRabbitTeeth
 CuteRabbitTeeth=10
 
 [Skills]
+Resist-Petrify=60
+Resist-Stun=30
 
 [Techniques]
-LookAtTheBones=10
+LookAtTheBones=100
 
 [modifiers]
 Heal=none
@@ -122,3 +125,8 @@ Glyph=100
 GreatSword=100
 Bow=120
 HolyHandGrenade=2000
+Axe=100
+Dagger=100
+Mace=100
+Stave=100
+EnergyBlaster=100

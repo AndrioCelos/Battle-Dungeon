@@ -1,7 +1,9 @@
 Battle Dungeon
 --------------
 
-Battle Dungeon is a fork of Battle Arena, which adds a variets of features to the game. The feature after which the mod is named isn't in yet.
+Battle Dungeon is a fork of Battle Arena, which adds a variety of features to the game. The feature after which the mod is named isn't in yet.
+Some of the changes have been merged into Battle Arena.
+
 The following changes have been made:
 
 * The bot now waits a few seconds before joining the channel, to allow time for services to accept it.
@@ -10,6 +12,7 @@ The following changes have been made:
 * Fleeing the battle results in a draw instead of defeat, but has a chance to fail.
 * The scoreboard HTML page is now HTML5 compliant. Also, a JSON scoreboard is now generated as well.
 * Support for DCC sessions in IRC mode has been added. Enter `!dcc` to start a DCC CHAT session with the bot, which will bypass flood limits. Of course, only private transactions can take place there if the bot isn't in DCC mode.
+* Certain events such as auctions can take place with the automated battle timer off.
 * A few typos have been fixed.
 * A new Allied NPC, the Tsarevna Alena from _Dragon Quest IV_, has been added.
 * A new skill, Warp, has been added. It allows the user to sacrifice red orbs to select the field on which the next battle will take place.

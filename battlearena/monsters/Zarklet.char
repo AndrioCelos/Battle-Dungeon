@@ -57,6 +57,8 @@ CanFlee=true
 Streak=31
 StreakMax=101
 CanTaunt=true
+IgnoreElementalMessage=true
+IgnoreOutpost=true
 
 [Monster]
 Type=
@@ -97,7 +99,6 @@ MPRegenerating=no
 [Weapons]
 Equipped=SpaceGun
 SpaceGun=6
-Strong=Spear.Sword
 
 [Skills]
 drainsamba.turn=0
@@ -109,10 +110,6 @@ Sacrifice=5
 SpaceBeam=5
 
 
-[Item_Amount]
-pizza=1
-
-
 [modifiers]
 Heal=none
 Earth=100
@@ -121,8 +118,8 @@ Wind=100
 Water=100
 Ice=120
 Lightning=100
-Light=100
-Dark=100
+Light=80
+Dark=80
 HandToHand=100
 Whip=100
 Sword=100
@@ -135,3 +132,9 @@ Scythe=100
 Glyph=100
 GreatSword=100
 Bow=100
+Axe=100
+Dagger=100
+Mace=100
+Stave=100
+EnergyBlaster=100
+HolyHandGrenade=0

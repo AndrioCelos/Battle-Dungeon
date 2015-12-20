@@ -54,6 +54,7 @@ Created=Fri Jun 22 19:56:53 2012
 Flag=NPC
 IgnoreQuicksilver=true
 CanTaunt=false
+CanUseItems=$iif(%ai.monster.name = Zemus, true)
 
 [Status]
 Poison=no
@@ -135,23 +136,23 @@ PhoenixStrike=$round($calc(1 + (($current.battlestreak / 2) / 5.5)),0)
 
 
 [Item_Amount]
-
+Dark-Matter=$iif(%ai.monster.name = Zemus, 1, 0)
 
 [Augments]
-HolyGloves=MeleeBonus.TechBonus.MagicBonus.EnhanceDodge.HurtEthereal
+HoleyGloves=MeleeBonus.TechBonus.MagicBonus.EnhanceDodge.HurtEthereal
 AsherGuns=DecreaseMechEnergyCost.EnhanceRanged.IgnoreDefense.IgnoreMetalDefense.IgnoreGuardian
 
 
 [Styles]
 Equipped=Guardian
-Guardian=10
+Guardian=12
 GuardianXP=1
 
 
 [mech]
 name=E.S. Asher
 inUse=false
-EngineLevel=$iif($current.battlestreak < 1000, 0, 1.2)
+EngineLevel=$iif($current.battlestreak < 1000, 0, 0.7)
 HpMax=20000
 HpCurrent=20000
 EnergyMax=10000

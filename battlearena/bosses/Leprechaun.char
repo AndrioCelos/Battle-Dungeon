@@ -102,6 +102,7 @@ LeprechaunPower=20
 [Skills]
 resist-stun=55
 resist-blind=55
+Resist-Petrify=60
 
 
 [Techniques]
@@ -134,3 +135,9 @@ Scythe=100
 Glyph=100
 GreatSword=100
 Bow=100
+Axe=100
+Dagger=100
+Mace=100
+Stave=100
+EnergyBlaster=100
+HolyHandGrenade=0

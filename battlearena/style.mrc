@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; STYLE CONTROL 
-;;;; Last updated: 02/14/15
+;;;; Last updated: 11/21/15
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 alias calculate.stylepoints {
@@ -111,6 +111,9 @@ alias add.style.orbbonus {
   if ($2 = monster) { %multiplier = 1.2 }
   if ($2 = boss) { %multiplier = 1.7 }
 
+  if (%battle.type = dungeon) { %multiplier = 1.3 }
+  if (%battle.type = torment) { %multiplier = 1.5 }
+
   var %orb.bonus.flag $readini($char($3), info, OrbBonus)
   if (%orb.bonus.flag = yes) { inc %multiplier $rand(125,150) }
 
@@ -123,9 +126,20 @@ alias add.style.orbbonus {
   if (%total.orbs.to.add <= 0) { set %total.orbs.to.add 1 } 
 
   inc %current.orb.bonus %total.orbs.to.add
-
   writeini $txtfile(battle2.txt) BattleInfo OrbBonus %current.orb.bonus
   unset %style.points | unset %current.orb.bonus | unset %total.orbs.to.add
+}
+
+alias stylepoints.decay {
+  ; $1 = player
+  var %current.player.style.points $readini $txtfile(battle2.txt) style $1
+  if (%current.player.style.points = $null) { return }
+
+  var %decay.rate .10
+  if (%current.player.style.points >= 8000) { inc %decay.rate .15 }
+
+  dec %current.player.style.points $round($calc(%current.player.style.points * %decay.rate),2)
+  writeini $txtfile(battle2.txt) style $1 %current.player.style.points
 }
 
 alias add.style.effectdeath {  
@@ -179,8 +193,10 @@ alias style.level {
   return $readini($char($1), styles, %current.playerstyle)
 }
 
-
 alias generate_style_order {
+  ; $1 = null for end of battle or BattleStyle for generating the list in battle
+
+  unset %battle.style.order
 
   ; make the Battle List table
   hmake BattleTable
@@ -235,13 +251,15 @@ alias generate_style_order {
   hfree BattleTable_Temp
 
   ; Erase the old battle.txt and replace it with the new one.
-  .remove $txtfile(battle.txt)
+  if ($1 = $null) { .remove $txtfile(battle.txt) }
 
   var %index = $hget(BattleTable_Sorted,0).item
   while (%index > 0) {
     dec %index
     var %tmp = $hget(BattleTable_Sorted,sorted_ $+ %index)
-    write $txtfile(battle.txt) %tmp
+    if ($1 = $null) { write $txtfile(battle.txt) %tmp }
+    if ($1 = BattleStyle) { %battle.style.order = $addtok(%battle.style.order, %tmp, 46)
+    } 
   }
 
   ; get rid of the sorted table

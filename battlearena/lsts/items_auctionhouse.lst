@@ -23,6 +23,7 @@ Present.400
 TurkeyLeg.100
 BloodyHeart.150
 RottingMeat.150
+PoisonPotion.300
 BloodScroll.200
 BurntScroll.200
 TreasureMap.200
@@ -71,3 +72,6 @@ AlphaWereMeat.1000
 Rum.800
 Wizard's-Ankh.1500
 SilverDiscountCard.1000
+DragonCharm.3000
+TitaniteShard.500
+TitaniteChunk.1000

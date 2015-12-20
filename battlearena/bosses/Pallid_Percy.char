@@ -57,6 +57,7 @@ Created=N/a
 Streak=51
 StreakMax=200
 CanTaunt=false
+IgnoreElementalMessage=true
 
 [Status]
 Poison=no
@@ -97,6 +98,8 @@ BedrockBite=55
 
 [Skills]
 desperateblows=1
+Resist-Petrify=60
+Resist-Stun=30
 
 
 [Techniques]
