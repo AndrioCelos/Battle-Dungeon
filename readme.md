@@ -4,6 +4,8 @@ Battle Dungeon
 Battle Dungeon is a fork of Battle Arena, which adds a variety of features to the game. The feature after which the mod is named isn't in yet.
 Some of the changes have been merged into Battle Arena.
 
+To install Battle Dungeon, first place all of the files from this repository into the mIRC data directory (`$mircdir`), then enter this command: `/load -rs install.mrc`. Allow the load event to run, and it will set up the Battle Arena scripts for you.
+
 The following changes have been made:
 
 * The bot now waits a few seconds before joining the channel, to allow time for services to accept it.
