@@ -3669,11 +3669,22 @@ conquest.tally {
     writeini battlestats.dat conquest LastTally $ctime
 
     ; Perform the tally
-    $display.message($readini(translation.dat, conquest, ConquestTallyTimeToTally), global) 
 
     ; Get the current conquest points
     var %conquest.points.players $readini(battlestats.dat, conquest, ConquestPointsPlayers)
     var %conquest.points.monsters $readini(battlestats.dat, conquest, ConquestPointsMonsters)
+
+    ; Check whether we need to display the message.
+    if (%conquest.points.players != $readini(battlestats.dat, LastConquest, ConquestPointsPlayers) || $&
+        %conquest.points.monsters != $readini(battlestats.dat, LastConquest, ConquestPointsMonsters)) {
+        var %speak = $true
+    }
+
+    if (%speak) {
+      $display.message($readini(translation.dat, conquest, ConquestTallyTimeToTally), global)
+      writeini battlestats.dat LastConquest ConquestPointsPlayers %conquest.points.players
+      writeini battlestats.dat LastConquest ConquestPointsMonsters %conquest.points.monsters
+    }
 
     if (%conquest.points.players = $null) { var %conquest.points.players 0 }
     if (%conquest.points.monsters = $null) { var %conquest.points.monsters 1000 }
@@ -3684,11 +3695,13 @@ conquest.tally {
       writeini battlestats.dat conquest ConquestPreviousWinner Players
       writeini battlestats.dat conquest ConquestPointsPlayers 1 
       writeini battlestats.dat conquest ConquestPointsMonsters 0
-      $display.message($readini(translation.dat, conquest, ConquestTallyPlayersWin), global) 
-      var %conquest.wins $readini(battlestats.dat, conquest, TotalPlayerWins)
-      if (%conquest.wins = $null) { var %conquest.wins 0 }
-      inc %conquest.wins 1
-      writeini battlestats.dat conquest TotalPlayerWins %conquest.wins
+      if (%speak) {
+        $display.message($readini(translation.dat, conquest, ConquestTallyPlayersWin), global)
+        var %conquest.wins $readini(battlestats.dat, conquest, TotalPlayerWins)
+        if (%conquest.wins = $null) { var %conquest.wins 0 }
+        inc %conquest.wins 1
+        writeini battlestats.dat conquest TotalPlayerWins %conquest.wins
+      }
     }
 
     if (%conquest.points.players < %conquest.points.monsters) { 
@@ -3699,11 +3712,13 @@ conquest.tally {
       writeini battlestats.dat conquest ConquestPointsPlayers %conquest.points.players 
       writeini battlestats.dat conquest ConquestPointsMonsters %conquest.points.monsters
 
-      $display.message($readini(translation.dat, conquest, ConquestTallyMonstersWin), global) 
-      var %conquest.wins $readini(battlestats.dat, conquest, TotalMonsterWins)
-      if (%conquest.wins = $null) { var %conquest.wins 0 }
-      inc %conquest.wins 1
-      writeini battlestats.dat conquest TotalMonsterWins %conquest.wins
+      if (%speak) {
+        $display.message($readini(translation.dat, conquest, ConquestTallyMonstersWin), global)
+        var %conquest.wins $readini(battlestats.dat, conquest, TotalMonsterWins)
+        if (%conquest.wins = $null) { var %conquest.wins 0 }
+        inc %conquest.wins 1
+        writeini battlestats.dat conquest TotalMonsterWins %conquest.wins
+      }
     }
   }
 }
